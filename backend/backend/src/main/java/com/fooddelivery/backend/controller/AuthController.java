@@ -6,6 +6,8 @@ import com.fooddelivery.backend.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.fooddelivery.backend.dto.LoginResponse;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -17,12 +19,12 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserResponse> login(@RequestBody LoginRequest request) {
-        UserResponse user = userService.login(
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+        LoginResponse loginResponse = userService.login(
                 request.getEmail(),
                 request.getPassword()
         );
 
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(loginResponse);
     }
 }

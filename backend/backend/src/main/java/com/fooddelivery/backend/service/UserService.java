@@ -8,18 +8,25 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import com.fooddelivery.backend.security.JwtService;
+import com.fooddelivery.backend.dto.LoginResponse;
+
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    private final JwtService jwtService;
+
     public UserService(
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     public List<UserResponse> getAllUsers() {
@@ -37,7 +44,7 @@ public class UserService {
         return UserResponse.fromUser(savedUser);
     }
 
-    public UserResponse login(String email, String password) {
+    public LoginResponse login(String email, String password) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Invalid email or password"));
 
@@ -45,6 +52,11 @@ public class UserService {
             throw new RuntimeException("Invalid email or password");
         }
 
-        return UserResponse.fromUser(user);
+        String token = jwtService.generateToken(user.getEmail());
+
+        return new LoginResponse(
+                token,
+                UserResponse.fromUser(user)
+        );
     }
 }
