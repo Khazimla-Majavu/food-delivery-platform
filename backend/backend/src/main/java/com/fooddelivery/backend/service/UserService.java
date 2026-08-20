@@ -36,6 +36,13 @@ public class UserService {
                 .toList();
     }
 
+    public UserResponse getCurrentUser(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return UserResponse.fromUser(user);
+    }
+
     public UserResponse createUser(User user) {
         user.setRole(User.Role.CUSTOMER);
         user.setPassword(passwordEncoder.encode(user.getPassword()));

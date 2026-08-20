@@ -6,6 +6,7 @@ import com.fooddelivery.backend.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("/api/users")
@@ -20,6 +21,11 @@ public class UserController {
     @GetMapping
     public List<UserResponse> getUsers() {
         return userService.getAllUsers();
+    }
+
+    @GetMapping("/me")
+    public UserResponse getCurrentUser(Authentication authentication) {
+        return userService.getCurrentUser(authentication.getName());
     }
 
     @PostMapping
