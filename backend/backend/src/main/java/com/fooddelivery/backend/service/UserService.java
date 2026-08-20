@@ -37,6 +37,7 @@ public class UserService {
     }
 
     public UserResponse createUser(User user) {
+        user.setRole(User.Role.CUSTOMER);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         User savedUser = userRepository.save(user);
@@ -52,8 +53,10 @@ public class UserService {
             throw new RuntimeException("Invalid email or password");
         }
 
-        String token = jwtService.generateToken(user.getEmail());
-
+        String token = jwtService.generateToken(
+                user.getEmail(),
+                user.getRole().name()
+        );
         return new LoginResponse(
                 token,
                 UserResponse.fromUser(user)
