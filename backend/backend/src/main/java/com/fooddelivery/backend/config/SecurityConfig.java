@@ -37,6 +37,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/restaurants").hasRole("RESTAURANT")
+                        .requestMatchers(HttpMethod.GET, "/api/restaurants/mine").hasRole("RESTAURANT")
+                        .requestMatchers(HttpMethod.GET, "/api/restaurants").authenticated()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(
