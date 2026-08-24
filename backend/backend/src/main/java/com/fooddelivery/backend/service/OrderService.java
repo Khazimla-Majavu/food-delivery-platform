@@ -116,4 +116,85 @@ public class OrderService {
 
         return OrderResponse.fromOrder(savedOrder, savedItems);
     }
+
+    public List<OrderResponse> getCustomerOrders(String customerEmail) {
+
+        User customer = userRepository.findByEmail(customerEmail)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+        return orderRepository.findByCustomerId(customer.getId())
+                .stream()
+                .map(order -> {
+                    List<OrderItem> orderItems =
+                            orderItemRepository.findByOrderId(order.getId());
+
+                    return OrderResponse.fromOrder(order, orderItems);
+                })
+                .toList();
+    }
+
+    public List<OrderResponse> getMyOrders(String customerEmail) {
+        User customer = userRepository.findByEmail(customerEmail)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+        return orderRepository.findByCustomerId(customer.getId())
+                .stream()
+                .map(order -> {
+                    List<OrderItem> items =
+                            orderItemRepository.findByOrderId(order.getId());
+
+                    return OrderResponse.fromOrder(order, items);
+                })
+                .toList();
+    }
+
+    public List<OrderResponse> getRestaurantOrders(
+            Long restaurantId,
+            String restaurantOwnerEmail
+    ) {
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+
+        if (!restaurant.getOwner().getEmail().equals(restaurantOwnerEmail)) {
+            throw new RuntimeException(
+                    "You are not authorized to view orders for this restaurant"
+            );
+        }
+
+        return orderRepository.findByRestaurantId(restaurantId)
+                .stream()
+                .map(order -> {
+                    List<OrderItem> items =
+                            orderItemRepository.findByOrderId(order.getId());
+
+                    return OrderResponse.fromOrder(order, items);
+                })
+                .toList();
+    }
+
+    public OrderResponse updateOrderStatus(
+            Long orderId,
+            Order.Status newStatus,
+            String restaurantOwnerEmail
+    ) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        Restaurant restaurant = order.getRestaurant();
+
+        if (!restaurant.getOwner().getEmail().equals(restaurantOwnerEmail)) {
+            throw new RuntimeException(
+                    "You are not authorized to update this order"
+            );
+        }
+
+        order.setStatus(newStatus);
+
+        Order savedOrder = orderRepository.save(order);
+
+        List<OrderItem> items =
+                orderItemRepository.findByOrderId(savedOrder.getId());
+
+        return OrderResponse.fromOrder(savedOrder, items);
+    }
 }
