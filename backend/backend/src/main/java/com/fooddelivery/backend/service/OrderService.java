@@ -187,6 +187,15 @@ public class OrderService {
                     "You are not authorized to update this order"
             );
         }
+        
+        if (!isValidStatusTransition(order.getStatus(), newStatus)) {
+            throw new RuntimeException(
+                    "Invalid order status transition from "
+                            + order.getStatus()
+                            + " to "
+                            + newStatus
+            );
+        }
 
         order.setStatus(newStatus);
 
@@ -196,5 +205,33 @@ public class OrderService {
                 orderItemRepository.findByOrderId(savedOrder.getId());
 
         return OrderResponse.fromOrder(savedOrder, items);
+    }
+
+    private boolean isValidStatusTransition(
+            Order.Status currentStatus,
+            Order.Status newStatus
+    ) {
+        return switch (currentStatus) {
+            case PENDING ->
+                    newStatus == Order.Status.ACCEPTED ||
+                    newStatus == Order.Status.CANCELLED;
+
+            case ACCEPTED ->
+                    newStatus == Order.Status.PREPARING ||
+                    newStatus == Order.Status.CANCELLED;
+
+            case PREPARING ->
+                    newStatus == Order.Status.READY ||
+                    newStatus == Order.Status.CANCELLED;
+
+            case READY ->
+                    newStatus == Order.Status.OUT_FOR_DELIVERY;
+
+            case OUT_FOR_DELIVERY ->
+                    newStatus == Order.Status.DELIVERED;
+
+            case DELIVERED, CANCELLED ->
+                    false;
+        };
     }
 }
