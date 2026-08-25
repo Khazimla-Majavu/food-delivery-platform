@@ -234,4 +234,113 @@ public class OrderService {
                     false;
         };
     }
+
+    public List<OrderResponse> getAvailableDriverOrders() {
+
+        return orderRepository.findByStatus(Order.Status.READY)
+                .stream()
+                .filter(order -> order.getDriver() == null)
+                .map(order -> {
+
+                    List<OrderItem> items =
+                            orderItemRepository.findByOrderId(order.getId());
+
+                    return OrderResponse.fromOrder(order, items);
+                })
+                .toList();
+    }
+
+    public OrderResponse claimOrder(
+            Long orderId,
+            String driverEmail
+    ) {
+        User driver = userRepository.findByEmail(driverEmail)
+                .orElseThrow(() -> new RuntimeException("Driver not found"));
+
+        if (driver.getRole() != User.Role.DRIVER) {
+            throw new RuntimeException("User is not a driver");
+        }
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        if (order.getStatus() != Order.Status.READY) {
+            throw new RuntimeException(
+                    "Only READY orders can be claimed"
+            );
+        }
+
+        if (order.getDriver() != null) {
+            throw new RuntimeException(
+                    "Order has already been claimed by another driver"
+            );
+        }
+
+        order.setDriver(driver);
+        order.setStatus(Order.Status.OUT_FOR_DELIVERY);
+
+        Order savedOrder = orderRepository.save(order);
+
+        List<OrderItem> items =
+                orderItemRepository.findByOrderId(savedOrder.getId());
+
+        return OrderResponse.fromOrder(savedOrder, items);
+    }
+
+    public List<OrderResponse> getDriverOrders(String driverEmail) {
+
+        User driver = userRepository.findByEmail(driverEmail)
+                .orElseThrow(() -> new RuntimeException("Driver not found"));
+
+        if (driver.getRole() != User.Role.DRIVER) {
+            throw new RuntimeException("User is not a driver");
+        }
+
+        return orderRepository.findByDriverId(driver.getId())
+                .stream()
+                .map(order -> {
+                    List<OrderItem> items =
+                            orderItemRepository.findByOrderId(order.getId());
+
+                    return OrderResponse.fromOrder(order, items);
+                })
+                .toList();
+    }
+
+    public OrderResponse completeDelivery(
+            Long orderId,
+            String driverEmail
+    ) {
+        User driver = userRepository.findByEmail(driverEmail)
+                .orElseThrow(() -> new RuntimeException("Driver not found"));
+
+        if (driver.getRole() != User.Role.DRIVER) {
+            throw new RuntimeException("User is not a driver");
+        }
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        if (order.getDriver() == null ||
+                !order.getDriver().getId().equals(driver.getId())) {
+            throw new RuntimeException(
+                    "You are not assigned to this order"
+            );
+        }
+
+        if (order.getStatus() != Order.Status.OUT_FOR_DELIVERY) {
+            throw new RuntimeException(
+                    "Only OUT_FOR_DELIVERY orders can be marked as delivered"
+            );
+        }
+
+        order.setStatus(Order.Status.DELIVERED);
+
+        Order savedOrder = orderRepository.save(order);
+
+        List<OrderItem> items =
+                orderItemRepository.findByOrderId(savedOrder.getId());
+
+        return OrderResponse.fromOrder(savedOrder, items);
+    }
 }

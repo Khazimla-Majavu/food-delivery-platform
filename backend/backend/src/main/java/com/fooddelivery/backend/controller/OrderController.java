@@ -64,4 +64,40 @@ public class OrderController {
                 authentication.getName()
         );
     }
+
+    @GetMapping("/driver/available")
+    public List<OrderResponse> getAvailableDriverOrders() {
+        return orderService.getAvailableDriverOrders();
+    }
+
+    @PostMapping("/{orderId}/claim")
+    public OrderResponse claimOrder(
+            @PathVariable Long orderId,
+            Authentication authentication
+    ) {
+        return orderService.claimOrder(
+                orderId,
+                authentication.getName()
+        );
+    }
+
+    @GetMapping("/driver/mine")
+    public List<OrderResponse> getDriverOrders(
+            Authentication authentication
+    ) {
+        return orderService.getDriverOrders(
+                authentication.getName()
+        );
+    }
+
+    @PostMapping("/{orderId}/complete")
+    public OrderResponse completeDelivery(
+            @PathVariable Long orderId,
+            Authentication authentication
+    ) {
+        return orderService.completeDelivery(
+                orderId,
+                authentication.getName()
+        );
+    }
 }

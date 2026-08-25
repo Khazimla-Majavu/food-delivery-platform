@@ -21,6 +21,10 @@ public class Order {
     @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
 
+    @ManyToOne
+    @JoinColumn(name = "driver_id")
+    private User driver;
+
     @Column(nullable = false)
     private BigDecimal totalAmount;
 
@@ -66,6 +70,14 @@ public class Order {
 
     public void setRestaurant(Restaurant restaurant) {
         this.restaurant = restaurant;
+    }
+
+    public User getDriver() {
+        return driver;
+    }
+
+    public void setDriver(User driver) {
+        this.driver = driver;
     }
 
     public BigDecimal getTotalAmount() {

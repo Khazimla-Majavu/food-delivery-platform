@@ -12,6 +12,7 @@ public class OrderResponse {
     private Long id;
     private Long customerId;
     private Long restaurantId;
+    private Long driverId;
     private BigDecimal totalAmount;
     private Order.Status status;
     private LocalDateTime createdAt;
@@ -24,6 +25,7 @@ public class OrderResponse {
             Long id,
             Long customerId,
             Long restaurantId,
+            Long driverId,
             BigDecimal totalAmount,
             Order.Status status,
             LocalDateTime createdAt,
@@ -32,6 +34,7 @@ public class OrderResponse {
         this.id = id;
         this.customerId = customerId;
         this.restaurantId = restaurantId;
+        this.driverId = driverId;
         this.totalAmount = totalAmount;
         this.status = status;
         this.createdAt = createdAt;
@@ -50,6 +53,9 @@ public class OrderResponse {
                 order.getId(),
                 order.getCustomer().getId(),
                 order.getRestaurant().getId(),
+                order.getDriver() != null
+                        ? order.getDriver().getId()
+                        : null,
                 order.getTotalAmount(),
                 order.getStatus(),
                 order.getCreatedAt(),
@@ -67,6 +73,10 @@ public class OrderResponse {
 
     public Long getRestaurantId() {
         return restaurantId;
+    }
+
+    public Long getDriverId() {
+        return driverId;
     }
 
     public BigDecimal getTotalAmount() {
