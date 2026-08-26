@@ -16,15 +16,25 @@ export interface MenuItem {
   restaurantId: number;
 }
 
+export interface UserResponse {
+  id: number;
+  name: string;
+  email: string;
+  phone: string | null;
+  role: string;
+}
+
+export interface UserResponse {
+  id: number;
+  name: string;
+  email: string;
+  phone: string | null;
+  role: string;
+}
+
 export interface LoginResponse {
   token: string;
-  user: {
-    id: number;
-    name: string;
-    email: string;
-    phone: string | null;
-    role: string;
-  };
+  user: UserResponse;
 }
 
 export interface OrderItemRequest {
@@ -52,6 +62,12 @@ export interface OrderResponse {
   items: OrderItemResponse[];
 }
 
+export interface MenuItemRequest {
+  name: string;
+  description: string;
+  price: number;
+}
+
 export async function login(
   email: string,
   password: string,
@@ -69,6 +85,36 @@ export async function login(
 
   if (!response.ok) {
     throw new Error(`Login failed: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export async function register(
+  name: string,
+  email: string,
+  phone: string,
+  password: string,
+): Promise<UserResponse> {
+  const response = await fetch(`${API_URL}/api/auth/register`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name,
+      email,
+      phone,
+      password,
+    }),
+  });
+
+  if (!response.ok) {
+    if (response.status === 409) {
+      throw new Error("This email is already registered.");
+    }
+
+    throw new Error(`Registration failed: ${response.status}`);
   }
 
   return response.json();
@@ -226,15 +272,12 @@ export async function claimOrder(
   orderId: number,
   token: string,
 ): Promise<OrderResponse> {
-  const response = await fetch(
-    `${API_URL}/api/orders/${orderId}/claim`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+  const response = await fetch(`${API_URL}/api/orders/${orderId}/claim`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
     },
-  );
+  });
 
   if (!response.ok) {
     throw new Error(`Failed to claim order: ${response.status}`);
@@ -243,9 +286,7 @@ export async function claimOrder(
   return response.json();
 }
 
-export async function getDriverOrders(
-  token: string,
-): Promise<OrderResponse[]> {
+export async function getDriverOrders(token: string): Promise<OrderResponse[]> {
   const response = await fetch(`${API_URL}/api/orders/driver/mine`, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -253,9 +294,7 @@ export async function getDriverOrders(
   });
 
   if (!response.ok) {
-    throw new Error(
-      `Failed to fetch driver orders: ${response.status}`,
-    );
+    throw new Error(`Failed to fetch driver orders: ${response.status}`);
   }
 
   return response.json();
@@ -265,40 +304,23 @@ export async function completeDelivery(
   orderId: number,
   token: string,
 ): Promise<OrderResponse> {
-  const response = await fetch(
-    `${API_URL}/api/orders/${orderId}/complete`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+  const response = await fetch(`${API_URL}/api/orders/${orderId}/complete`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
     },
-  );
+  });
 
   if (!response.ok) {
-    throw new Error(
-      `Failed to complete delivery: ${response.status}`,
-    );
+    throw new Error(`Failed to complete delivery: ${response.status}`);
   }
 
   return response.json();
 }
 
-export interface CreateMenuItemRequest {
-  name: string;
-  description: string;
-  price: number;
-}
-
-export interface UpdateMenuItemRequest {
-  name: string;
-  description: string;
-  price: number;
-}
-
 export async function createMenuItem(
   restaurantId: number,
-  request: CreateMenuItemRequest,
+  request: MenuItemRequest,
   token: string,
 ): Promise<MenuItem> {
   const response = await fetch(
@@ -323,7 +345,7 @@ export async function createMenuItem(
 export async function updateMenuItem(
   restaurantId: number,
   menuItemId: number,
-  request: UpdateMenuItemRequest,
+  request: MenuItemRequest,
   token: string,
 ): Promise<MenuItem> {
   const response = await fetch(

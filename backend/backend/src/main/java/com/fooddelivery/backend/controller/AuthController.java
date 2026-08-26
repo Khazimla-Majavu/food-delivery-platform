@@ -1,12 +1,12 @@
 package com.fooddelivery.backend.controller;
 
 import com.fooddelivery.backend.dto.LoginRequest;
+import com.fooddelivery.backend.dto.LoginResponse;
+import com.fooddelivery.backend.dto.RegisterRequest;
 import com.fooddelivery.backend.dto.UserResponse;
 import com.fooddelivery.backend.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import com.fooddelivery.backend.dto.LoginResponse;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -26,5 +26,17 @@ public class AuthController {
         );
 
         return ResponseEntity.ok(loginResponse);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<UserResponse> register(@RequestBody RegisterRequest request) {
+        UserResponse userResponse = userService.register(
+                request.getName(),
+                request.getEmail(),
+                request.getPhone(),
+                request.getPassword()
+        );
+
+        return ResponseEntity.ok(userResponse);
     }
 }

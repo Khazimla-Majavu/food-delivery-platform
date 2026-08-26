@@ -1,9 +1,12 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 import { login } from "../../lib/api";
 
 export default function LoginForm() {
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -21,7 +24,8 @@ export default function LoginForm() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
-      window.location.reload();
+      router.push("/");
+      router.refresh();
     } catch {
       setError("Login failed. Please check your email and password.");
     } finally {

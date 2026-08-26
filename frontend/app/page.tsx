@@ -1,30 +1,105 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import LoginForm from "./components/LoginForm";
 import RestaurantList from "./components/RestaurantList";
+import { getUser, logout } from "../lib/auth";
+import { UserResponse } from "../lib/api";
 
 export default function Home() {
+  const [user, setUser] = useState<UserResponse | null>(null);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    setUser(getUser());
+    setLoaded(true);
+  }, []);
+
+  function handleLogout() {
+    logout();
+    setUser(null);
+  }
+
   return (
     <main className="min-h-screen bg-white">
       {/* Navigation */}
       <nav className="border-b border-gray-200">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <h1 className="text-2xl font-bold text-orange-600">
+          <a href="/" className="text-2xl font-bold text-orange-600">
             FoodDelivery
-          </h1>
+          </a>
 
           <div className="flex items-center gap-4">
-            <a
-              href="/orders"
-              className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
-            >
-              My Orders
-            </a>
+            {!loaded ? null : user ? (
+              <>
+                <span className="text-sm text-gray-600">Hi, {user.name}</span>
 
-            <a
-              href="/cart"
-              className="rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700"
-            >
-              Cart
-            </a>
+                {user.role === "CUSTOMER" && (
+                  <>
+                    <a
+                      href="/orders"
+                      className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+                    >
+                      My Orders
+                    </a>
+
+                    <a
+                      href="/cart"
+                      className="rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700"
+                    >
+                      Cart
+                    </a>
+                  </>
+                )}
+
+                {user.role === "RESTAURANT" && (
+                  <a
+                    href="/restaurant-dashboard"
+                    className="rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700"
+                  >
+                    Restaurant Dashboard
+                  </a>
+                )}
+
+                {user.role === "DRIVER" && (
+                  <a
+                    href="/driver-dashboard"
+                    className="rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700"
+                  >
+                    Driver Dashboard
+                  </a>
+                )}
+
+                {user.role === "ADMIN" && (
+                  <span className="text-sm font-medium text-gray-700">
+                    Admin
+                  </span>
+                )}
+
+                <button
+                  onClick={handleLogout}
+                  className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+                >
+                  Log out
+                </button>
+              </>
+            ) : (
+              <>
+                <a
+                  href="/login"
+                  className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+                >
+                  Log in
+                </a>
+
+                <a
+                  href="/register"
+                  className="rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700"
+                >
+                  Register
+                </a>
+              </>
+            )}
           </div>
         </div>
       </nav>
@@ -62,20 +137,22 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Login Test */}
-      <section className="mx-auto max-w-md px-6 py-16">
-        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h3 className="mb-2 text-2xl font-bold text-gray-900">
-            Customer Login
-          </h3>
+      {/* Login */}
+      {!loaded ? null : !user ? (
+        <section className="mx-auto max-w-md px-6 py-16">
+          <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+            <h3 className="mb-2 text-2xl font-bold text-gray-900">
+              Customer Login
+            </h3>
 
-          <p className="mb-6 text-sm text-gray-600">
-            Log in to connect to the FoodDelivery API.
-          </p>
+            <p className="mb-6 text-sm text-gray-600">
+              Log in to connect to the FoodDelivery API.
+            </p>
 
-          <LoginForm />
-        </div>
-      </section>
+            <LoginForm />
+          </div>
+        </section>
+      ) : null}
 
       {/* Restaurant Discovery */}
       <section className="mx-auto max-w-7xl px-6 py-16">
@@ -84,9 +161,7 @@ export default function Home() {
             Explore restaurants
           </h3>
 
-          <p className="mt-2 text-gray-600">
-            Find something delicious to eat.
-          </p>
+          <p className="mt-2 text-gray-600">Find something delicious to eat.</p>
         </div>
 
         <RestaurantList />

@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import {
   getMyRestaurants,
   getRestaurantOrders,
   getRestaurantMenu,
   createMenuItem,
+  updateMenuItem,
+  deleteMenuItem,
   Restaurant,
   OrderResponse,
   MenuItem,
@@ -17,16 +19,38 @@ export default function RestaurantDashboard() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
 
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editingItemId, setEditingItemId] = useState<number | null>(null);
+
   const [menuName, setMenuName] = useState("");
   const [menuDescription, setMenuDescription] = useState("");
   const [menuPrice, setMenuPrice] = useState("");
+
   const [menuError, setMenuError] = useState("");
   const [menuSubmitting, setMenuSubmitting] = useState(false);
+  const [deletingItemId, setDeletingItemId] = useState<number | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  async function handleAddMenuItem(event: React.FormEvent) {
+  function resetMenuForm() {
+    setMenuName("");
+    setMenuDescription("");
+    setMenuPrice("");
+    setMenuError("");
+    setEditingItemId(null);
+    setShowAddForm(false);
+  }
+
+  function startEditing(item: MenuItem) {
+    setEditingItemId(item.id);
+    setMenuName(item.name);
+    setMenuDescription(item.description);
+    setMenuPrice(String(item.price));
+    setMenuError("");
+    setShowAddForm(false);
+  }
+
+  async function handleAddMenuItem(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const token = localStorage.getItem("token");
@@ -71,14 +95,112 @@ export default function RestaurantDashboard() {
 
       setMenuItems((currentItems) => [...currentItems, newMenuItem]);
 
-      setMenuName("");
-      setMenuDescription("");
-      setMenuPrice("");
-      setShowAddForm(false);
+      resetMenuForm();
     } catch {
       setMenuError("Unable to add the menu item.");
     } finally {
       setMenuSubmitting(false);
+    }
+  }
+
+  async function handleUpdateMenuItem(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      setMenuError("Please log in again.");
+      return;
+    }
+
+    if (restaurants.length === 0 || editingItemId === null) {
+      setMenuError("Unable to update this menu item.");
+      return;
+    }
+
+    if (!menuName.trim() || !menuDescription.trim() || !menuPrice) {
+      setMenuError("Please complete all fields.");
+      return;
+    }
+
+    const price = Number(menuPrice);
+
+    if (Number.isNaN(price) || price <= 0) {
+      setMenuError("Please enter a valid price.");
+      return;
+    }
+
+    try {
+      setMenuSubmitting(true);
+      setMenuError("");
+
+      const restaurantId = restaurants[0].id;
+
+      const updatedItem = await updateMenuItem(
+        restaurantId,
+        editingItemId,
+        {
+          name: menuName.trim(),
+          description: menuDescription.trim(),
+          price,
+        },
+        token,
+      );
+
+      setMenuItems((currentItems) =>
+        currentItems.map((item) =>
+          item.id === updatedItem.id ? updatedItem : item,
+        ),
+      );
+
+      resetMenuForm();
+    } catch {
+      setMenuError("Unable to update the menu item.");
+    } finally {
+      setMenuSubmitting(false);
+    }
+  }
+
+  async function handleDeleteMenuItem(menuItemId: number) {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      setMenuError("Please log in again.");
+      return;
+    }
+
+    if (restaurants.length === 0) {
+      setMenuError("No restaurant found.");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this menu item?",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setDeletingItemId(menuItemId);
+      setMenuError("");
+
+      const restaurantId = restaurants[0].id;
+
+      await deleteMenuItem(restaurantId, menuItemId, token);
+
+      setMenuItems((currentItems) =>
+        currentItems.filter((item) => item.id !== menuItemId),
+      );
+
+      if (editingItemId === menuItemId) {
+        resetMenuForm();
+      }
+    } catch {
+      setMenuError("Unable to delete the menu item.");
+    } finally {
+      setDeletingItemId(null);
     }
   }
 
@@ -144,9 +266,7 @@ export default function RestaurantDashboard() {
       <main className="min-h-screen bg-gray-50">
         <div className="mx-auto max-w-7xl px-6 py-12">
           <div className="rounded-xl border border-red-200 bg-white p-6">
-            <h1 className="text-2xl font-bold text-red-600">
-              Dashboard Error
-            </h1>
+            <h1 className="text-2xl font-bold text-red-600">Dashboard Error</h1>
 
             <p className="mt-2 text-gray-600">{error}</p>
           </div>
@@ -194,9 +314,7 @@ export default function RestaurantDashboard() {
       <section className="mx-auto max-w-7xl px-6 py-12">
         {/* Restaurants */}
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">
-            Your Restaurants
-          </h2>
+          <h2 className="text-2xl font-bold text-gray-900">Your Restaurants</h2>
 
           {restaurants.length === 0 ? (
             <div className="mt-6 rounded-xl border border-gray-200 bg-white p-6">
@@ -241,16 +359,23 @@ export default function RestaurantDashboard() {
 
             <div className="flex items-center gap-3">
               <span className="rounded-full bg-orange-100 px-4 py-2 text-sm font-semibold text-orange-700">
-                {menuItems.length}{" "}
-                {menuItems.length === 1 ? "item" : "items"}
+                {menuItems.length} {menuItems.length === 1 ? "item" : "items"}
               </span>
 
               {restaurants.length > 0 && (
                 <button
                   type="button"
                   onClick={() => {
-                    setShowAddForm((current) => !current);
-                    setMenuError("");
+                    if (showAddForm) {
+                      resetMenuForm();
+                    } else {
+                      setEditingItemId(null);
+                      setMenuName("");
+                      setMenuDescription("");
+                      setMenuPrice("");
+                      setMenuError("");
+                      setShowAddForm(true);
+                    }
                   }}
                   className="rounded-lg bg-orange-600 px-4 py-2 font-semibold text-white hover:bg-orange-700"
                 >
@@ -259,6 +384,13 @@ export default function RestaurantDashboard() {
               )}
             </div>
           </div>
+
+          {/* Menu Error */}
+          {menuError && !showAddForm && (
+            <div className="mt-6 rounded-lg border border-red-200 bg-red-50 p-4">
+              <p className="text-sm text-red-600">{menuError}</p>
+            </div>
+          )}
 
           {/* Add Menu Item Form */}
           {showAddForm && (
@@ -277,10 +409,7 @@ export default function RestaurantDashboard() {
                 </div>
               )}
 
-              <form
-                onSubmit={handleAddMenuItem}
-                className="mt-6 space-y-5"
-              >
+              <form onSubmit={handleAddMenuItem} className="mt-6 space-y-5">
                 <div>
                   <label
                     htmlFor="menuName"
@@ -310,9 +439,7 @@ export default function RestaurantDashboard() {
                   <textarea
                     id="menuDescription"
                     value={menuDescription}
-                    onChange={(event) =>
-                      setMenuDescription(event.target.value)
-                    }
+                    onChange={(event) => setMenuDescription(event.target.value)}
                     placeholder="Describe the menu item"
                     rows={3}
                     className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200"
@@ -345,13 +472,123 @@ export default function RestaurantDashboard() {
                   </div>
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={menuSubmitting}
-                  className="w-full rounded-lg bg-orange-600 px-4 py-3 font-semibold text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {menuSubmitting ? "Adding..." : "Add Menu Item"}
-                </button>
+                <div className="flex gap-3">
+                  <button
+                    type="submit"
+                    disabled={menuSubmitting}
+                    className="flex-1 rounded-lg bg-orange-600 px-4 py-3 font-semibold text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {menuSubmitting ? "Adding..." : "Add Menu Item"}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={resetMenuForm}
+                    disabled={menuSubmitting}
+                    className="rounded-lg border border-gray-300 px-6 py-3 font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* Edit Menu Item Form */}
+          {editingItemId !== null && (
+            <div className="mt-6 rounded-xl border border-orange-200 bg-orange-50 p-6 shadow-sm">
+              <h3 className="text-xl font-semibold text-gray-900">
+                Edit Menu Item
+              </h3>
+
+              <p className="mt-1 text-sm text-gray-600">
+                Update the details of this menu item.
+              </p>
+
+              {menuError && (
+                <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-4">
+                  <p className="text-sm text-red-600">{menuError}</p>
+                </div>
+              )}
+
+              <form onSubmit={handleUpdateMenuItem} className="mt-6 space-y-5">
+                <div>
+                  <label
+                    htmlFor="editMenuName"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Item Name
+                  </label>
+
+                  <input
+                    id="editMenuName"
+                    type="text"
+                    value={menuName}
+                    onChange={(event) => setMenuName(event.target.value)}
+                    className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="editMenuDescription"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Description
+                  </label>
+
+                  <textarea
+                    id="editMenuDescription"
+                    value={menuDescription}
+                    onChange={(event) => setMenuDescription(event.target.value)}
+                    rows={3}
+                    className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="editMenuPrice"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Price
+                  </label>
+
+                  <div className="mt-2 flex">
+                    <span className="flex items-center rounded-l-lg border border-r-0 border-gray-300 bg-gray-100 px-4 text-gray-600">
+                      R
+                    </span>
+
+                    <input
+                      id="editMenuPrice"
+                      type="number"
+                      min="0.01"
+                      step="0.01"
+                      value={menuPrice}
+                      onChange={(event) => setMenuPrice(event.target.value)}
+                      className="w-full rounded-r-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    type="submit"
+                    disabled={menuSubmitting}
+                    className="flex-1 rounded-lg bg-orange-600 px-4 py-3 font-semibold text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {menuSubmitting ? "Saving..." : "Save Changes"}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={resetMenuForm}
+                    disabled={menuSubmitting}
+                    className="rounded-lg border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                </div>
               </form>
             </div>
           )}
@@ -370,9 +607,15 @@ export default function RestaurantDashboard() {
                   key={item.id}
                   className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
                 >
-                  <h3 className="text-xl font-semibold text-gray-900">
-                    {item.name}
-                  </h3>
+                  <div className="flex items-start justify-between gap-4">
+                    <h3 className="text-xl font-semibold text-gray-900">
+                      {item.name}
+                    </h3>
+
+                    <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600">
+                      #{item.id}
+                    </span>
+                  </div>
 
                   <p className="mt-2 text-sm text-gray-600">
                     {item.description}
@@ -381,6 +624,26 @@ export default function RestaurantDashboard() {
                   <p className="mt-4 text-lg font-bold text-orange-600">
                     R{Number(item.price).toFixed(2)}
                   </p>
+
+                  <div className="mt-5 flex gap-3 border-t border-gray-100 pt-5">
+                    <button
+                      type="button"
+                      onClick={() => startEditing(item)}
+                      disabled={deletingItemId === item.id}
+                      className="flex-1 rounded-lg border border-gray-300 px-4 py-2 font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteMenuItem(item.id)}
+                      disabled={deletingItemId === item.id}
+                      className="flex-1 rounded-lg bg-red-600 px-4 py-2 font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {deletingItemId === item.id ? "Deleting..." : "Delete"}
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
