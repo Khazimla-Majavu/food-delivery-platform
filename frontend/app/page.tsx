@@ -12,13 +12,19 @@ export default function Home() {
           </h1>
 
           <div className="flex items-center gap-4">
-            <button className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100">
-              Log in
-            </button>
+            <a
+              href="/orders"
+              className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+            >
+              My Orders
+            </a>
 
-            <button className="rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700">
-              Sign up
-            </button>
+            <a
+              href="/cart"
+              className="rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700"
+            >
+              Cart
+            </a>
           </div>
         </div>
       </nav>

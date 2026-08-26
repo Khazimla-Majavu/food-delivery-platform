@@ -19,6 +19,7 @@ export default function LoginForm() {
       const data = await login(email, password);
 
       localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
       window.location.reload();
     } catch {
@@ -68,11 +69,7 @@ export default function LoginForm() {
         />
       </div>
 
-      {error && (
-        <p className="text-sm text-red-600">
-          {error}
-        </p>
-      )}
+      {error && <p className="text-sm text-red-600">{error}</p>}
 
       <button
         type="submit"

@@ -27,9 +27,34 @@ export interface LoginResponse {
   };
 }
 
+export interface OrderItemRequest {
+  menuItemId: number;
+  quantity: number;
+}
+
+export interface OrderItemResponse {
+  id: number;
+  menuItemId: number;
+  menuItemName: string;
+  quantity: number;
+  price: number;
+  subtotal: number;
+}
+
+export interface OrderResponse {
+  id: number;
+  customerId: number;
+  restaurantId: number;
+  driverId: number | null;
+  totalAmount: number;
+  status: string;
+  createdAt: string;
+  items: OrderItemResponse[];
+}
+
 export async function login(
   email: string,
-  password: string
+  password: string,
 ): Promise<LoginResponse> {
   const response = await fetch(`${API_URL}/api/auth/login`, {
     method: "POST",
@@ -49,9 +74,7 @@ export async function login(
   return response.json();
 }
 
-export async function getRestaurants(
-  token: string
-): Promise<Restaurant[]> {
+export async function getRestaurants(token: string): Promise<Restaurant[]> {
   const response = await fetch(`${API_URL}/api/restaurants`, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -67,7 +90,7 @@ export async function getRestaurants(
 
 export async function getRestaurantMenu(
   restaurantId: number,
-  token: string
+  token: string,
 ): Promise<MenuItem[]> {
   const response = await fetch(
     `${API_URL}/api/restaurants/${restaurantId}/menu`,
@@ -75,11 +98,187 @@ export async function getRestaurantMenu(
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    }
+    },
   );
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch restaurant menu: ${response.status}`);
+    throw new Error(`Failed to fetch menu: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export async function createOrder(
+  restaurantId: number,
+  items: OrderItemRequest[],
+  token: string,
+): Promise<OrderResponse> {
+  const response = await fetch(
+    `${API_URL}/api/orders/restaurant/${restaurantId}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        items,
+      }),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to create order: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export async function getMyOrders(token: string): Promise<OrderResponse[]> {
+  const response = await fetch(`${API_URL}/api/orders/mine`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch orders: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export async function getMyRestaurants(token: string): Promise<Restaurant[]> {
+  const response = await fetch(`${API_URL}/api/restaurants/mine`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch restaurants: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export async function getRestaurantOrders(
+  restaurantId: number,
+  token: string,
+): Promise<OrderResponse[]> {
+  const response = await fetch(
+    `${API_URL}/api/orders/restaurant/${restaurantId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch restaurant orders: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export async function updateOrderStatus(
+  orderId: number,
+  status: string,
+  token: string,
+): Promise<OrderResponse> {
+  const response = await fetch(
+    `${API_URL}/api/orders/${orderId}/status?status=${encodeURIComponent(status)}`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to update order status: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export async function getAvailableDriverOrders(
+  token: string,
+): Promise<OrderResponse[]> {
+  const response = await fetch(`${API_URL}/api/orders/driver/available`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch available driver orders: ${response.status}`,
+    );
+  }
+
+  return response.json();
+}
+
+export async function claimOrder(
+  orderId: number,
+  token: string,
+): Promise<OrderResponse> {
+  const response = await fetch(
+    `${API_URL}/api/orders/${orderId}/claim`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to claim order: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export async function getDriverOrders(
+  token: string,
+): Promise<OrderResponse[]> {
+  const response = await fetch(`${API_URL}/api/orders/driver/mine`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch driver orders: ${response.status}`,
+    );
+  }
+
+  return response.json();
+}
+
+export async function completeDelivery(
+  orderId: number,
+  token: string,
+): Promise<OrderResponse> {
+  const response = await fetch(
+    `${API_URL}/api/orders/${orderId}/complete`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to complete delivery: ${response.status}`,
+    );
   }
 
   return response.json();
