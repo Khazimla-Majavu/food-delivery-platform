@@ -283,3 +283,84 @@ export async function completeDelivery(
 
   return response.json();
 }
+
+export interface CreateMenuItemRequest {
+  name: string;
+  description: string;
+  price: number;
+}
+
+export interface UpdateMenuItemRequest {
+  name: string;
+  description: string;
+  price: number;
+}
+
+export async function createMenuItem(
+  restaurantId: number,
+  request: CreateMenuItemRequest,
+  token: string,
+): Promise<MenuItem> {
+  const response = await fetch(
+    `${API_URL}/api/restaurants/${restaurantId}/menu`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(request),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to create menu item: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export async function updateMenuItem(
+  restaurantId: number,
+  menuItemId: number,
+  request: UpdateMenuItemRequest,
+  token: string,
+): Promise<MenuItem> {
+  const response = await fetch(
+    `${API_URL}/api/restaurants/${restaurantId}/menu/${menuItemId}`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(request),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to update menu item: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export async function deleteMenuItem(
+  restaurantId: number,
+  menuItemId: number,
+  token: string,
+): Promise<void> {
+  const response = await fetch(
+    `${API_URL}/api/restaurants/${restaurantId}/menu/${menuItemId}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to delete menu item: ${response.status}`);
+  }
+}

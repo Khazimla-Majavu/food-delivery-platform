@@ -4,17 +4,83 @@ import { useEffect, useState } from "react";
 import {
   getMyRestaurants,
   getRestaurantOrders,
-  updateOrderStatus,
+  getRestaurantMenu,
+  createMenuItem,
   Restaurant,
   OrderResponse,
+  MenuItem,
 } from "../../lib/api";
 
 export default function RestaurantDashboard() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [orders, setOrders] = useState<OrderResponse[]>([]);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [menuName, setMenuName] = useState("");
+  const [menuDescription, setMenuDescription] = useState("");
+  const [menuPrice, setMenuPrice] = useState("");
+  const [menuError, setMenuError] = useState("");
+  const [menuSubmitting, setMenuSubmitting] = useState(false);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [updatingOrderId, setUpdatingOrderId] = useState<number | null>(null);
+
+  async function handleAddMenuItem(event: React.FormEvent) {
+    event.preventDefault();
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      setMenuError("Please log in again.");
+      return;
+    }
+
+    if (restaurants.length === 0) {
+      setMenuError("No restaurant found.");
+      return;
+    }
+
+    if (!menuName.trim() || !menuDescription.trim() || !menuPrice) {
+      setMenuError("Please complete all fields.");
+      return;
+    }
+
+    const price = Number(menuPrice);
+
+    if (Number.isNaN(price) || price <= 0) {
+      setMenuError("Please enter a valid price.");
+      return;
+    }
+
+    try {
+      setMenuSubmitting(true);
+      setMenuError("");
+
+      const restaurantId = restaurants[0].id;
+
+      const newMenuItem = await createMenuItem(
+        restaurantId,
+        {
+          name: menuName.trim(),
+          description: menuDescription.trim(),
+          price,
+        },
+        token,
+      );
+
+      setMenuItems((currentItems) => [...currentItems, newMenuItem]);
+
+      setMenuName("");
+      setMenuDescription("");
+      setMenuPrice("");
+      setShowAddForm(false);
+    } catch {
+      setMenuError("Unable to add the menu item.");
+    } finally {
+      setMenuSubmitting(false);
+    }
+  }
 
   useEffect(() => {
     async function loadDashboard() {
@@ -43,12 +109,15 @@ export default function RestaurantDashboard() {
         setRestaurants(myRestaurants);
 
         if (myRestaurants.length > 0) {
-          const restaurantOrders = await getRestaurantOrders(
-            myRestaurants[0].id,
-            token,
-          );
+          const restaurantId = myRestaurants[0].id;
+
+          const [restaurantOrders, restaurantMenu] = await Promise.all([
+            getRestaurantOrders(restaurantId, token),
+            getRestaurantMenu(restaurantId, token),
+          ]);
 
           setOrders(restaurantOrders);
+          setMenuItems(restaurantMenu);
         }
       } catch {
         setError("Unable to load the restaurant dashboard.");
@@ -60,98 +129,17 @@ export default function RestaurantDashboard() {
     loadDashboard();
   }, []);
 
-  async function handleStatusUpdate(
-    orderId: number,
-    status: string,
-  ) {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      setError("Please log in again.");
-      return;
-    }
-
-    setUpdatingOrderId(orderId);
-    setError("");
-
-    try {
-      const updatedOrder = await updateOrderStatus(
-        orderId,
-        status,
-        token,
-      );
-
-      setOrders((currentOrders) =>
-        currentOrders.map((order) =>
-          order.id === updatedOrder.id ? updatedOrder : order,
-        ),
-      );
-    } catch {
-      setError("Unable to update the order status.");
-    } finally {
-      setUpdatingOrderId(null);
-    }
-  }
-
-  function getNextStatus(status: string): {
-    status: string;
-    label: string;
-  } | null {
-    switch (status) {
-      case "PENDING":
-        return {
-          status: "ACCEPTED",
-          label: "Accept Order",
-        };
-
-      case "ACCEPTED":
-        return {
-          status: "PREPARING",
-          label: "Start Preparing",
-        };
-
-      case "PREPARING":
-        return {
-          status: "READY",
-          label: "Mark Ready",
-        };
-
-      case "READY":
-        return {
-          status: "OUT_FOR_DELIVERY",
-          label: "Send Out For Delivery",
-        };
-
-      case "OUT_FOR_DELIVERY":
-        return {
-          status: "DELIVERED",
-          label: "Mark Delivered",
-        };
-
-      default:
-        return null;
-    }
-  }
-
-  function canCancel(status: string): boolean {
-    return status === "PENDING" ||
-      status === "ACCEPTED" ||
-      status === "PREPARING";
-  }
-
   if (loading) {
     return (
       <main className="min-h-screen bg-gray-50">
         <div className="mx-auto max-w-7xl px-6 py-12">
-          <p className="text-gray-600">
-            Loading restaurant dashboard...
-          </p>
+          <p className="text-gray-600">Loading restaurant dashboard...</p>
         </div>
       </main>
     );
   }
 
-  if (error && restaurants.length === 0) {
+  if (error) {
     return (
       <main className="min-h-screen bg-gray-50">
         <div className="mx-auto max-w-7xl px-6 py-12">
@@ -172,10 +160,7 @@ export default function RestaurantDashboard() {
       {/* Header */}
       <nav className="border-b border-gray-200 bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <a
-            href="/"
-            className="text-2xl font-bold text-orange-600"
-          >
+          <a href="/" className="text-2xl font-bold text-orange-600">
             FoodDelivery
           </a>
 
@@ -200,20 +185,13 @@ export default function RestaurantDashboard() {
           </h1>
 
           <p className="mt-3 text-gray-600">
-            Manage your restaurant and view incoming orders.
+            Manage your restaurant, menu, and incoming orders.
           </p>
         </div>
       </section>
 
       {/* Dashboard */}
       <section className="mx-auto max-w-7xl px-6 py-12">
-        {/* Error */}
-        {error && (
-          <div className="mb-8 rounded-xl border border-red-200 bg-red-50 p-4">
-            <p className="text-sm text-red-700">{error}</p>
-          </div>
-        )}
-
         {/* Restaurants */}
         <div>
           <h2 className="text-2xl font-bold text-gray-900">
@@ -250,6 +228,165 @@ export default function RestaurantDashboard() {
           )}
         </div>
 
+        {/* Menu */}
+        <div className="mt-12">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">Your Menu</h2>
+
+              <p className="mt-1 text-gray-600">
+                Manage the food items available at your restaurant.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <span className="rounded-full bg-orange-100 px-4 py-2 text-sm font-semibold text-orange-700">
+                {menuItems.length}{" "}
+                {menuItems.length === 1 ? "item" : "items"}
+              </span>
+
+              {restaurants.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAddForm((current) => !current);
+                    setMenuError("");
+                  }}
+                  className="rounded-lg bg-orange-600 px-4 py-2 font-semibold text-white hover:bg-orange-700"
+                >
+                  {showAddForm ? "Cancel" : "Add Menu Item"}
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Add Menu Item Form */}
+          {showAddForm && (
+            <div className="mt-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+              <h3 className="text-xl font-semibold text-gray-900">
+                Add Menu Item
+              </h3>
+
+              <p className="mt-1 text-sm text-gray-600">
+                Add a new food item to your restaurant menu.
+              </p>
+
+              {menuError && (
+                <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-4">
+                  <p className="text-sm text-red-600">{menuError}</p>
+                </div>
+              )}
+
+              <form
+                onSubmit={handleAddMenuItem}
+                className="mt-6 space-y-5"
+              >
+                <div>
+                  <label
+                    htmlFor="menuName"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Item Name
+                  </label>
+
+                  <input
+                    id="menuName"
+                    type="text"
+                    value={menuName}
+                    onChange={(event) => setMenuName(event.target.value)}
+                    placeholder="e.g. Chicken Burger"
+                    className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="menuDescription"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Description
+                  </label>
+
+                  <textarea
+                    id="menuDescription"
+                    value={menuDescription}
+                    onChange={(event) =>
+                      setMenuDescription(event.target.value)
+                    }
+                    placeholder="Describe the menu item"
+                    rows={3}
+                    className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="menuPrice"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Price
+                  </label>
+
+                  <div className="mt-2 flex">
+                    <span className="flex items-center rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 px-4 text-gray-600">
+                      R
+                    </span>
+
+                    <input
+                      id="menuPrice"
+                      type="number"
+                      min="0.01"
+                      step="0.01"
+                      value={menuPrice}
+                      onChange={(event) => setMenuPrice(event.target.value)}
+                      placeholder="75.00"
+                      className="w-full rounded-r-lg border border-gray-300 px-4 py-3 text-gray-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={menuSubmitting}
+                  className="w-full rounded-lg bg-orange-600 px-4 py-3 font-semibold text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {menuSubmitting ? "Adding..." : "Add Menu Item"}
+                </button>
+              </form>
+            </div>
+          )}
+
+          {/* Menu Items */}
+          {menuItems.length === 0 ? (
+            <div className="mt-6 rounded-xl border border-gray-200 bg-white p-6">
+              <p className="text-gray-600">
+                You don't have any menu items yet.
+              </p>
+            </div>
+          ) : (
+            <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {menuItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+                >
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    {item.name}
+                  </h3>
+
+                  <p className="mt-2 text-sm text-gray-600">
+                    {item.description}
+                  </p>
+
+                  <p className="mt-4 text-lg font-bold text-orange-600">
+                    R{Number(item.price).toFixed(2)}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* Orders */}
         <div className="mt-12">
           <div className="flex items-center justify-between">
@@ -264,8 +401,7 @@ export default function RestaurantDashboard() {
             </div>
 
             <span className="rounded-full bg-orange-100 px-4 py-2 text-sm font-semibold text-orange-700">
-              {orders.length}{" "}
-              {orders.length === 1 ? "order" : "orders"}
+              {orders.length} {orders.length === 1 ? "order" : "orders"}
             </span>
           </div>
 
@@ -275,106 +411,59 @@ export default function RestaurantDashboard() {
             </div>
           ) : (
             <div className="mt-6 space-y-6">
-              {orders.map((order) => {
-                const nextStatus = getNextStatus(order.status);
-                const isUpdating = updatingOrderId === order.id;
+              {orders.map((order) => (
+                <div
+                  key={order.id}
+                  className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+                >
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <h3 className="text-xl font-semibold text-gray-900">
+                        Order #{order.id}
+                      </h3>
 
-                return (
-                  <div
-                    key={order.id}
-                    className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
-                  >
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                      <div>
-                        <h3 className="text-xl font-semibold text-gray-900">
-                          Order #{order.id}
-                        </h3>
-
-                        <p className="mt-1 text-sm text-gray-500">
-                          Customer #{order.customerId}
-                        </p>
-                      </div>
-
-                      <span className="rounded-full bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700">
-                        {order.status}
-                      </span>
+                      <p className="mt-1 text-sm text-gray-500">
+                        Customer #{order.customerId}
+                      </p>
                     </div>
 
-                    {/* Items */}
-                    <div className="mt-6 border-t border-gray-100 pt-5">
-                      <h4 className="font-semibold text-gray-900">
-                        Items
-                      </h4>
-
-                      <div className="mt-3 space-y-3">
-                        {order.items.map((item) => (
-                          <div
-                            key={item.id}
-                            className="flex items-center justify-between text-sm"
-                          >
-                            <span className="text-gray-700">
-                              {item.quantity} × {item.menuItemName}
-                            </span>
-
-                            <span className="font-medium text-gray-900">
-                              R
-                              {Number(item.subtotal).toFixed(2)}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Total */}
-                    <div className="mt-5 flex items-center justify-between border-t border-gray-100 pt-5">
-                      <span className="font-semibold text-gray-700">
-                        Order Total
-                      </span>
-
-                      <span className="text-xl font-bold text-orange-600">
-                        R{Number(order.totalAmount).toFixed(2)}
-                      </span>
-                    </div>
-
-                    {/* Actions */}
-                    {(nextStatus || canCancel(order.status)) && (
-                      <div className="mt-6 flex flex-wrap gap-3 border-t border-gray-100 pt-5">
-                        {nextStatus && (
-                          <button
-                            onClick={() =>
-                              handleStatusUpdate(
-                                order.id,
-                                nextStatus.status,
-                              )
-                            }
-                            disabled={isUpdating}
-                            className="rounded-lg bg-orange-600 px-5 py-3 text-sm font-semibold text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50"
-                          >
-                            {isUpdating
-                              ? "Updating..."
-                              : nextStatus.label}
-                          </button>
-                        )}
-
-                        {canCancel(order.status) && (
-                          <button
-                            onClick={() =>
-                              handleStatusUpdate(
-                                order.id,
-                                "CANCELLED",
-                              )
-                            }
-                            disabled={isUpdating}
-                            className="rounded-lg border border-red-300 px-5 py-3 text-sm font-semibold text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
-                          >
-                            Cancel Order
-                          </button>
-                        )}
-                      </div>
-                    )}
+                    <span className="rounded-full bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700">
+                      {order.status}
+                    </span>
                   </div>
-                );
-              })}
+
+                  <div className="mt-6 border-t border-gray-100 pt-5">
+                    <h4 className="font-semibold text-gray-900">Items</h4>
+
+                    <div className="mt-3 space-y-3">
+                      {order.items.map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center justify-between text-sm"
+                        >
+                          <span className="text-gray-700">
+                            {item.quantity} × {item.menuItemName}
+                          </span>
+
+                          <span className="font-medium text-gray-900">
+                            R{Number(item.subtotal).toFixed(2)}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mt-5 flex items-center justify-between border-t border-gray-100 pt-5">
+                    <span className="font-semibold text-gray-700">
+                      Order Total
+                    </span>
+
+                    <span className="text-xl font-bold text-orange-600">
+                      R{Number(order.totalAmount).toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
