@@ -97,7 +97,7 @@ function OrderStatusTracker({ status }: { status: string }) {
                   {step.label}
                 </p>
 
-                {current && (
+                {current && status !== "DELIVERED" && (
                   <p className="mt-1 text-sm text-gray-500">
                     Current status
                   </p>
