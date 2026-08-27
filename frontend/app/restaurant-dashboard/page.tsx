@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   getMyRestaurants,
   getRestaurantOrders,
@@ -8,6 +8,7 @@ import {
   createMenuItem,
   updateMenuItem,
   deleteMenuItem,
+  updateOrderStatus,
   Restaurant,
   OrderResponse,
   MenuItem,
@@ -19,38 +20,27 @@ export default function RestaurantDashboard() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
 
   const [showAddForm, setShowAddForm] = useState(false);
-  const [editingItemId, setEditingItemId] = useState<number | null>(null);
-
   const [menuName, setMenuName] = useState("");
   const [menuDescription, setMenuDescription] = useState("");
   const [menuPrice, setMenuPrice] = useState("");
-
   const [menuError, setMenuError] = useState("");
   const [menuSubmitting, setMenuSubmitting] = useState(false);
-  const [deletingItemId, setDeletingItemId] = useState<number | null>(null);
+
+  const [editingMenuItemId, setEditingMenuItemId] = useState<number | null>(
+    null,
+  );
+  const [editMenuName, setEditMenuName] = useState("");
+  const [editMenuDescription, setEditMenuDescription] = useState("");
+  const [editMenuPrice, setEditMenuPrice] = useState("");
+  const [editMenuError, setEditMenuError] = useState("");
+  const [editMenuSubmitting, setEditMenuSubmitting] = useState(false);
+
+  const [updatingOrderId, setUpdatingOrderId] = useState<number | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  function resetMenuForm() {
-    setMenuName("");
-    setMenuDescription("");
-    setMenuPrice("");
-    setMenuError("");
-    setEditingItemId(null);
-    setShowAddForm(false);
-  }
-
-  function startEditing(item: MenuItem) {
-    setEditingItemId(item.id);
-    setMenuName(item.name);
-    setMenuDescription(item.description);
-    setMenuPrice(String(item.price));
-    setMenuError("");
-    setShowAddForm(false);
-  }
-
-  async function handleAddMenuItem(event: FormEvent<HTMLFormElement>) {
+  async function handleAddMenuItem(event: React.FormEvent) {
     event.preventDefault();
 
     const token = localStorage.getItem("token");
@@ -95,7 +85,10 @@ export default function RestaurantDashboard() {
 
       setMenuItems((currentItems) => [...currentItems, newMenuItem]);
 
-      resetMenuForm();
+      setMenuName("");
+      setMenuDescription("");
+      setMenuPrice("");
+      setShowAddForm(false);
     } catch {
       setMenuError("Unable to add the menu item.");
     } finally {
@@ -103,45 +96,64 @@ export default function RestaurantDashboard() {
     }
   }
 
-  async function handleUpdateMenuItem(event: FormEvent<HTMLFormElement>) {
+  function startEditingMenuItem(item: MenuItem) {
+    setEditingMenuItemId(item.id);
+    setEditMenuName(item.name);
+    setEditMenuDescription(item.description);
+    setEditMenuPrice(String(item.price));
+    setEditMenuError("");
+  }
+
+  function cancelEditingMenuItem() {
+    setEditingMenuItemId(null);
+    setEditMenuName("");
+    setEditMenuDescription("");
+    setEditMenuPrice("");
+    setEditMenuError("");
+  }
+
+  async function handleUpdateMenuItem(
+    event: React.FormEvent,
+    menuItemId: number,
+  ) {
     event.preventDefault();
 
     const token = localStorage.getItem("token");
 
     if (!token) {
-      setMenuError("Please log in again.");
+      setEditMenuError("Please log in again.");
       return;
     }
 
-    if (restaurants.length === 0 || editingItemId === null) {
-      setMenuError("Unable to update this menu item.");
+    if (restaurants.length === 0) {
+      setEditMenuError("No restaurant found.");
       return;
     }
 
-    if (!menuName.trim() || !menuDescription.trim() || !menuPrice) {
-      setMenuError("Please complete all fields.");
+    if (!editMenuName.trim() || !editMenuDescription.trim() || !editMenuPrice) {
+      setEditMenuError("Please complete all fields.");
       return;
     }
 
-    const price = Number(menuPrice);
+    const price = Number(editMenuPrice);
 
     if (Number.isNaN(price) || price <= 0) {
-      setMenuError("Please enter a valid price.");
+      setEditMenuError("Please enter a valid price.");
       return;
     }
 
     try {
-      setMenuSubmitting(true);
-      setMenuError("");
+      setEditMenuSubmitting(true);
+      setEditMenuError("");
 
       const restaurantId = restaurants[0].id;
 
-      const updatedItem = await updateMenuItem(
+      const updatedMenuItem = await updateMenuItem(
         restaurantId,
-        editingItemId,
+        menuItemId,
         {
-          name: menuName.trim(),
-          description: menuDescription.trim(),
+          name: editMenuName.trim(),
+          description: editMenuDescription.trim(),
           price,
         },
         token,
@@ -149,15 +161,15 @@ export default function RestaurantDashboard() {
 
       setMenuItems((currentItems) =>
         currentItems.map((item) =>
-          item.id === updatedItem.id ? updatedItem : item,
+          item.id === menuItemId ? updatedMenuItem : item,
         ),
       );
 
-      resetMenuForm();
+      cancelEditingMenuItem();
     } catch {
-      setMenuError("Unable to update the menu item.");
+      setEditMenuError("Unable to update the menu item.");
     } finally {
-      setMenuSubmitting(false);
+      setEditMenuSubmitting(false);
     }
   }
 
@@ -165,12 +177,12 @@ export default function RestaurantDashboard() {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      setMenuError("Please log in again.");
+      setError("Please log in again.");
       return;
     }
 
     if (restaurants.length === 0) {
-      setMenuError("No restaurant found.");
+      setError("No restaurant found.");
       return;
     }
 
@@ -183,8 +195,7 @@ export default function RestaurantDashboard() {
     }
 
     try {
-      setDeletingItemId(menuItemId);
-      setMenuError("");
+      setError("");
 
       const restaurantId = restaurants[0].id;
 
@@ -193,15 +204,141 @@ export default function RestaurantDashboard() {
       setMenuItems((currentItems) =>
         currentItems.filter((item) => item.id !== menuItemId),
       );
-
-      if (editingItemId === menuItemId) {
-        resetMenuForm();
-      }
     } catch {
-      setMenuError("Unable to delete the menu item.");
-    } finally {
-      setDeletingItemId(null);
+      setError("Unable to delete the menu item.");
     }
+  }
+
+  async function handleOrderStatusUpdate(orderId: number, status: string) {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      setError("Please log in again.");
+      return;
+    }
+
+    try {
+      setUpdatingOrderId(orderId);
+      setError("");
+
+      const updatedOrder = await updateOrderStatus(orderId, status, token);
+
+      setOrders((currentOrders) =>
+        currentOrders.map((order) =>
+          order.id === orderId ? updatedOrder : order,
+        ),
+      );
+    } catch {
+      setError("Unable to update the order status.");
+    } finally {
+      setUpdatingOrderId(null);
+    }
+  }
+
+  function renderOrderActions(order: OrderResponse) {
+    const isUpdating = updatingOrderId === order.id;
+
+    if (order.status === "PENDING") {
+      return (
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            disabled={isUpdating}
+            onClick={() => handleOrderStatusUpdate(order.id, "ACCEPTED")}
+            className="rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isUpdating ? "Updating..." : "Accept Order"}
+          </button>
+
+          <button
+            type="button"
+            disabled={isUpdating}
+            onClick={() => handleOrderStatusUpdate(order.id, "CANCELLED")}
+            className="rounded-lg border border-red-300 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Cancel Order
+          </button>
+        </div>
+      );
+    }
+
+    if (order.status === "ACCEPTED") {
+      return (
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            disabled={isUpdating}
+            onClick={() => handleOrderStatusUpdate(order.id, "PREPARING")}
+            className="rounded-lg bg-orange-600 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isUpdating ? "Updating..." : "Start Preparing"}
+          </button>
+
+          <button
+            type="button"
+            disabled={isUpdating}
+            onClick={() => handleOrderStatusUpdate(order.id, "CANCELLED")}
+            className="rounded-lg border border-red-300 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Cancel Order
+          </button>
+        </div>
+      );
+    }
+
+    if (order.status === "PREPARING") {
+      return (
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            disabled={isUpdating}
+            onClick={() => handleOrderStatusUpdate(order.id, "READY")}
+            className="rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isUpdating ? "Updating..." : "Mark Ready"}
+          </button>
+
+          <button
+            type="button"
+            disabled={isUpdating}
+            onClick={() => handleOrderStatusUpdate(order.id, "CANCELLED")}
+            className="rounded-lg border border-red-300 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Cancel Order
+          </button>
+        </div>
+      );
+    }
+
+    if (order.status === "READY") {
+      return (
+        <p className="text-sm font-medium text-gray-600">
+          Ready for driver pickup.
+        </p>
+      );
+    }
+
+    if (order.status === "OUT_FOR_DELIVERY") {
+      return (
+        <p className="text-sm font-medium text-gray-600">
+          Order is out for delivery.
+        </p>
+      );
+    }
+
+    if (order.status === "DELIVERED") {
+      return (
+        <p className="text-sm font-medium text-green-600">Order delivered.</p>
+      );
+    }
+
+    if (order.status === "CANCELLED") {
+      return (
+        <p className="text-sm font-medium text-red-600">Order cancelled.</p>
+      );
+    }
+
+    return null;
   }
 
   useEffect(() => {
@@ -277,7 +414,6 @@ export default function RestaurantDashboard() {
 
   return (
     <main className="min-h-screen bg-gray-50">
-      {/* Header */}
       <nav className="border-b border-gray-200 bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <a href="/" className="text-2xl font-bold text-orange-600">
@@ -293,7 +429,6 @@ export default function RestaurantDashboard() {
         </div>
       </nav>
 
-      {/* Dashboard Header */}
       <section className="bg-orange-50">
         <div className="mx-auto max-w-7xl px-6 py-12">
           <p className="text-sm font-medium text-orange-600">
@@ -310,9 +445,7 @@ export default function RestaurantDashboard() {
         </div>
       </section>
 
-      {/* Dashboard */}
       <section className="mx-auto max-w-7xl px-6 py-12">
-        {/* Restaurants */}
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Your Restaurants</h2>
 
@@ -346,7 +479,6 @@ export default function RestaurantDashboard() {
           )}
         </div>
 
-        {/* Menu */}
         <div className="mt-12">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -366,16 +498,8 @@ export default function RestaurantDashboard() {
                 <button
                   type="button"
                   onClick={() => {
-                    if (showAddForm) {
-                      resetMenuForm();
-                    } else {
-                      setEditingItemId(null);
-                      setMenuName("");
-                      setMenuDescription("");
-                      setMenuPrice("");
-                      setMenuError("");
-                      setShowAddForm(true);
-                    }
+                    setShowAddForm((current) => !current);
+                    setMenuError("");
                   }}
                   className="rounded-lg bg-orange-600 px-4 py-2 font-semibold text-white hover:bg-orange-700"
                 >
@@ -385,14 +509,6 @@ export default function RestaurantDashboard() {
             </div>
           </div>
 
-          {/* Menu Error */}
-          {menuError && !showAddForm && (
-            <div className="mt-6 rounded-lg border border-red-200 bg-red-50 p-4">
-              <p className="text-sm text-red-600">{menuError}</p>
-            </div>
-          )}
-
-          {/* Add Menu Item Form */}
           {showAddForm && (
             <div className="mt-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
               <h3 className="text-xl font-semibold text-gray-900">
@@ -472,128 +588,17 @@ export default function RestaurantDashboard() {
                   </div>
                 </div>
 
-                <div className="flex gap-3">
-                  <button
-                    type="submit"
-                    disabled={menuSubmitting}
-                    className="flex-1 rounded-lg bg-orange-600 px-4 py-3 font-semibold text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    {menuSubmitting ? "Adding..." : "Add Menu Item"}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={resetMenuForm}
-                    disabled={menuSubmitting}
-                    className="rounded-lg border border-gray-300 px-6 py-3 font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    Cancel
-                  </button>
-                </div>
+                <button
+                  type="submit"
+                  disabled={menuSubmitting}
+                  className="w-full rounded-lg bg-orange-600 px-4 py-3 font-semibold text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {menuSubmitting ? "Adding..." : "Add Menu Item"}
+                </button>
               </form>
             </div>
           )}
 
-          {/* Edit Menu Item Form */}
-          {editingItemId !== null && (
-            <div className="mt-6 rounded-xl border border-orange-200 bg-orange-50 p-6 shadow-sm">
-              <h3 className="text-xl font-semibold text-gray-900">
-                Edit Menu Item
-              </h3>
-
-              <p className="mt-1 text-sm text-gray-600">
-                Update the details of this menu item.
-              </p>
-
-              {menuError && (
-                <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-4">
-                  <p className="text-sm text-red-600">{menuError}</p>
-                </div>
-              )}
-
-              <form onSubmit={handleUpdateMenuItem} className="mt-6 space-y-5">
-                <div>
-                  <label
-                    htmlFor="editMenuName"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Item Name
-                  </label>
-
-                  <input
-                    id="editMenuName"
-                    type="text"
-                    value={menuName}
-                    onChange={(event) => setMenuName(event.target.value)}
-                    className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="editMenuDescription"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Description
-                  </label>
-
-                  <textarea
-                    id="editMenuDescription"
-                    value={menuDescription}
-                    onChange={(event) => setMenuDescription(event.target.value)}
-                    rows={3}
-                    className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="editMenuPrice"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Price
-                  </label>
-
-                  <div className="mt-2 flex">
-                    <span className="flex items-center rounded-l-lg border border-r-0 border-gray-300 bg-gray-100 px-4 text-gray-600">
-                      R
-                    </span>
-
-                    <input
-                      id="editMenuPrice"
-                      type="number"
-                      min="0.01"
-                      step="0.01"
-                      value={menuPrice}
-                      onChange={(event) => setMenuPrice(event.target.value)}
-                      className="w-full rounded-r-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex gap-3">
-                  <button
-                    type="submit"
-                    disabled={menuSubmitting}
-                    className="flex-1 rounded-lg bg-orange-600 px-4 py-3 font-semibold text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    {menuSubmitting ? "Saving..." : "Save Changes"}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={resetMenuForm}
-                    disabled={menuSubmitting}
-                    className="rounded-lg border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            </div>
-          )}
-
-          {/* Menu Items */}
           {menuItems.length === 0 ? (
             <div className="mt-6 rounded-xl border border-gray-200 bg-white p-6">
               <p className="text-gray-600">
@@ -607,50 +612,111 @@ export default function RestaurantDashboard() {
                   key={item.id}
                   className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
                 >
-                  <div className="flex items-start justify-between gap-4">
-                    <h3 className="text-xl font-semibold text-gray-900">
-                      {item.name}
-                    </h3>
-
-                    <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600">
-                      #{item.id}
-                    </span>
-                  </div>
-
-                  <p className="mt-2 text-sm text-gray-600">
-                    {item.description}
-                  </p>
-
-                  <p className="mt-4 text-lg font-bold text-orange-600">
-                    R{Number(item.price).toFixed(2)}
-                  </p>
-
-                  <div className="mt-5 flex gap-3 border-t border-gray-100 pt-5">
-                    <button
-                      type="button"
-                      onClick={() => startEditing(item)}
-                      disabled={deletingItemId === item.id}
-                      className="flex-1 rounded-lg border border-gray-300 px-4 py-2 font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                  {editingMenuItemId === item.id ? (
+                    <form
+                      onSubmit={(event) => handleUpdateMenuItem(event, item.id)}
+                      className="space-y-4"
                     >
-                      Edit
-                    </button>
+                      <h3 className="text-xl font-semibold text-gray-900">
+                        Edit Menu Item
+                      </h3>
 
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteMenuItem(item.id)}
-                      disabled={deletingItemId === item.id}
-                      className="flex-1 rounded-lg bg-red-600 px-4 py-2 font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      {deletingItemId === item.id ? "Deleting..." : "Delete"}
-                    </button>
-                  </div>
+                      {editMenuError && (
+                        <p className="text-sm text-red-600">{editMenuError}</p>
+                      )}
+
+                      <input
+                        type="text"
+                        value={editMenuName}
+                        onChange={(event) =>
+                          setEditMenuName(event.target.value)
+                        }
+                        className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 outline-none focus:border-orange-500"
+                      />
+
+                      <textarea
+                        value={editMenuDescription}
+                        onChange={(event) =>
+                          setEditMenuDescription(event.target.value)
+                        }
+                        rows={3}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 outline-none focus:border-orange-500"
+                      />
+
+                      <div className="flex">
+                        <span className="flex items-center rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 px-4 text-gray-600">
+                          R
+                        </span>
+
+                        <input
+                          type="number"
+                          min="0.01"
+                          step="0.01"
+                          value={editMenuPrice}
+                          onChange={(event) =>
+                            setEditMenuPrice(event.target.value)
+                          }
+                          className="w-full rounded-r-lg border border-gray-300 px-4 py-3 text-gray-900 outline-none focus:border-orange-500"
+                        />
+                      </div>
+
+                      <div className="flex gap-3">
+                        <button
+                          type="submit"
+                          disabled={editMenuSubmitting}
+                          className="rounded-lg bg-orange-600 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          {editMenuSubmitting ? "Saving..." : "Save"}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={cancelEditingMenuItem}
+                          className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    <>
+                      <h3 className="text-xl font-semibold text-gray-900">
+                        {item.name}
+                      </h3>
+
+                      <p className="mt-2 text-sm text-gray-600">
+                        {item.description}
+                      </p>
+
+                      <p className="mt-4 text-lg font-bold text-orange-600">
+                        R{Number(item.price).toFixed(2)}
+                      </p>
+
+                      <div className="mt-5 flex gap-3">
+                        <button
+                          type="button"
+                          onClick={() => startEditingMenuItem(item)}
+                          className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                        >
+                          Edit
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteMenuItem(item.id)}
+                          className="rounded-lg border border-red-300 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               ))}
             </div>
           )}
         </div>
 
-        {/* Orders */}
         <div className="mt-12">
           <div className="flex items-center justify-between">
             <div>
@@ -724,6 +790,10 @@ export default function RestaurantDashboard() {
                     <span className="text-xl font-bold text-orange-600">
                       R{Number(order.totalAmount).toFixed(2)}
                     </span>
+                  </div>
+
+                  <div className="mt-5 border-t border-gray-100 pt-5">
+                    {renderOrderActions(order)}
                   </div>
                 </div>
               ))}
