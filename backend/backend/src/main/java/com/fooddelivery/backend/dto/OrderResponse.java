@@ -12,6 +12,8 @@ public class OrderResponse {
     private Long id;
     private Long customerId;
     private Long restaurantId;
+    private String restaurantName;
+    private String restaurantAddress;
     private Long driverId;
     private BigDecimal totalAmount;
     private Order.Status status;
@@ -25,6 +27,8 @@ public class OrderResponse {
             Long id,
             Long customerId,
             Long restaurantId,
+            String restaurantName,
+            String restaurantAddress,
             Long driverId,
             BigDecimal totalAmount,
             Order.Status status,
@@ -34,6 +38,8 @@ public class OrderResponse {
         this.id = id;
         this.customerId = customerId;
         this.restaurantId = restaurantId;
+        this.restaurantName = restaurantName;
+        this.restaurantAddress = restaurantAddress;
         this.driverId = driverId;
         this.totalAmount = totalAmount;
         this.status = status;
@@ -53,6 +59,8 @@ public class OrderResponse {
                 order.getId(),
                 order.getCustomer().getId(),
                 order.getRestaurant().getId(),
+                order.getRestaurant().getName(),
+                order.getRestaurant().getAddress(),
                 order.getDriver() != null
                         ? order.getDriver().getId()
                         : null,
@@ -73,6 +81,14 @@ public class OrderResponse {
 
     public Long getRestaurantId() {
         return restaurantId;
+    }
+
+    public String getRestaurantName() {
+        return restaurantName;
+    }
+
+    public String getRestaurantAddress() {
+        return restaurantAddress;
     }
 
     public Long getDriverId() {

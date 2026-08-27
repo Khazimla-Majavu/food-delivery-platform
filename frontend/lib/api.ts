@@ -24,14 +24,6 @@ export interface UserResponse {
   role: string;
 }
 
-export interface UserResponse {
-  id: number;
-  name: string;
-  email: string;
-  phone: string | null;
-  role: string;
-}
-
 export interface LoginResponse {
   token: string;
   user: UserResponse;
@@ -55,6 +47,8 @@ export interface OrderResponse {
   id: number;
   customerId: number;
   restaurantId: number;
+  restaurantName: string;
+  restaurantAddress: string;
   driverId: number | null;
   totalAmount: number;
   status: string;

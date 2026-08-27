@@ -76,9 +76,7 @@ function OrderStatusTracker({ status }: { status: string }) {
                 {index < statusSteps.length - 1 && (
                   <div
                     className={`mt-1 h-6 w-0.5 ${
-                      index < currentIndex
-                        ? "bg-orange-600"
-                        : "bg-gray-300"
+                      index < currentIndex ? "bg-orange-600" : "bg-gray-300"
                     }`}
                   />
                 )}
@@ -98,9 +96,7 @@ function OrderStatusTracker({ status }: { status: string }) {
                 </p>
 
                 {current && status !== "DELIVERED" && (
-                  <p className="mt-1 text-sm text-gray-500">
-                    Current status
-                  </p>
+                  <p className="mt-1 text-sm text-gray-500">Current status</p>
                 )}
               </div>
             </div>
@@ -144,10 +140,7 @@ export default function OrdersPage() {
       {/* Header */}
       <nav className="border-b border-gray-200 bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <a
-            href="/"
-            className="text-2xl font-bold text-orange-600"
-          >
+          <a href="/" className="text-2xl font-bold text-orange-600">
             FoodDelivery
           </a>
 
@@ -162,25 +155,15 @@ export default function OrdersPage() {
 
       {/* Orders */}
       <section className="mx-auto max-w-4xl px-6 py-12">
-        <h1 className="text-4xl font-bold text-gray-900">
-          My Orders
-        </h1>
+        <h1 className="text-4xl font-bold text-gray-900">My Orders</h1>
 
         <p className="mt-2 text-gray-600">
           View your previous and current orders.
         </p>
 
-        {loading && (
-          <p className="mt-8 text-gray-600">
-            Loading orders...
-          </p>
-        )}
+        {loading && <p className="mt-8 text-gray-600">Loading orders...</p>}
 
-        {error && (
-          <p className="mt-8 text-red-600">
-            {error}
-          </p>
-        )}
+        {error && <p className="mt-8 text-red-600">{error}</p>}
 
         {!loading && !error && orders.length === 0 && (
           <div className="mt-8 rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
@@ -215,8 +198,12 @@ export default function OrdersPage() {
                       Order #{order.id}
                     </h2>
 
+                    <p className="mt-1 text-sm font-medium text-gray-700">
+                      {order.restaurantName}
+                    </p>
+
                     <p className="mt-1 text-sm text-gray-500">
-                      Restaurant #{order.restaurantId}
+                      {order.restaurantAddress}
                     </p>
                   </div>
 
@@ -238,9 +225,7 @@ export default function OrdersPage() {
 
                 {/* Items */}
                 <div className="mt-6 space-y-4 border-t border-gray-100 pt-6">
-                  <h3 className="text-sm font-semibold text-gray-700">
-                    Items
-                  </h3>
+                  <h3 className="text-sm font-semibold text-gray-700">Items</h3>
 
                   {order.items.map((item) => (
                     <div
@@ -253,8 +238,7 @@ export default function OrdersPage() {
                         </p>
 
                         <p className="text-sm text-gray-500">
-                          {item.quantity} × R
-                          {Number(item.price).toFixed(2)}
+                          {item.quantity} × R{Number(item.price).toFixed(2)}
                         </p>
                       </div>
 
@@ -267,9 +251,7 @@ export default function OrdersPage() {
 
                 {/* Order total */}
                 <div className="mt-5 flex items-center justify-between border-t border-gray-100 pt-5">
-                  <span className="font-medium text-gray-700">
-                    Total
-                  </span>
+                  <span className="font-medium text-gray-700">Total</span>
 
                   <span className="text-xl font-bold text-orange-600">
                     R{Number(order.totalAmount).toFixed(2)}
@@ -278,8 +260,7 @@ export default function OrdersPage() {
 
                 {/* Date */}
                 <p className="mt-3 text-xs text-gray-500">
-                  Placed{" "}
-                  {new Date(order.createdAt).toLocaleString()}
+                  Placed {new Date(order.createdAt).toLocaleString()}
                 </p>
               </div>
             ))}
