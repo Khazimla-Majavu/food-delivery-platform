@@ -3,6 +3,114 @@
 import { useEffect, useState } from "react";
 import { getMyOrders, OrderResponse } from "../../lib/api";
 
+const statusSteps = [
+  {
+    status: "PENDING",
+    label: "Order placed",
+  },
+  {
+    status: "ACCEPTED",
+    label: "Order accepted",
+  },
+  {
+    status: "PREPARING",
+    label: "Preparing your food",
+  },
+  {
+    status: "READY",
+    label: "Ready for pickup",
+  },
+  {
+    status: "OUT_FOR_DELIVERY",
+    label: "On the way",
+  },
+  {
+    status: "DELIVERED",
+    label: "Delivered",
+  },
+];
+
+function getStatusIndex(status: string) {
+  return statusSteps.findIndex((step) => step.status === status);
+}
+
+function OrderStatusTracker({ status }: { status: string }) {
+  if (status === "CANCELLED") {
+    return (
+      <div className="mt-6 rounded-lg border border-red-200 bg-red-50 p-4">
+        <p className="font-semibold text-red-700">Order cancelled</p>
+
+        <p className="mt-1 text-sm text-red-600">
+          This order has been cancelled.
+        </p>
+      </div>
+    );
+  }
+
+  const currentIndex = getStatusIndex(status);
+
+  return (
+    <div className="mt-6">
+      <h3 className="mb-4 text-sm font-semibold text-gray-700">
+        Order progress
+      </h3>
+
+      <div className="space-y-4">
+        {statusSteps.map((step, index) => {
+          const completed = index <= currentIndex;
+          const current = index === currentIndex;
+
+          return (
+            <div key={step.status} className="flex items-start gap-4">
+              <div className="flex flex-col items-center">
+                <div
+                  className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
+                    completed
+                      ? "bg-orange-600 text-white"
+                      : "border-2 border-gray-300 bg-white text-gray-400"
+                  }`}
+                >
+                  {completed ? "✓" : index + 1}
+                </div>
+
+                {index < statusSteps.length - 1 && (
+                  <div
+                    className={`mt-1 h-6 w-0.5 ${
+                      index < currentIndex
+                        ? "bg-orange-600"
+                        : "bg-gray-300"
+                    }`}
+                  />
+                )}
+              </div>
+
+              <div className="pt-1">
+                <p
+                  className={`font-semibold ${
+                    current
+                      ? "text-orange-600"
+                      : completed
+                        ? "text-gray-900"
+                        : "text-gray-400"
+                  }`}
+                >
+                  {step.label}
+                </p>
+
+                {current && (
+                  <p className="mt-1 text-sm text-gray-500">
+                    Current status
+                  </p>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export default function OrdersPage() {
   const [orders, setOrders] = useState<OrderResponse[]>([]);
   const [loading, setLoading] = useState(true);
@@ -112,13 +220,28 @@ export default function OrdersPage() {
                     </p>
                   </div>
 
-                  <span className="inline-flex w-fit rounded-full bg-orange-100 px-3 py-1 text-sm font-semibold text-orange-700">
+                  <span
+                    className={`inline-flex w-fit rounded-full px-3 py-1 text-sm font-semibold ${
+                      order.status === "CANCELLED"
+                        ? "bg-red-100 text-red-700"
+                        : order.status === "DELIVERED"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-orange-100 text-orange-700"
+                    }`}
+                  >
                     {order.status}
                   </span>
                 </div>
 
+                {/* Status tracker */}
+                <OrderStatusTracker status={order.status} />
+
                 {/* Items */}
-                <div className="mt-5 space-y-4">
+                <div className="mt-6 space-y-4 border-t border-gray-100 pt-6">
+                  <h3 className="text-sm font-semibold text-gray-700">
+                    Items
+                  </h3>
+
                   {order.items.map((item) => (
                     <div
                       key={item.id}
