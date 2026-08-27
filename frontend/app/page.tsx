@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import LoginForm from "./components/LoginForm";
 import RestaurantList from "./components/RestaurantList";
 import { getUser, logout } from "../lib/auth";
 import { UserResponse } from "../lib/api";
@@ -136,23 +135,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* Login */}
-      {!loaded ? null : !user ? (
-        <section className="mx-auto max-w-md px-6 py-16">
-          <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-            <h3 className="mb-2 text-2xl font-bold text-gray-900">
-              Customer Login
-            </h3>
-
-            <p className="mb-6 text-sm text-gray-600">
-              Log in to connect to the FoodDelivery API.
-            </p>
-
-            <LoginForm />
-          </div>
-        </section>
-      ) : null}
 
       {/* Restaurant Discovery */}
       <section className="mx-auto max-w-7xl px-6 py-16">
