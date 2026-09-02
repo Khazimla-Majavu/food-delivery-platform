@@ -30,9 +30,7 @@ export default function DriverDashboard() {
       const user = JSON.parse(userJson);
 
       if (user.role !== "DRIVER") {
-        setError(
-          "You do not have permission to access the driver dashboard.",
-        );
+        setError("You do not have permission to access the driver dashboard.");
         setLoading(false);
         return;
       }
@@ -112,9 +110,7 @@ export default function DriverDashboard() {
       <main className="min-h-screen bg-gray-50">
         <div className="mx-auto max-w-7xl px-6 py-12">
           <div className="rounded-xl border border-red-200 bg-white p-6">
-            <h1 className="text-2xl font-bold text-red-600">
-              Dashboard Error
-            </h1>
+            <h1 className="text-2xl font-bold text-red-600">Dashboard Error</h1>
 
             <p className="mt-2 text-gray-600">{error}</p>
           </div>
@@ -200,8 +196,12 @@ export default function DriverDashboard() {
                         Order #{order.id}
                       </h3>
 
+                      <p className="mt-1 text-sm font-medium text-gray-700">
+                        {order.restaurantName}
+                      </p>
+
                       <p className="mt-1 text-sm text-gray-500">
-                        Restaurant #{order.restaurantId}
+                        {order.restaurantAddress}
                       </p>
                     </div>
 
@@ -246,9 +246,7 @@ export default function DriverDashboard() {
                     disabled={actionLoading === order.id}
                     className="mt-6 w-full rounded-lg bg-orange-600 px-4 py-3 font-semibold text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    {actionLoading === order.id
-                      ? "Claiming..."
-                      : "Claim Order"}
+                    {actionLoading === order.id ? "Claiming..." : "Claim Order"}
                   </button>
                 </div>
               ))}
@@ -263,14 +261,11 @@ export default function DriverDashboard() {
                 My Deliveries
               </h2>
 
-              <p className="mt-1 text-gray-600">
-                Orders assigned to you.
-              </p>
+              <p className="mt-1 text-gray-600">Orders assigned to you.</p>
             </div>
 
             <span className="rounded-full bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700">
-              {myOrders.length}{" "}
-              {myOrders.length === 1 ? "order" : "orders"}
+              {myOrders.length} {myOrders.length === 1 ? "order" : "orders"}
             </span>
           </div>
 
@@ -293,8 +288,12 @@ export default function DriverDashboard() {
                         Order #{order.id}
                       </h3>
 
+                      <p className="mt-1 text-sm font-medium text-gray-700">
+                        {order.restaurantName}
+                      </p>
+
                       <p className="mt-1 text-sm text-gray-500">
-                        Restaurant #{order.restaurantId}
+                        {order.restaurantAddress}
                       </p>
                     </div>
 
