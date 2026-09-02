@@ -1,5 +1,6 @@
 package com.fooddelivery.backend.controller;
 
+import com.fooddelivery.backend.dto.PaymentResponse;
 import com.fooddelivery.backend.model.Payment;
 import com.fooddelivery.backend.service.PaymentService;
 import org.springframework.http.ResponseEntity;
@@ -17,28 +18,47 @@ public class PaymentController {
     }
 
     @PostMapping("/order/{orderId}")
-    public ResponseEntity<Payment> createPayment(
+    public ResponseEntity<PaymentResponse> createPayment(
             @PathVariable Long orderId,
             Authentication authentication
     ) {
+        Payment payment = paymentService.createPayment(
+                orderId,
+                authentication.getName()
+        );
+
         return ResponseEntity.ok(
-                paymentService.createPayment(
-                        orderId,
-                        authentication.getName()
-                )
+                PaymentResponse.fromPayment(payment)
         );
     }
 
     @GetMapping("/order/{orderId}")
-    public ResponseEntity<Payment> getPayment(
+    public ResponseEntity<PaymentResponse> getPayment(
             @PathVariable Long orderId,
             Authentication authentication
     ) {
+        Payment payment = paymentService.getPaymentByOrderId(
+                orderId,
+                authentication.getName()
+        );
+
         return ResponseEntity.ok(
-                paymentService.getPaymentByOrderId(
-                        orderId,
-                        authentication.getName()
-                )
+                PaymentResponse.fromPayment(payment)
+        );
+    }
+
+    @PutMapping("/{paymentId}/status")
+    public ResponseEntity<PaymentResponse> updatePaymentStatus(
+            @PathVariable Long paymentId,
+            @RequestParam Payment.Status status
+    ) {
+        Payment payment = paymentService.updatePaymentStatus(
+                paymentId,
+                status
+        );
+
+        return ResponseEntity.ok(
+                PaymentResponse.fromPayment(payment)
         );
     }
 }

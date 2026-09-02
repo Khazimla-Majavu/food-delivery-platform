@@ -89,4 +89,17 @@ public class PaymentService {
                         "Payment not found for this order"
                 ));
     }
+
+    public Payment updatePaymentStatus(
+            Long paymentId,
+            Payment.Status status
+    ) {
+
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new RuntimeException("Payment not found"));
+
+        payment.setStatus(status);
+
+        return paymentRepository.save(payment);
+    }
 }
