@@ -85,6 +85,14 @@ public class SecurityConfig {
                                 HttpMethod.POST,
                                 "/api/orders/*/complete"
                         ).hasRole("DRIVER")
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/payments/order/*"
+                        ).hasRole("CUSTOMER")
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/payments/order/*"
+                        ).hasRole("CUSTOMER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(
