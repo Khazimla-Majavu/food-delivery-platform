@@ -91,15 +91,31 @@ public class PaymentService {
     }
 
     public Payment updatePaymentStatus(
-            Long paymentId,
-            Payment.Status status
-    ) {
+                Long paymentId,
+                Payment.Status status
+        ) {
 
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new RuntimeException("Payment not found"));
 
+        Payment.Status currentStatus = payment.getStatus();
+
+        boolean validTransition =
+                (currentStatus == Payment.Status.PENDING &&
+                        status == Payment.Status.PROCESSING)
+                ||
+                (currentStatus == Payment.Status.PROCESSING &&
+                        (status == Payment.Status.PAID ||
+                        status == Payment.Status.FAILED));
+
+        if (!validTransition) {
+                throw new RuntimeException(
+                        "Invalid payment status transition"
+                );
+        }
+
         payment.setStatus(status);
 
         return paymentRepository.save(payment);
-    }
+        }
 }

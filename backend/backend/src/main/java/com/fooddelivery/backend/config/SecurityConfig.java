@@ -93,6 +93,10 @@ public class SecurityConfig {
                                 HttpMethod.GET,
                                 "/api/payments/order/*"
                         ).hasRole("CUSTOMER")
+                        .requestMatchers(
+                                HttpMethod.PUT,
+                                "/api/payments/*/status"
+                        ).hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(
