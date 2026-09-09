@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useCart } from "../context/CartContext";
-import { createOrder } from "../../lib/api";
+import { createOrder, createPayment } from "../../lib/api";
 
 export default function CartPage() {
   const { items, removeFromCart, updateQuantity, clearCart, total } = useCart();
@@ -47,10 +47,13 @@ export default function CartPage() {
       }));
 
       const order = await createOrder(restaurantId, orderItems, token);
+      const payment = await createPayment(order.id, token);
 
       clearCart();
 
-      setOrderSuccess(`Order #${order.id} created successfully!`);
+      setOrderSuccess(
+        `Order #${order.id} created successfully. Payment #${payment.id} is ${payment.status}.`,
+      );
     } catch (error) {
       console.error(error);
       setCheckoutError("Unable to create your order. Please try again.");

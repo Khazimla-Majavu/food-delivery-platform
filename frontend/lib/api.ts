@@ -380,3 +380,52 @@ export async function deleteMenuItem(
     throw new Error(`Failed to delete menu item: ${response.status}`);
   }
 }
+
+export interface PaymentResponse {
+  id: number;
+  orderId: number;
+  amount: number;
+  status: "PENDING" | "PROCESSING" | "PAID" | "FAILED";
+  createdAt: string;
+}
+
+export async function createPayment(
+  orderId: number,
+  token: string,
+): Promise<PaymentResponse> {
+  const response = await fetch(
+    `${API_URL}/api/payments/order/${orderId}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to create payment: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export async function getPayment(
+  orderId: number,
+  token: string,
+): Promise<PaymentResponse> {
+  const response = await fetch(
+    `${API_URL}/api/payments/order/${orderId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch payment: ${response.status}`);
+  }
+
+  return response.json();
+}
