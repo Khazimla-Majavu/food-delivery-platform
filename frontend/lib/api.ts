@@ -471,3 +471,29 @@ export async function createDeliveryLocation(
 
   return response.json();
 }
+
+export async function getDeliveryLocation(
+  orderId: number,
+  token: string,
+): Promise<{
+  id: number;
+  orderId: number;
+  address: string;
+  latitude: number | null;
+  longitude: number | null;
+}> {
+  const response = await fetch(
+    `${API_URL}/api/delivery-locations/order/${orderId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch delivery location: ${response.status}`);
+  }
+
+  return response.json();
+}

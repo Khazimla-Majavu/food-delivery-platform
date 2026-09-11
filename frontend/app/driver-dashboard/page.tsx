@@ -6,6 +6,7 @@ import {
   completeDelivery,
   getAvailableDriverOrders,
   getDriverOrders,
+  getDeliveryLocation,
   OrderResponse,
 } from "../../lib/api";
 
@@ -15,6 +16,7 @@ export default function DriverDashboard() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
   const [error, setError] = useState("");
+  const [deliveryAddresses, setDeliveryAddresses] = useState<Record<number, string>>({});
 
   async function loadDashboard() {
     const token = localStorage.getItem("token");
@@ -42,6 +44,19 @@ export default function DriverDashboard() {
 
       setAvailableOrders(available);
       setMyOrders(mine);
+
+      const locations = await Promise.all(
+        mine.map(async (order) => {
+          try {
+            const location = await getDeliveryLocation(order.id, token);
+            return [order.id, location.address] as const;
+          } catch {
+            return [order.id, "Delivery address unavailable"] as const;
+          }
+        }),
+      );
+
+      setDeliveryAddresses(Object.fromEntries(locations));
     } catch {
       setError("Unable to load the driver dashboard.");
     } finally {
@@ -279,6 +294,10 @@ export default function DriverDashboard() {
 
                       <p className="mt-1 text-sm text-gray-500">
                         {order.restaurantAddress}
+                      </p>
+
+                      <p className="mt-3 text-sm font-medium text-gray-700">
+                        Delivery address: {deliveryAddresses[order.id] || "Loading..."}
                       </p>
                     </div>
 
