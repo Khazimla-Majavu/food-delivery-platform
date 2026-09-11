@@ -15,6 +15,10 @@ public class Restaurant {
 
     private String description;
 
+    private java.math.BigDecimal latitude;
+
+    private java.math.BigDecimal longitude;
+
     @Column(nullable = false)
     private String address;
 
@@ -47,6 +51,22 @@ public class Restaurant {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public java.math.BigDecimal getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(java.math.BigDecimal latitude) {
+        this.latitude = latitude;
+    }
+
+    public java.math.BigDecimal getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(java.math.BigDecimal longitude) {
+        this.longitude = longitude;
     }
 
     public String getAddress() {
