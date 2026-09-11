@@ -97,6 +97,14 @@ public class SecurityConfig {
                                 HttpMethod.PUT,
                                 "/api/payments/*/status"
                         ).hasRole("ADMIN")
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/delivery-locations/order/*"
+                        ).hasRole("CUSTOMER")
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/delivery-locations/order/*"
+                        ).authenticated()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(
