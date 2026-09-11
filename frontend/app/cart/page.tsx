@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useCart } from "../context/CartContext";
-import { createOrder, createPayment } from "../../lib/api";
+import { createOrder, createPayment, createDeliveryLocation } from "../../lib/api";
 
 export default function CartPage() {
   const { items, removeFromCart, updateQuantity, clearCart, total } = useCart();
@@ -10,10 +10,16 @@ export default function CartPage() {
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
   const [orderSuccess, setOrderSuccess] = useState("");
+  const [deliveryAddress, setDeliveryAddress] = useState("");
 
   async function handleCheckout() {
     setCheckoutError("");
     setOrderSuccess("");
+
+    if (!deliveryAddress.trim()) {
+      setCheckoutError("Please enter your delivery address.");
+      return;
+    }
 
     if (items.length === 0) {
       setCheckoutError("Your cart is empty.");
@@ -47,6 +53,7 @@ export default function CartPage() {
       }));
 
       const order = await createOrder(restaurantId, orderItems, token);
+      await createDeliveryLocation(order.id, deliveryAddress.trim(), token);
       const payment = await createPayment(order.id, token);
 
       clearCart();
@@ -161,6 +168,21 @@ export default function CartPage() {
                   </div>
                 </div>
               ))}
+            </div>
+
+            {/* Delivery Address */}
+            <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+              <label className="block text-lg font-semibold text-gray-900">
+                Delivery address
+              </label>
+
+              <textarea
+                value={deliveryAddress}
+                onChange={(event) => setDeliveryAddress(event.target.value)}
+                placeholder="Enter your delivery address"
+                rows={3}
+                className="mt-3 w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+              />
             </div>
 
             {/* Summary */}

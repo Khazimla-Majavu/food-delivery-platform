@@ -429,3 +429,45 @@ export async function getPayment(
 
   return response.json();
 }
+
+export async function createDeliveryLocation(
+  orderId: number,
+  address: string,
+  token: string,
+  latitude?: number,
+  longitude?: number,
+): Promise<{
+  id: number;
+  orderId: number;
+  address: string;
+  latitude: number | null;
+  longitude: number | null;
+}> {
+  const params = new URLSearchParams({
+    address,
+  });
+
+  if (latitude !== undefined) {
+    params.set("latitude", latitude.toString());
+  }
+
+  if (longitude !== undefined) {
+    params.set("longitude", longitude.toString());
+  }
+
+  const response = await fetch(
+    `${API_URL}/api/delivery-locations/order/${orderId}?${params.toString()}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to create delivery location: ${response.status}`);
+  }
+
+  return response.json();
+}
