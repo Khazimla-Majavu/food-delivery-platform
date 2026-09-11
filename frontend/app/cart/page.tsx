@@ -11,6 +11,27 @@ export default function CartPage() {
   const [checkoutError, setCheckoutError] = useState("");
   const [orderSuccess, setOrderSuccess] = useState("");
   const [deliveryAddress, setDeliveryAddress] = useState("");
+  const [latitude, setLatitude] = useState<number | undefined>();
+  const [longitude, setLongitude] = useState<number | undefined>();
+
+  function getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error("Geolocation is not supported by this browser."));
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          resolve({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+        },
+        () => reject(new Error("Unable to get your location.")),
+      );
+    });
+  }
 
   async function handleCheckout() {
     setCheckoutError("");
@@ -45,6 +66,9 @@ export default function CartPage() {
     setCheckoutLoading(true);
 
     try {
+      const location = await getCurrentLocation();
+      setLatitude(location.latitude);
+      setLongitude(location.longitude);
       const restaurantId = restaurantIds[0];
 
       const orderItems = items.map((item) => ({
@@ -53,7 +77,13 @@ export default function CartPage() {
       }));
 
       const order = await createOrder(restaurantId, orderItems, token);
-      await createDeliveryLocation(order.id, deliveryAddress.trim(), token);
+      await createDeliveryLocation(
+        order.id,
+        deliveryAddress.trim(),
+        token,
+        location.latitude,
+        location.longitude,
+      );
       const payment = await createPayment(order.id, token);
 
       clearCart();
