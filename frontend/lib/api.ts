@@ -497,3 +497,23 @@ export async function getDeliveryLocation(
 
   return response.json();
 }
+
+export async function getDeliveryDistance(
+  orderId: number,
+  token: string,
+): Promise<{ orderId: number; distanceKm: number }> {
+  const response = await fetch(
+    `${API_URL}/api/delivery-distance/order/${orderId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to get delivery distance: ${response.status}`);
+  }
+
+  return response.json();
+}

@@ -105,6 +105,10 @@ public class SecurityConfig {
                                 HttpMethod.GET,
                                 "/api/delivery-locations/order/*"
                         ).authenticated()
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/delivery-distance/order/*"
+                        ).authenticated()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(
