@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getMyOrders, OrderResponse } from "../../lib/api";
+import { getMyOrders, getDeliveryDistance, OrderResponse } from "../../lib/api";
 
 const statusSteps = [
   {
@@ -109,6 +109,7 @@ function OrderStatusTracker({ status }: { status: string }) {
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<OrderResponse[]>([]);
+  const [deliveryDistances, setDeliveryDistances] = useState<Record<number, number>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -125,6 +126,25 @@ export default function OrdersPage() {
       try {
         const data = await getMyOrders(token);
         setOrders(data);
+
+        const distanceEntries = await Promise.all(
+          data.map(async (order) => {
+            try {
+              const distance = await getDeliveryDistance(order.id, token);
+              return [order.id, distance.distanceKm] as const;
+            } catch {
+              return null;
+            }
+          }),
+        );
+
+        setDeliveryDistances(
+          Object.fromEntries(
+            distanceEntries.filter(
+              (entry): entry is readonly [number, number] => entry !== null,
+            ),
+          ),
+        );
       } catch {
         setError("Unable to load your orders.");
       } finally {
@@ -205,6 +225,12 @@ export default function OrdersPage() {
                     <p className="mt-1 text-sm text-gray-500">
                       {order.restaurantAddress}
                     </p>
+
+                    {deliveryDistances[order.id] !== undefined && (
+                      <p className="mt-1 text-sm font-medium text-gray-700">
+                        Delivery distance: {deliveryDistances[order.id].toFixed(2)} km
+                      </p>
+                    )}
                   </div>
 
                   <span
