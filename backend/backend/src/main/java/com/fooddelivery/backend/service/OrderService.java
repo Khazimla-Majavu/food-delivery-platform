@@ -12,6 +12,7 @@ import com.fooddelivery.backend.repository.OrderItemRepository;
 import com.fooddelivery.backend.repository.OrderRepository;
 import com.fooddelivery.backend.repository.RestaurantRepository;
 import com.fooddelivery.backend.repository.UserRepository;
+import com.fooddelivery.backend.repository.DeliveryLocationRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -27,19 +28,31 @@ public class OrderService {
     private final RestaurantRepository restaurantRepository;
     private final MenuItemRepository menuItemRepository;
     private final UserRepository userRepository;
+    private final DeliveryLocationRepository deliveryLocationRepository;
+    private final DeliveryFeeService deliveryFeeService;
+    private final DistanceService distanceService;
+    private final OrderPricingService orderPricingService;
 
     public OrderService(
             OrderRepository orderRepository,
             OrderItemRepository orderItemRepository,
             RestaurantRepository restaurantRepository,
             MenuItemRepository menuItemRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            DeliveryLocationRepository deliveryLocationRepository,
+            DeliveryFeeService deliveryFeeService,
+            DistanceService distanceService,
+            OrderPricingService orderPricingService
     ) {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.restaurantRepository = restaurantRepository;
         this.menuItemRepository = menuItemRepository;
         this.userRepository = userRepository;
+        this.deliveryLocationRepository = deliveryLocationRepository;
+        this.deliveryFeeService = deliveryFeeService;
+        this.distanceService = distanceService;
+        this.orderPricingService = orderPricingService;
     }
 
     public OrderResponse createOrder(
@@ -104,6 +117,9 @@ public class OrderService {
             orderItems.add(orderItem);
         }
 
+        order.setSubtotal(total);
+        order.setDeliveryFee(BigDecimal.ZERO);
+        order.setServiceFee(BigDecimal.ZERO);
         order.setTotalAmount(total);
 
         Order savedOrder = orderRepository.save(order);

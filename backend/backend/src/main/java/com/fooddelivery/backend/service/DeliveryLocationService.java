@@ -17,15 +17,18 @@ public class DeliveryLocationService {
     private final DeliveryLocationRepository deliveryLocationRepository;
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
+    private final OrderPricingService orderPricingService;
 
     public DeliveryLocationService(
             DeliveryLocationRepository deliveryLocationRepository,
             OrderRepository orderRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            OrderPricingService orderPricingService
     ) {
         this.deliveryLocationRepository = deliveryLocationRepository;
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
+        this.orderPricingService = orderPricingService;
     }
 
     public DeliveryLocationResponse createLocation(
@@ -67,9 +70,13 @@ public class DeliveryLocationService {
         location.setLatitude(latitude);
         location.setLongitude(longitude);
 
-        return DeliveryLocationResponse.fromDeliveryLocation(
-                deliveryLocationRepository.save(location)
-        );
+        DeliveryLocation savedLocation =
+                deliveryLocationRepository.save(location);
+
+        orderPricingService.applyPricing(order, savedLocation);
+        orderRepository.save(order);
+
+        return DeliveryLocationResponse.fromDeliveryLocation(savedLocation);
     }
 
     public DeliveryLocationResponse getLocation(
