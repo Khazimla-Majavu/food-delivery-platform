@@ -15,8 +15,10 @@ public class Restaurant {
 
     private String description;
 
+    @Column(precision = 10, scale = 7)
     private java.math.BigDecimal latitude;
 
+    @Column(precision = 10, scale = 7)
     private java.math.BigDecimal longitude;
 
     @Column(nullable = false)
