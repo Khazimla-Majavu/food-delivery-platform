@@ -50,6 +50,9 @@ export interface OrderResponse {
   restaurantName: string;
   restaurantAddress: string;
   driverId: number | null;
+  subtotal: number;
+  deliveryFee: number;
+  serviceFee: number;
   totalAmount: number;
   status: string;
   createdAt: string;
@@ -442,6 +445,10 @@ export async function createDeliveryLocation(
   address: string;
   latitude: number | null;
   longitude: number | null;
+  subtotal: number;
+  deliveryFee: number;
+  serviceFee: number;
+  totalAmount: number;
 }> {
   const params = new URLSearchParams({
     address,

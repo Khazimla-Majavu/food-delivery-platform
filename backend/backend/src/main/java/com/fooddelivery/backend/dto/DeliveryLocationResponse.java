@@ -11,19 +11,31 @@ public class DeliveryLocationResponse {
     private String address;
     private BigDecimal latitude;
     private BigDecimal longitude;
+    private BigDecimal subtotal;
+    private BigDecimal deliveryFee;
+    private BigDecimal serviceFee;
+    private BigDecimal totalAmount;
 
     public DeliveryLocationResponse(
             Long id,
             Long orderId,
             String address,
             BigDecimal latitude,
-            BigDecimal longitude
+            BigDecimal longitude,
+            BigDecimal subtotal,
+            BigDecimal deliveryFee,
+            BigDecimal serviceFee,
+            BigDecimal totalAmount
     ) {
         this.id = id;
         this.orderId = orderId;
         this.address = address;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.subtotal = subtotal;
+        this.deliveryFee = deliveryFee;
+        this.serviceFee = serviceFee;
+        this.totalAmount = totalAmount;
     }
 
     public Long getId() {
@@ -46,6 +58,22 @@ public class DeliveryLocationResponse {
         return longitude;
     }
 
+    public BigDecimal getSubtotal() {
+        return subtotal;
+    }
+
+    public BigDecimal getDeliveryFee() {
+        return deliveryFee;
+    }
+
+    public BigDecimal getServiceFee() {
+        return serviceFee;
+    }
+
+    public BigDecimal getTotalAmount() {
+        return totalAmount;
+    }
+
     public static DeliveryLocationResponse fromDeliveryLocation(
             DeliveryLocation location
     ) {
@@ -54,7 +82,11 @@ public class DeliveryLocationResponse {
                 location.getOrder().getId(),
                 location.getAddress(),
                 location.getLatitude(),
-                location.getLongitude()
+                location.getLongitude(),
+                location.getOrder().getSubtotal(),
+                location.getOrder().getDeliveryFee(),
+                location.getOrder().getServiceFee(),
+                location.getOrder().getTotalAmount()
         );
     }
 }

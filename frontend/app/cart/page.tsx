@@ -77,7 +77,7 @@ export default function CartPage() {
       }));
 
       const order = await createOrder(restaurantId, orderItems, token);
-      await createDeliveryLocation(
+      const pricing = await createDeliveryLocation(
         order.id,
         deliveryAddress.trim(),
         token,
@@ -89,7 +89,7 @@ export default function CartPage() {
       clearCart();
 
       setOrderSuccess(
-        `Order #${order.id} created successfully. Payment #${payment.id} is ${payment.status}.`,
+        `Order #${order.id} created successfully. Total: R${pricing.totalAmount.toFixed(2)}. Payment #${payment.id} is ${payment.status}.`,
       );
     } catch (error) {
       console.error(error);

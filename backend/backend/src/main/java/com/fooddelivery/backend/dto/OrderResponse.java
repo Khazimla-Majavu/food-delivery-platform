@@ -15,6 +15,9 @@ public class OrderResponse {
     private String restaurantName;
     private String restaurantAddress;
     private Long driverId;
+    private BigDecimal subtotal;
+    private BigDecimal deliveryFee;
+    private BigDecimal serviceFee;
     private BigDecimal totalAmount;
     private Order.Status status;
     private LocalDateTime createdAt;
@@ -30,6 +33,9 @@ public class OrderResponse {
             String restaurantName,
             String restaurantAddress,
             Long driverId,
+            BigDecimal subtotal,
+            BigDecimal deliveryFee,
+            BigDecimal serviceFee,
             BigDecimal totalAmount,
             Order.Status status,
             LocalDateTime createdAt,
@@ -41,6 +47,9 @@ public class OrderResponse {
         this.restaurantName = restaurantName;
         this.restaurantAddress = restaurantAddress;
         this.driverId = driverId;
+        this.subtotal = subtotal;
+        this.deliveryFee = deliveryFee;
+        this.serviceFee = serviceFee;
         this.totalAmount = totalAmount;
         this.status = status;
         this.createdAt = createdAt;
@@ -64,6 +73,9 @@ public class OrderResponse {
                 order.getDriver() != null
                         ? order.getDriver().getId()
                         : null,
+                order.getSubtotal(),
+                order.getDeliveryFee(),
+                order.getServiceFee(),
                 order.getTotalAmount(),
                 order.getStatus(),
                 order.getCreatedAt(),
@@ -93,6 +105,18 @@ public class OrderResponse {
 
     public Long getDriverId() {
         return driverId;
+    }
+
+    public BigDecimal getSubtotal() {
+        return subtotal;
+    }
+
+    public BigDecimal getDeliveryFee() {
+        return deliveryFee;
+    }
+
+    public BigDecimal getServiceFee() {
+        return serviceFee;
     }
 
     public BigDecimal getTotalAmount() {
