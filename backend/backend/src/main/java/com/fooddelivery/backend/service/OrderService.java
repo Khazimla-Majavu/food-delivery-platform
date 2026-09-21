@@ -34,6 +34,7 @@ public class OrderService {
     private final DistanceService distanceService;
     private final OrderPricingService orderPricingService;
     private final NotificationService notificationService;
+    private final FinancialRecordService financialRecordService;
 
     public OrderService(
             OrderRepository orderRepository,
@@ -45,7 +46,8 @@ public class OrderService {
             DeliveryFeeService deliveryFeeService,
             DistanceService distanceService,
             OrderPricingService orderPricingService,
-            NotificationService notificationService
+            NotificationService notificationService,
+            FinancialRecordService financialRecordService
     ) {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
@@ -57,6 +59,7 @@ public class OrderService {
         this.distanceService = distanceService;
         this.orderPricingService = orderPricingService;
         this.notificationService = notificationService;
+        this.financialRecordService = financialRecordService;
     }
 
     public OrderResponse createOrder(
@@ -359,6 +362,8 @@ public class OrderService {
         order.setStatus(Order.Status.DELIVERED);
 
         Order savedOrder = orderRepository.save(order);
+
+        financialRecordService.createFinancialRecord(savedOrder);
 
         notificationService.createNotification(order.getCustomer().getId(), "Your order #" + order.getId() + " has been delivered.");
         List<OrderItem> items =
