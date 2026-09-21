@@ -98,6 +98,10 @@ public class SecurityConfig {
                                 "/api/payments/*/status"
                         ).hasRole("ADMIN")
                         .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/financial-records/order/*"
+                        ).hasRole("ADMIN")
+                        .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/delivery-locations/order/*"
                         ).hasRole("CUSTOMER")

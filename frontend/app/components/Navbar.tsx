@@ -115,7 +115,12 @@ export default function Navbar() {
               )}
 
               {user.role === "ADMIN" && (
-                <span className="text-sm font-medium text-gray-700">Admin</span>
+                <Link
+                  href="/admin"
+                  className="rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700"
+                >
+                  Admin Dashboard
+                </Link>
               )}
 
               <button

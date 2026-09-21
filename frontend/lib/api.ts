@@ -433,6 +433,37 @@ export async function getPayment(
   return response.json();
 }
 
+export interface FinancialRecordResponse {
+  id: number;
+  orderId: number;
+  restaurantCommission: number;
+  driverCommission: number;
+  driverEarnings: number;
+  platformRevenue: number;
+}
+
+export async function getFinancialRecord(
+  orderId: number,
+  token: string,
+): Promise<FinancialRecordResponse> {
+  const response = await fetch(
+    `${API_URL}/api/financial-records/order/${orderId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch financial record: ${response.status}`,
+    );
+  }
+
+  return response.json();
+}
+
 export async function createDeliveryLocation(
   orderId: number,
   address: string,
