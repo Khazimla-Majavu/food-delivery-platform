@@ -13,6 +13,7 @@ import com.fooddelivery.backend.repository.OrderRepository;
 import com.fooddelivery.backend.repository.RestaurantRepository;
 import com.fooddelivery.backend.repository.UserRepository;
 import com.fooddelivery.backend.repository.DeliveryLocationRepository;
+import com.fooddelivery.backend.service.NotificationService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -32,6 +33,7 @@ public class OrderService {
     private final DeliveryFeeService deliveryFeeService;
     private final DistanceService distanceService;
     private final OrderPricingService orderPricingService;
+    private final NotificationService notificationService;
 
     public OrderService(
             OrderRepository orderRepository,
@@ -42,7 +44,8 @@ public class OrderService {
             DeliveryLocationRepository deliveryLocationRepository,
             DeliveryFeeService deliveryFeeService,
             DistanceService distanceService,
-            OrderPricingService orderPricingService
+            OrderPricingService orderPricingService,
+            NotificationService notificationService
     ) {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
@@ -53,6 +56,7 @@ public class OrderService {
         this.deliveryFeeService = deliveryFeeService;
         this.distanceService = distanceService;
         this.orderPricingService = orderPricingService;
+        this.notificationService = notificationService;
     }
 
     public OrderResponse createOrder(
@@ -217,6 +221,7 @@ public class OrderService {
 
         Order savedOrder = orderRepository.save(order);
 
+        notificationService.createNotification(order.getCustomer().getId(), "Your order #" + order.getId() + " is now " + newStatus.name().replace("_", " ").toLowerCase() + ".");
         List<OrderItem> items =
                 orderItemRepository.findByOrderId(savedOrder.getId());
 
@@ -299,6 +304,7 @@ public class OrderService {
 
         List<OrderItem> items =
                 orderItemRepository.findByOrderId(savedOrder.getId());
+        notificationService.createNotification(order.getCustomer().getId(), "Your order #" + order.getId() + " is now out for delivery.");
 
         return OrderResponse.fromOrder(savedOrder, items);
     }
@@ -354,6 +360,7 @@ public class OrderService {
 
         Order savedOrder = orderRepository.save(order);
 
+        notificationService.createNotification(order.getCustomer().getId(), "Your order #" + order.getId() + " has been delivered.");
         List<OrderItem> items =
                 orderItemRepository.findByOrderId(savedOrder.getId());
 
