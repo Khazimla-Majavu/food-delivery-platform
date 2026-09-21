@@ -2,16 +2,36 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { UserResponse } from "../../lib/api";
-import { getUser, logout } from "../../lib/auth";
+import {
+  getNotifications,
+  NotificationResponse,
+  UserResponse,
+} from "../../lib/api";
+import { getToken, getUser, logout } from "../../lib/auth";
 
 export default function Navbar() {
   const [user, setUser] = useState<UserResponse | null>(null);
+  const [notifications, setNotifications] = useState<NotificationResponse[]>([]);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    function loadUser() {
-      setUser(getUser());
+    async function loadUser() {
+      const currentUser = getUser();
+      const token = getToken();
+
+      setUser(currentUser);
+
+      if (currentUser?.role === "CUSTOMER" && token) {
+        try {
+          const data = await getNotifications(token);
+          setNotifications(data);
+        } catch {
+          setNotifications([]);
+        }
+      } else {
+        setNotifications([]);
+      }
+
       setLoaded(true);
     }
 
@@ -26,8 +46,13 @@ export default function Navbar() {
 
   function handleLogout() {
     logout();
+    setNotifications([]);
     window.dispatchEvent(new Event("auth-change"));
   }
+
+  const unreadCount = notifications.filter(
+    (notification) => !notification.read,
+  ).length;
 
   return (
     <nav className="border-b border-gray-200 bg-white">
@@ -48,6 +73,18 @@ export default function Navbar() {
                     className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
                   >
                     My Orders
+                  </Link>
+
+                  <Link
+                    href="/notifications"
+                    className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+                  >
+                    Notifications
+                    {unreadCount > 0 && (
+                      <span className="ml-2 rounded-full bg-orange-600 px-2 py-1 text-xs font-bold text-white">
+                        {unreadCount}
+                      </span>
+                    )}
                   </Link>
 
                   <Link

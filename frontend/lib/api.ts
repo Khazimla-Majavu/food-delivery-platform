@@ -524,3 +524,26 @@ export async function getDeliveryDistance(
 
   return response.json();
 }
+
+export interface NotificationResponse {
+  id: number;
+  message: string;
+  read: boolean;
+  createdAt: string;
+}
+
+export async function getNotifications(
+  token: string,
+): Promise<NotificationResponse[]> {
+  const response = await fetch(`${API_URL}/api/notifications`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch notifications: ${response.status}`);
+  }
+
+  return response.json();
+}
