@@ -547,3 +547,24 @@ export async function getNotifications(
 
   return response.json();
 }
+
+export async function markNotificationAsRead(
+  notificationId: number,
+  token: string,
+): Promise<void> {
+  const response = await fetch(
+    `${API_URL}/api/notifications/${notificationId}/read`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to mark notification as read: ${response.status}`,
+    );
+  }
+}

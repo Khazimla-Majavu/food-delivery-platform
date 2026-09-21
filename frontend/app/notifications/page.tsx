@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   getNotifications,
+  markNotificationAsRead,
   NotificationResponse,
 } from "../../lib/api";
 import { getToken, getUser } from "../../lib/auth";
@@ -26,7 +27,23 @@ export default function NotificationsPage() {
 
       try {
         const data = await getNotifications(token);
-        setNotifications(data);
+
+        await Promise.all(
+          data
+            .filter((notification) => !notification.read)
+            .map((notification) =>
+              markNotificationAsRead(notification.id, token),
+            ),
+        );
+
+        setNotifications(
+          data.map((notification) => ({
+            ...notification,
+            read: true,
+          })),
+        );
+
+        window.dispatchEvent(new Event("notifications-read"));
       } catch {
         setError("Unable to load notifications.");
       } finally {

@@ -25,6 +25,18 @@ public class NotificationController {
         this.userRepository = userRepository;
     }
 
+    @PutMapping("/{notificationId}/read")
+    public ResponseEntity<Void> markAsRead(
+            @PathVariable Long notificationId,
+            Authentication authentication
+    ) {
+        User user = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        notificationService.markAsRead(notificationId, user.getId());
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping
     public ResponseEntity<List<NotificationResponse>> getNotifications(
             Authentication authentication
