@@ -433,6 +433,27 @@ export async function getPayment(
   return response.json();
 }
 
+export async function getAdminPayments(
+  token: string,
+): Promise<PaymentResponse[]> {
+  const response = await fetch(
+    `${API_URL}/api/payments/admin/all`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch admin payments: ${response.status}`,
+    );
+  }
+
+  return response.json();
+}
+
 export interface FinancialRecordResponse {
   id: number;
   orderId: number;

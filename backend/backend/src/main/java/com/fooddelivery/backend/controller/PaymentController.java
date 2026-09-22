@@ -47,6 +47,16 @@ public class PaymentController {
         );
     }
 
+    @GetMapping("/admin/all")
+    public ResponseEntity<java.util.List<PaymentResponse>> getAllPayments() {
+        return ResponseEntity.ok(
+                paymentService.getAllPayments()
+                        .stream()
+                        .map(PaymentResponse::fromPayment)
+                        .toList()
+        );
+    }
+
     @PutMapping("/{paymentId}/status")
     public ResponseEntity<PaymentResponse> updatePaymentStatus(
             @PathVariable Long paymentId,

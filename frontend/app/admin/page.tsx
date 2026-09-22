@@ -6,7 +6,9 @@ import {
   getUsers,
   getAdminOrders,
   getAdminRestaurants,
+  getAdminPayments,
   FinancialRecordResponse,
+  PaymentResponse,
   UserResponse,
   OrderResponse,
   Restaurant,
@@ -18,10 +20,12 @@ export default function AdminPage() {
   const [users, setUsers] = useState<UserResponse[]>([]);
   const [orders, setOrders] = useState<OrderResponse[]>([]);
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [payments, setPayments] = useState<PaymentResponse[]>([]);
   const [error, setError] = useState("");
   const [usersError, setUsersError] = useState("");
   const [ordersError, setOrdersError] = useState("");
   const [restaurantsError, setRestaurantsError] = useState("");
+  const [paymentsError, setPaymentsError] = useState("");
 
   useEffect(() => {
     async function loadUsers() {
@@ -81,6 +85,26 @@ export default function AdminPage() {
     }
 
     loadRestaurants();
+  }, []);
+
+  useEffect(() => {
+    async function loadPayments() {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        setPaymentsError("You must be logged in.");
+        return;
+      }
+
+      try {
+        const data = await getAdminPayments(token);
+        setPayments(data);
+      } catch {
+        setPaymentsError("Unable to load payments.");
+      }
+    }
+
+    loadPayments();
   }, []);
 
   async function handleSearch() {
@@ -168,6 +192,56 @@ export default function AdminPage() {
           </div>
         </div>
       )}
+
+      <div className="mb-8 rounded-lg border p-6">
+        <h2 className="mb-6 text-xl font-semibold">
+          Payments
+        </h2>
+
+        {paymentsError && (
+          <p className="text-red-600">
+            {paymentsError}
+          </p>
+        )}
+
+        {!paymentsError && payments.length === 0 && (
+          <p className="text-gray-600">
+            No payments found.
+          </p>
+        )}
+
+        {payments.length > 0 && (
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b text-left">
+                  <th className="px-4 py-3">ID</th>
+                  <th className="px-4 py-3">Order</th>
+                  <th className="px-4 py-3">Amount</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3">Created</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {payments.map((payment) => (
+                  <tr key={payment.id} className="border-b">
+                    <td className="px-4 py-3">{payment.id}</td>
+                    <td className="px-4 py-3">{payment.orderId}</td>
+                    <td className="px-4 py-3">
+                      R{payment.amount.toFixed(2)}
+                    </td>
+                    <td className="px-4 py-3">{payment.status}</td>
+                    <td className="px-4 py-3">
+                      {new Date(payment.createdAt).toLocaleString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
 
       <div className="mb-8 rounded-lg border p-6">
         <h2 className="mb-6 text-xl font-semibold">

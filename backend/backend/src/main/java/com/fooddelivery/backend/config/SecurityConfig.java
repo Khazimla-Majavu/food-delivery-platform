@@ -99,6 +99,10 @@ public class SecurityConfig {
                         ).hasRole("ADMIN")
                         .requestMatchers(
                                 HttpMethod.GET,
+                                "/api/payments/admin/all"
+                        ).hasRole("ADMIN")
+                        .requestMatchers(
+                                HttpMethod.GET,
                                 "/api/orders/admin/all"
                         ).hasRole("ADMIN")
                         .requestMatchers(

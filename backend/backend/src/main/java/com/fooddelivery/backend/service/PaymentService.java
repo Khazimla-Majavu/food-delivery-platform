@@ -90,6 +90,10 @@ public class PaymentService {
                 ));
     }
 
+    public java.util.List<Payment> getAllPayments() {
+        return paymentRepository.findAll();
+    }
+
     public Payment updatePaymentStatus(
                 Long paymentId,
                 Payment.Status status
