@@ -3,11 +3,14 @@
 import { useEffect, useState } from "react";
 import {
   getFinancialRecord,
+  backfillFinancialRecords,
+  getFinancialSummary,
   getUsers,
   getAdminOrders,
   getAdminRestaurants,
   getAdminPayments,
   FinancialRecordResponse,
+  FinancialSummaryResponse,
   PaymentResponse,
   UserResponse,
   OrderResponse,
@@ -17,6 +20,9 @@ import {
 export default function AdminPage() {
   const [orderId, setOrderId] = useState("");
   const [record, setRecord] = useState<FinancialRecordResponse | null>(null);
+  const [financialSummary, setFinancialSummary] =
+    useState<FinancialSummaryResponse | null>(null);
+  const [financialSummaryError, setFinancialSummaryError] = useState("");
   const [users, setUsers] = useState<UserResponse[]>([]);
   const [orders, setOrders] = useState<OrderResponse[]>([]);
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
@@ -88,6 +94,26 @@ export default function AdminPage() {
   }, []);
 
   useEffect(() => {
+    async function loadFinancialSummary() {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        setFinancialSummaryError("You must be logged in.");
+        return;
+      }
+
+      try {
+        const data = await getFinancialSummary(token);
+        setFinancialSummary(data);
+      } catch {
+        setFinancialSummaryError("Unable to load financial summary.");
+      }
+    }
+
+    loadFinancialSummary();
+  }, []);
+
+  useEffect(() => {
     async function loadPayments() {
       const token = localStorage.getItem("token");
 
@@ -135,63 +161,92 @@ export default function AdminPage() {
       <h1 className="mb-6 text-3xl font-bold">Admin Dashboard</h1>
 
       <div className="mb-8 rounded-lg border p-6">
-        <h2 className="mb-4 text-xl font-semibold">
-          Order Financials
-        </h2>
-
-        <div className="flex gap-3">
-          <input
-            type="number"
-            value={orderId}
-            onChange={(event) => setOrderId(event.target.value)}
-            placeholder="Order ID"
-            className="rounded border px-3 py-2"
-          />
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-xl font-semibold">
+            Financial Summary
+          </h2>
 
           <button
-            onClick={handleSearch}
-            className="rounded bg-black px-4 py-2 text-white"
+            onClick={async () => {
+              const token = localStorage.getItem("token");
+
+              if (!token) {
+                setFinancialSummaryError("You must be logged in.");
+                return;
+              }
+
+              try {
+                await backfillFinancialRecords(token);
+                const updatedSummary = await getFinancialSummary(token);
+                setFinancialSummary(updatedSummary);
+                setFinancialSummaryError("");
+              } catch {
+                setFinancialSummaryError(
+                  "Unable to backfill financial records.",
+                );
+              }
+            }}
+            className="rounded bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
           >
-            View
+            Backfill Financial Records
           </button>
         </div>
 
-        {error && (
-          <p className="mt-4 text-red-600">
-            {error}
+        {financialSummaryError && (
+          <p className="text-red-600">
+            {financialSummaryError}
           </p>
         )}
-      </div>
 
-      {record && (
-        <div className="mb-8 rounded-lg border p-6">
-          <h2 className="mb-6 text-xl font-semibold">
-            Order #{record.orderId}
-          </h2>
-
-          <div className="space-y-4">
-            <div className="flex justify-between">
-              <span>Restaurant commission</span>
-              <strong>R{record.restaurantCommission.toFixed(2)}</strong>
+        {financialSummary && (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+            <div className="rounded-lg border p-4">
+              <p className="text-sm text-gray-600">
+                Completed Orders
+              </p>
+              <p className="mt-2 text-2xl font-semibold">
+                {financialSummary.completedOrders}
+              </p>
             </div>
 
-            <div className="flex justify-between">
-              <span>Driver commission</span>
-              <strong>R{record.driverCommission.toFixed(2)}</strong>
+            <div className="rounded-lg border p-4">
+              <p className="text-sm text-gray-600">
+                Restaurant Commissions
+              </p>
+              <p className="mt-2 text-2xl font-semibold">
+                R{financialSummary.totalRestaurantCommission.toFixed(2)}
+              </p>
             </div>
 
-            <div className="flex justify-between">
-              <span>Driver earnings</span>
-              <strong>R{record.driverEarnings.toFixed(2)}</strong>
+            <div className="rounded-lg border p-4">
+              <p className="text-sm text-gray-600">
+                Driver Commissions
+              </p>
+              <p className="mt-2 text-2xl font-semibold">
+                R{financialSummary.totalDriverCommission.toFixed(2)}
+              </p>
             </div>
 
-            <div className="flex justify-between border-t pt-4">
-              <span>Platform revenue</span>
-              <strong>R{record.platformRevenue.toFixed(2)}</strong>
+            <div className="rounded-lg border p-4">
+              <p className="text-sm text-gray-600">
+                Driver Earnings
+              </p>
+              <p className="mt-2 text-2xl font-semibold">
+                R{financialSummary.totalDriverEarnings.toFixed(2)}
+              </p>
+            </div>
+
+            <div className="rounded-lg border p-4">
+              <p className="text-sm text-gray-600">
+                Platform Revenue
+              </p>
+              <p className="mt-2 text-2xl font-semibold">
+                R{financialSummary.totalPlatformRevenue.toFixed(2)}
+              </p>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       <div className="mb-8 rounded-lg border p-6">
         <h2 className="mb-6 text-xl font-semibold">

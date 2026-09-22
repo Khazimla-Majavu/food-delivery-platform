@@ -479,6 +479,58 @@ export async function getUsers(
   return response.json();
 }
 
+
+export interface FinancialSummaryResponse {
+  completedOrders: number;
+  totalRestaurantCommission: number;
+  totalDriverCommission: number;
+  totalDriverEarnings: number;
+  totalPlatformRevenue: number;
+}
+
+export async function backfillFinancialRecords(
+  token: string,
+): Promise<{ createdRecords: number }> {
+  const response = await fetch(
+    `${API_URL}/api/financial-records/admin/backfill`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to backfill financial records: ${response.status}`,
+    );
+  }
+
+  return response.json();
+}
+
+export async function getFinancialSummary(
+  token: string,
+): Promise<FinancialSummaryResponse> {
+  const response = await fetch(
+    `${API_URL}/api/financial-records/admin/summary`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch financial summary: ${response.status}`,
+    );
+  }
+
+  return response.json();
+}
+
 export async function getFinancialRecord(
   orderId: number,
   token: string,
