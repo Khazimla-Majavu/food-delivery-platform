@@ -4,16 +4,20 @@ import { useEffect, useState } from "react";
 import {
   getFinancialRecord,
   getUsers,
+  getAdminOrders,
   FinancialRecordResponse,
   UserResponse,
+  OrderResponse,
 } from "@/lib/api";
 
 export default function AdminPage() {
   const [orderId, setOrderId] = useState("");
   const [record, setRecord] = useState<FinancialRecordResponse | null>(null);
   const [users, setUsers] = useState<UserResponse[]>([]);
+  const [orders, setOrders] = useState<OrderResponse[]>([]);
   const [error, setError] = useState("");
   const [usersError, setUsersError] = useState("");
+  const [ordersError, setOrdersError] = useState("");
 
   useEffect(() => {
     async function loadUsers() {
@@ -33,6 +37,26 @@ export default function AdminPage() {
     }
 
     loadUsers();
+  }, []);
+
+  useEffect(() => {
+    async function loadOrders() {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        setOrdersError("You must be logged in.");
+        return;
+      }
+
+      try {
+        const data = await getAdminOrders(token);
+        setOrders(data);
+      } catch {
+        setOrdersError("Unable to load orders.");
+      }
+    }
+
+    loadOrders();
   }, []);
 
   async function handleSearch() {
@@ -120,6 +144,74 @@ export default function AdminPage() {
           </div>
         </div>
       )}
+
+      <div className="mb-8 rounded-lg border p-6">
+        <h2 className="mb-6 text-xl font-semibold">
+          Orders
+        </h2>
+
+        {ordersError && (
+          <p className="text-red-600">
+            {ordersError}
+          </p>
+        )}
+
+        {!ordersError && orders.length === 0 && (
+          <p className="text-gray-600">
+            No orders found.
+          </p>
+        )}
+
+        {orders.length > 0 && (
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b text-left">
+                  <th className="px-4 py-3">ID</th>
+                  <th className="px-4 py-3">Customer</th>
+                  <th className="px-4 py-3">Restaurant</th>
+                  <th className="px-4 py-3">Driver</th>
+                  <th className="px-4 py-3">Subtotal</th>
+                  <th className="px-4 py-3">Delivery</th>
+                  <th className="px-4 py-3">Service</th>
+                  <th className="px-4 py-3">Total</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3">Created</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {orders.map((order) => (
+                  <tr key={order.id} className="border-b">
+                    <td className="px-4 py-3">{order.id}</td>
+                    <td className="px-4 py-3">{order.customerId}</td>
+                    <td className="px-4 py-3">{order.restaurantName}</td>
+                    <td className="px-4 py-3">
+                      {order.driverId ?? "Unassigned"}
+                    </td>
+                    <td className="px-4 py-3">
+                      R{order.subtotal.toFixed(2)}
+                    </td>
+                    <td className="px-4 py-3">
+                      R{order.deliveryFee.toFixed(2)}
+                    </td>
+                    <td className="px-4 py-3">
+                      R{order.serviceFee.toFixed(2)}
+                    </td>
+                    <td className="px-4 py-3">
+                      R{order.totalAmount.toFixed(2)}
+                    </td>
+                    <td className="px-4 py-3">{order.status}</td>
+                    <td className="px-4 py-3">
+                      {new Date(order.createdAt).toLocaleString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
 
       <div className="rounded-lg border p-6">
         <h2 className="mb-6 text-xl font-semibold">

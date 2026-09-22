@@ -615,3 +615,19 @@ export async function markNotificationAsRead(
     );
   }
 }
+
+export async function getAdminOrders(
+  token: string,
+): Promise<OrderResponse[]> {
+  const response = await fetch(`${API_URL}/api/orders/admin/all`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch admin orders: ${response.status}`);
+  }
+
+  return response.json();
+}

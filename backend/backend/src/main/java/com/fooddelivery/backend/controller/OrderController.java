@@ -100,4 +100,9 @@ public class OrderController {
                 authentication.getName()
         );
     }
+
+    @GetMapping("/admin/all")
+    public List<OrderResponse> getAllOrders() {
+        return orderService.getAllOrders();
+    }
 }

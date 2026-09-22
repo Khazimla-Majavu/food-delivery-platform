@@ -140,6 +140,18 @@ public class OrderService {
         return OrderResponse.fromOrder(savedOrder, savedItems);
     }
 
+    public List<OrderResponse> getAllOrders() {
+        return orderRepository.findAll()
+                .stream()
+                .map(order -> {
+                    List<OrderItem> items =
+                            orderItemRepository.findByOrderId(order.getId());
+
+                    return OrderResponse.fromOrder(order, items);
+                })
+                .toList();
+    }
+
     public List<OrderResponse> getCustomerOrders(String customerEmail) {
 
         User customer = userRepository.findByEmail(customerEmail)
