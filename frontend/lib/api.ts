@@ -442,6 +442,22 @@ export interface FinancialRecordResponse {
   platformRevenue: number;
 }
 
+export async function getUsers(
+  token: string,
+): Promise<UserResponse[]> {
+  const response = await fetch(`${API_URL}/api/users`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch users: ${response.status}`);
+  }
+
+  return response.json();
+}
+
 export async function getFinancialRecord(
   orderId: number,
   token: string,

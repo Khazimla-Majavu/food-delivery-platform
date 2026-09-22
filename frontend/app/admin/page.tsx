@@ -1,12 +1,39 @@
 "use client";
 
-import { useState } from "react";
-import { getFinancialRecord, FinancialRecordResponse } from "@/lib/api";
+import { useEffect, useState } from "react";
+import {
+  getFinancialRecord,
+  getUsers,
+  FinancialRecordResponse,
+  UserResponse,
+} from "@/lib/api";
 
 export default function AdminPage() {
   const [orderId, setOrderId] = useState("");
   const [record, setRecord] = useState<FinancialRecordResponse | null>(null);
+  const [users, setUsers] = useState<UserResponse[]>([]);
   const [error, setError] = useState("");
+  const [usersError, setUsersError] = useState("");
+
+  useEffect(() => {
+    async function loadUsers() {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        setUsersError("You must be logged in.");
+        return;
+      }
+
+      try {
+        const data = await getUsers(token);
+        setUsers(data);
+      } catch {
+        setUsersError("Unable to load users.");
+      }
+    }
+
+    loadUsers();
+  }, []);
 
   async function handleSearch() {
     const token = localStorage.getItem("token");
@@ -32,7 +59,7 @@ export default function AdminPage() {
   }
 
   return (
-    <main className="mx-auto max-w-4xl p-6">
+    <main className="mx-auto max-w-6xl p-6">
       <h1 className="mb-6 text-3xl font-bold">Admin Dashboard</h1>
 
       <div className="mb-8 rounded-lg border p-6">
@@ -65,7 +92,7 @@ export default function AdminPage() {
       </div>
 
       {record && (
-        <div className="rounded-lg border p-6">
+        <div className="mb-8 rounded-lg border p-6">
           <h2 className="mb-6 text-xl font-semibold">
             Order #{record.orderId}
           </h2>
@@ -93,6 +120,52 @@ export default function AdminPage() {
           </div>
         </div>
       )}
+
+      <div className="rounded-lg border p-6">
+        <h2 className="mb-6 text-xl font-semibold">
+          Users
+        </h2>
+
+        {usersError && (
+          <p className="text-red-600">
+            {usersError}
+          </p>
+        )}
+
+        {!usersError && users.length === 0 && (
+          <p className="text-gray-600">
+            No users found.
+          </p>
+        )}
+
+        {users.length > 0 && (
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b text-left">
+                  <th className="px-4 py-3">ID</th>
+                  <th className="px-4 py-3">Name</th>
+                  <th className="px-4 py-3">Email</th>
+                  <th className="px-4 py-3">Phone</th>
+                  <th className="px-4 py-3">Role</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {users.map((user) => (
+                  <tr key={user.id} className="border-b">
+                    <td className="px-4 py-3">{user.id}</td>
+                    <td className="px-4 py-3">{user.name}</td>
+                    <td className="px-4 py-3">{user.email}</td>
+                    <td className="px-4 py-3">{user.phone}</td>
+                    <td className="px-4 py-3">{user.role}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </main>
   );
 }
