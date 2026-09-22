@@ -5,9 +5,11 @@ import {
   getFinancialRecord,
   getUsers,
   getAdminOrders,
+  getAdminRestaurants,
   FinancialRecordResponse,
   UserResponse,
   OrderResponse,
+  Restaurant,
 } from "@/lib/api";
 
 export default function AdminPage() {
@@ -15,9 +17,11 @@ export default function AdminPage() {
   const [record, setRecord] = useState<FinancialRecordResponse | null>(null);
   const [users, setUsers] = useState<UserResponse[]>([]);
   const [orders, setOrders] = useState<OrderResponse[]>([]);
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [error, setError] = useState("");
   const [usersError, setUsersError] = useState("");
   const [ordersError, setOrdersError] = useState("");
+  const [restaurantsError, setRestaurantsError] = useState("");
 
   useEffect(() => {
     async function loadUsers() {
@@ -57,6 +61,26 @@ export default function AdminPage() {
     }
 
     loadOrders();
+  }, []);
+
+  useEffect(() => {
+    async function loadRestaurants() {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        setRestaurantsError("You must be logged in.");
+        return;
+      }
+
+      try {
+        const data = await getAdminRestaurants(token);
+        setRestaurants(data);
+      } catch {
+        setRestaurantsError("Unable to load restaurants.");
+      }
+    }
+
+    loadRestaurants();
   }, []);
 
   async function handleSearch() {
@@ -144,6 +168,58 @@ export default function AdminPage() {
           </div>
         </div>
       )}
+
+      <div className="mb-8 rounded-lg border p-6">
+        <h2 className="mb-6 text-xl font-semibold">
+          Restaurants
+        </h2>
+
+        {restaurantsError && (
+          <p className="text-red-600">
+            {restaurantsError}
+          </p>
+        )}
+
+        {!restaurantsError && restaurants.length === 0 && (
+          <p className="text-gray-600">
+            No restaurants found.
+          </p>
+        )}
+
+        {restaurants.length > 0 && (
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b text-left">
+                  <th className="px-4 py-3">ID</th>
+                  <th className="px-4 py-3">Name</th>
+                  <th className="px-4 py-3">Description</th>
+                  <th className="px-4 py-3">Address</th>
+                  <th className="px-4 py-3">Owner</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {restaurants.map((restaurant) => (
+                  <tr key={restaurant.id} className="border-b">
+                    <td className="px-4 py-3">{restaurant.id}</td>
+                    <td className="px-4 py-3">{restaurant.name}</td>
+                    <td className="px-4 py-3">
+                      {restaurant.description}
+                    </td>
+                    <td className="px-4 py-3">
+                      {restaurant.address}
+                    </td>
+                    <td className="px-4 py-3">
+                      {restaurant.ownerId}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
 
       <div className="mb-8 rounded-lg border p-6">
         <h2 className="mb-6 text-xl font-semibold">

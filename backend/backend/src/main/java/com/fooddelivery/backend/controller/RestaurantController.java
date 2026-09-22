@@ -23,6 +23,11 @@ public class RestaurantController {
         return restaurantService.getAllRestaurants();
     }
 
+    @GetMapping("/admin/all")
+    public List<RestaurantResponse> getAdminRestaurants() {
+        return restaurantService.getAllRestaurants();
+    }
+
     @GetMapping("/mine")
     public List<RestaurantResponse> getMyRestaurants(
             Authentication authentication

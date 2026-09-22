@@ -631,3 +631,24 @@ export async function getAdminOrders(
 
   return response.json();
 }
+
+export async function getAdminRestaurants(
+  token: string,
+): Promise<Restaurant[]> {
+  const response = await fetch(
+    `${API_URL}/api/restaurants/admin/all`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch admin restaurants: ${response.status}`,
+    );
+  }
+
+  return response.json();
+}
