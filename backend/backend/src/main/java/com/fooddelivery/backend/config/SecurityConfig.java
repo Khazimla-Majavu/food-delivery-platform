@@ -111,6 +111,14 @@ public class SecurityConfig {
                         ).hasRole("ADMIN")
 
                         .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/financial-records/admin/backfill"
+                        ).hasRole("ADMIN")
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/financial-records/admin/summary"
+                        ).hasRole("ADMIN")
+                        .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/financial-records/order/*"
                         ).hasRole("ADMIN")

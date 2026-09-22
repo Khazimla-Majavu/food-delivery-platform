@@ -5,6 +5,7 @@ import com.fooddelivery.backend.model.Order;
 import com.fooddelivery.backend.model.Restaurant;
 import com.fooddelivery.backend.model.User;
 import com.fooddelivery.backend.repository.FinancialRecordRepository;
+import com.fooddelivery.backend.repository.OrderRepository;
 import com.fooddelivery.backend.service.CommissionService;
 import com.fooddelivery.backend.service.DriverCommissionService;
 import com.fooddelivery.backend.service.DriverEarningsService;
@@ -25,6 +26,9 @@ class FinancialRecordServiceTest {
         FinancialRecordRepository repository =
                 mock(FinancialRecordRepository.class);
 
+        OrderRepository orderRepository =
+                mock(OrderRepository.class);
+
         when(repository.findByOrderId(1L))
                 .thenReturn(Optional.empty());
 
@@ -37,7 +41,8 @@ class FinancialRecordServiceTest {
                         new CommissionService(),
                         new DriverEarningsService(
                                 new DriverCommissionService()
-                        )
+                        ),
+                        orderRepository
                 );
 
         Order order = new Order();

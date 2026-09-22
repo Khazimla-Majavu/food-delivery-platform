@@ -16,6 +16,21 @@ public class FinancialRecordController {
         this.financialRecordService = financialRecordService;
     }
 
+    @PostMapping("/admin/backfill")
+    public java.util.Map<String, Object> backfillFinancialRecords() {
+        int createdRecords =
+                financialRecordService.backfillFinancialRecords();
+
+        return java.util.Map.of(
+                "createdRecords", createdRecords
+        );
+    }
+
+    @GetMapping("/admin/summary")
+    public java.util.Map<String, Object> getFinancialSummary() {
+        return financialRecordService.getFinancialSummary();
+    }
+
     @GetMapping("/order/{orderId}")
     public FinancialRecord getFinancialRecord(
             @PathVariable Long orderId
