@@ -3,14 +3,14 @@ spring:
     name: backend
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/food_delivery
-    username: postgres
-    password: Dlamini07
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/food_delivery}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:}
 
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: ${DDL_AUTO:update}
+    show-sql: ${SHOW_SQL:true}
     properties:
       hibernate:
-        format_sql: true
+        format_sql: ${FORMAT_SQL:true}
