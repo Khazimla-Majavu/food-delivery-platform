@@ -15,10 +15,13 @@ public class JwtService {
     @Value("${JWT_SECRET:food-delivery-platform-secret-key-change-this-in-production-2026}")
     private String secret;
 
-    private static final long EXPIRATION_TIME = 1000 * 60 * 60; // 1 hour
+    private static final long EXPIRATION_TIME = 1000 * 60 * 60;
 
-    private final SecretKey secretKey =
-            Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    private SecretKey getSecretKey() {
+        return Keys.hmacShaKeyFor(
+                secret.getBytes(StandardCharsets.UTF_8)
+        );
+    }
 
     public String generateToken(String email, String role) {
         Date now = new Date();
@@ -29,13 +32,13 @@ public class JwtService {
                 .claim("role", role)
                 .issuedAt(now)
                 .expiration(expiration)
-                .signWith(secretKey)
+                .signWith(getSecretKey())
                 .compact();
     }
 
     public String extractEmail(String token) {
         return Jwts.parser()
-                .verifyWith(secretKey)
+                .verifyWith(getSecretKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
@@ -44,7 +47,7 @@ public class JwtService {
 
     public String extractRole(String token) {
         return Jwts.parser()
-                .verifyWith(secretKey)
+                .verifyWith(getSecretKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
