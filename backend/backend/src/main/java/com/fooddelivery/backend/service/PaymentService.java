@@ -94,6 +94,48 @@ public class PaymentService {
         return paymentRepository.findAll();
     }
 
+    public Payment testPay(Long orderId, String customerEmail) {
+        User customer = userRepository.findByEmail(customerEmail)
+                .orElseThrow(() ->
+                        new RuntimeException("Customer not found")
+                );
+
+        if (customer.getRole() != User.Role.CUSTOMER) {
+            throw new RuntimeException("User is not a customer");
+        }
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() ->
+                        new RuntimeException("Order not found")
+                );
+
+        if (!order.getCustomer().getId().equals(customer.getId())) {
+            throw new RuntimeException(
+                    "You are not authorized to pay for this order"
+            );
+        }
+
+        Payment payment = paymentRepository.findByOrderId(orderId)
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Payment not found for this order"
+                        )
+                );
+
+        if (payment.getStatus() != Payment.Status.PENDING) {
+            throw new RuntimeException(
+                    "Payment cannot be processed from its current status"
+            );
+        }
+
+        payment.setStatus(Payment.Status.PROCESSING);
+        paymentRepository.save(payment);
+
+        payment.setStatus(Payment.Status.PAID);
+
+        return paymentRepository.save(payment);
+    }
+
     public Payment updatePaymentStatus(
                 Long paymentId,
                 Payment.Status status

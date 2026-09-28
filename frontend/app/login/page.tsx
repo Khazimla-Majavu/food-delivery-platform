@@ -1,6 +1,17 @@
 import LoginForm from "../components/LoginForm";
 
-export default function LoginPage() {
+interface LoginPageProps {
+  searchParams: Promise<{
+    redirect?: string;
+  }>;
+}
+
+export default async function LoginPage({
+  searchParams,
+}: LoginPageProps) {
+  const params = await searchParams;
+  const redirect = params.redirect || "/";
+
   return (
     <main className="min-h-screen bg-gray-50">
       <section className="mx-auto max-w-md px-6 py-12">
@@ -12,7 +23,7 @@ export default function LoginPage() {
           </p>
 
           <div className="mt-8">
-            <LoginForm />
+            <LoginForm redirect={redirect} />
           </div>
         </div>
       </section>

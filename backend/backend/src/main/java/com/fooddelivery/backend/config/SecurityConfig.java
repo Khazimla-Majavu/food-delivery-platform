@@ -68,7 +68,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/restaurants").hasRole("RESTAURANT")
                         .requestMatchers(HttpMethod.GET, "/api/restaurants/mine").hasRole("RESTAURANT")
-                        .requestMatchers(HttpMethod.GET, "/api/restaurants").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/restaurants").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/restaurants/*/menu").permitAll()
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/orders/driver/available"
@@ -85,6 +86,10 @@ public class SecurityConfig {
                                 HttpMethod.POST,
                                 "/api/orders/*/complete"
                         ).hasRole("DRIVER")
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/payments/order/*/test-pay"
+                        ).hasRole("CUSTOMER")
                         .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/payments/order/*"

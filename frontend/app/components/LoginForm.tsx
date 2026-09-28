@@ -4,7 +4,11 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { login } from "../../lib/api";
 
-export default function LoginForm() {
+interface LoginFormProps {
+  redirect?: string;
+}
+
+export default function LoginForm({ redirect = "/" }: LoginFormProps) {
   const router = useRouter();
 
   const [email, setEmail] = useState("");
@@ -26,7 +30,7 @@ export default function LoginForm() {
 
       window.dispatchEvent(new Event("auth-change"));
 
-      router.push("/");
+      router.push(redirect);
       router.refresh();
     } catch {
       setError("Login failed. Please check your email and password.");

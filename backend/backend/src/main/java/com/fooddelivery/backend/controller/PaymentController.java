@@ -57,6 +57,21 @@ public class PaymentController {
         );
     }
 
+    @PostMapping("/order/{orderId}/test-pay")
+    public ResponseEntity<PaymentResponse> testPay(
+            @PathVariable Long orderId,
+            Authentication authentication
+    ) {
+        Payment payment = paymentService.testPay(
+                orderId,
+                authentication.getName()
+        );
+
+        return ResponseEntity.ok(
+                PaymentResponse.fromPayment(payment)
+        );
+    }
+
     @PutMapping("/{paymentId}/status")
     public ResponseEntity<PaymentResponse> updatePaymentStatus(
             @PathVariable Long paymentId,

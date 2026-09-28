@@ -1,69 +1,65 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import RestaurantList from "./components/RestaurantList";
-import { getUser, logout } from "../lib/auth";
-import { UserResponse } from "../lib/api";
 
 export default function Home() {
-  const [user, setUser] = useState<UserResponse | null>(null);
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    setUser(getUser());
-    setLoaded(true);
-  }, []);
-
-  function handleLogout() {
-    logout();
-    setUser(null);
-  }
-
   return (
-    <main className="min-h-screen bg-white">
-      {/* Navigation */}
-
+    <main className="min-h-screen bg-white text-black">
       {/* Hero */}
-      <section className="bg-orange-50">
-        <div className="mx-auto max-w-7xl px-6 py-20">
-          <div className="max-w-3xl">
-            <p className="mb-4 font-semibold text-orange-600">
-              Delicious food, delivered to you
+      <section className="border-b border-neutral-200">
+        <div className="mx-auto max-w-7xl px-6 py-24 lg:px-8 lg:py-32">
+          <div className="max-w-4xl">
+            <p className="mb-6 text-sm font-medium uppercase tracking-[0.2em] text-neutral-500">
+              Food from local restaurants
             </p>
 
-            <h2 className="text-5xl font-bold leading-tight text-gray-900">
-              Discover great food near you.
-            </h2>
+            <h1 className="text-5xl font-semibold leading-[1.05] tracking-[-0.04em] sm:text-6xl lg:text-8xl">
+              Good food.
+              <br />
+              Delivered.
+            </h1>
 
-            <p className="mt-6 text-lg text-gray-600">
-              Order from local restaurants and get your favourite meals
+            <p className="mt-8 max-w-2xl text-lg leading-8 text-neutral-600 sm:text-xl">
+              Discover local restaurants, order what you want, and have it
               delivered straight to your door.
             </p>
 
-            {/* Search */}
-            <div className="mt-8 flex max-w-2xl flex-col gap-3 sm:flex-row">
-              <input
-                type="text"
-                placeholder="Enter your delivery address"
-                className="flex-1 rounded-lg border border-gray-300 bg-white px-5 py-4 text-gray-900 outline-none focus:border-orange-500"
-              />
+            <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+              <a
+                href="#restaurants"
+                className="inline-flex items-center justify-center rounded-full bg-black px-7 py-4 text-sm font-semibold text-white transition hover:bg-neutral-800"
+              >
+                Explore restaurants
+              </a>
 
-              <button className="rounded-lg bg-orange-600 px-7 py-4 font-semibold text-white hover:bg-orange-700">
-                Find food
-              </button>
+              <a
+                href="/register"
+                className="inline-flex items-center justify-center rounded-full border border-neutral-300 px-7 py-4 text-sm font-semibold text-black transition hover:border-black"
+              >
+                Get started
+              </a>
             </div>
           </div>
         </div>
       </section>
 
       {/* Restaurant Discovery */}
-      <section className="mx-auto max-w-7xl px-6 py-16">
-        <div className="mb-8">
-          <h3 className="text-3xl font-bold text-gray-900">
-            Explore restaurants
-          </h3>
+      <section
+        id="restaurants"
+        className="mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-24"
+      >
+        <div className="mb-10">
+          <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-neutral-500">
+            Discover
+          </p>
 
-          <p className="mt-2 text-gray-600">Find something delicious to eat.</p>
+          <h2 className="text-4xl font-semibold tracking-[-0.03em] sm:text-5xl">
+            Restaurants near you
+          </h2>
+
+          <p className="mt-3 max-w-xl text-neutral-500">
+            Browse local restaurants and find something worth ordering.
+          </p>
         </div>
 
         <RestaurantList />

@@ -1,5 +1,7 @@
 package com.fooddelivery.backend.service;
 
+import com.fooddelivery.backend.model.Payment;
+
 import com.fooddelivery.backend.dto.CreateOrderRequest;
 import com.fooddelivery.backend.dto.OrderResponse;
 import com.fooddelivery.backend.model.MenuItem;
@@ -13,6 +15,7 @@ import com.fooddelivery.backend.repository.OrderRepository;
 import com.fooddelivery.backend.repository.RestaurantRepository;
 import com.fooddelivery.backend.repository.UserRepository;
 import com.fooddelivery.backend.repository.DeliveryLocationRepository;
+import com.fooddelivery.backend.repository.PaymentRepository;
 import com.fooddelivery.backend.service.NotificationService;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +33,7 @@ public class OrderService {
     private final MenuItemRepository menuItemRepository;
     private final UserRepository userRepository;
     private final DeliveryLocationRepository deliveryLocationRepository;
+    private final PaymentRepository paymentRepository;
     private final DeliveryFeeService deliveryFeeService;
     private final DistanceService distanceService;
     private final OrderPricingService orderPricingService;
@@ -43,6 +47,7 @@ public class OrderService {
             MenuItemRepository menuItemRepository,
             UserRepository userRepository,
             DeliveryLocationRepository deliveryLocationRepository,
+            PaymentRepository paymentRepository,
             DeliveryFeeService deliveryFeeService,
             DistanceService distanceService,
             OrderPricingService orderPricingService,
@@ -55,6 +60,7 @@ public class OrderService {
         this.menuItemRepository = menuItemRepository;
         this.userRepository = userRepository;
         this.deliveryLocationRepository = deliveryLocationRepository;
+        this.paymentRepository = paymentRepository;
         this.deliveryFeeService = deliveryFeeService;
         this.distanceService = distanceService;
         this.orderPricingService = orderPricingService;
@@ -198,6 +204,9 @@ public class OrderService {
 
         return orderRepository.findByRestaurantId(restaurantId)
                 .stream()
+                .filter(order -> paymentRepository.findByOrderId(order.getId())
+                        .map(payment -> payment.getStatus() == com.fooddelivery.backend.model.Payment.Status.PAID)
+                        .orElse(false))
                 .map(order -> {
                     List<OrderItem> items =
                             orderItemRepository.findByOrderId(order.getId());
@@ -223,6 +232,21 @@ public class OrderService {
             );
         }
         
+        if (newStatus != Order.Status.CANCELLED) {
+            Payment payment = paymentRepository.findByOrderId(orderId)
+                    .orElseThrow(() ->
+                            new RuntimeException(
+                                    "Payment not found for this order"
+                            )
+                    );
+
+            if (payment.getStatus() != Payment.Status.PAID) {
+                throw new RuntimeException(
+                        "Order cannot be processed until payment is successful"
+                );
+            }
+        }
+
         if (!isValidStatusTransition(order.getStatus(), newStatus)) {
             throw new RuntimeException(
                     "Invalid order status transition from "

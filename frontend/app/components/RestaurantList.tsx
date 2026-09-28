@@ -12,14 +12,8 @@ export default function RestaurantList() {
     async function loadRestaurants() {
       const token = localStorage.getItem("token");
 
-      if (!token) {
-        setError("Please log in to view restaurants.");
-        setLoading(false);
-        return;
-      }
-
       try {
-        const data = await getRestaurants(token);
+        const data = await getRestaurants(token || "");
         setRestaurants(data);
       } catch {
         setError("Unable to load restaurants.");
@@ -32,15 +26,27 @@ export default function RestaurantList() {
   }, []);
 
   if (loading) {
-    return <p className="text-gray-600">Loading restaurants...</p>;
+    return (
+      <p className="py-10 text-sm text-neutral-500">
+        Loading restaurants...
+      </p>
+    );
   }
 
   if (error) {
-    return <p className="text-red-600">{error}</p>;
+    return (
+      <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-6">
+        <p className="text-sm text-neutral-600">{error}</p>
+      </div>
+    );
   }
 
   if (restaurants.length === 0) {
-    return <p className="text-gray-600">No restaurants available yet.</p>;
+    return (
+      <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-10 text-center">
+        <p className="text-neutral-500">No restaurants available yet.</p>
+      </div>
+    );
   }
 
   return (
@@ -49,26 +55,32 @@ export default function RestaurantList() {
         <a
           key={restaurant.id}
           href={`/restaurants/${restaurant.id}`}
-          className="block overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:shadow-md"
+          className="group overflow-hidden rounded-2xl border border-neutral-200 bg-white transition duration-200 hover:-translate-y-1 hover:border-neutral-300 hover:shadow-xl"
         >
-          <div className="flex h-48 items-center justify-center bg-gray-100">
-            <span className="text-gray-400">Restaurant Image</span>
+          <div className="flex h-52 items-center justify-center bg-neutral-100">
+            <span className="text-sm font-medium uppercase tracking-[0.15em] text-neutral-400">
+              Restaurant
+            </span>
           </div>
 
-          <div className="p-5">
-            <h4 className="text-xl font-semibold text-gray-900">
-              {restaurant.name}
-            </h4>
+          <div className="p-6">
+            <div className="flex items-start justify-between gap-4">
+              <h3 className="text-xl font-semibold tracking-[-0.02em] text-black">
+                {restaurant.name}
+              </h3>
 
-            <p className="mt-2 text-sm text-gray-500">
+              <span className="text-xl text-neutral-400 transition-transform duration-200 group-hover:translate-x-1">
+                →
+              </span>
+            </div>
+
+            <p className="mt-3 line-clamp-2 text-sm leading-6 text-neutral-500">
               {restaurant.description}
             </p>
 
-            <div className="mt-4">
-              <span className="text-sm text-gray-500">
-                {restaurant.address}
-              </span>
-            </div>
+            <p className="mt-5 text-sm font-medium text-neutral-700">
+              {restaurant.address}
+            </p>
           </div>
         </a>
       ))}

@@ -117,11 +117,13 @@ export async function register(
   return response.json();
 }
 
-export async function getRestaurants(token: string): Promise<Restaurant[]> {
+export async function getRestaurants(token?: string): Promise<Restaurant[]> {
+  const headers: HeadersInit = token
+    ? { Authorization: `Bearer ${token}` }
+    : {};
+
   const response = await fetch(`${API_URL}/api/restaurants`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    headers,
   });
 
   if (!response.ok) {
@@ -408,6 +410,27 @@ export async function createPayment(
 
   if (!response.ok) {
     throw new Error(`Failed to create payment: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export async function testPay(
+  orderId: number,
+  token: string,
+): Promise<PaymentResponse> {
+  const response = await fetch(
+    `${API_URL}/api/payments/order/${orderId}/test-pay`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to process test payment: ${response.status}`);
   }
 
   return response.json();

@@ -11,7 +11,9 @@ import { getToken, getUser, logout } from "../../lib/auth";
 
 export default function Navbar() {
   const [user, setUser] = useState<UserResponse | null>(null);
-  const [notifications, setNotifications] = useState<NotificationResponse[]>([]);
+  const [notifications, setNotifications] = useState<NotificationResponse[]>(
+    [],
+  );
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -57,20 +59,19 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 border-b border-neutral-800 bg-black text-white">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-8">
-
         {/* Chow Brand */}
         <Link
           href="/"
           className="group flex items-center gap-3"
           aria-label="Chow home"
         >
-          <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white transition-transform duration-200 group-hover:scale-105">
-            <span className="text-xl leading-none">✦</span>
-          </div>
+          <img
+            src="/chow-logo.jpeg"
+            alt="Chow logo"
+            className="h-10 w-auto transition-transform duration-200 group-hover:scale-105"
+          />
 
-          <span className="text-3xl font-light tracking-[-0.05em]">
-            chow
-          </span>
+          <span className="text-3xl font-light tracking-[-0.05em]">chow</span>
         </Link>
 
         {/* Navigation */}
@@ -95,7 +96,6 @@ export default function Navbar() {
                     className="relative rounded-full px-4 py-2 text-sm font-medium text-neutral-300 transition hover:bg-white hover:text-black"
                   >
                     Notifications
-
                     {unreadCount > 0 && (
                       <span className="ml-2 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-white px-1.5 text-xs font-bold text-black">
                         {unreadCount}
