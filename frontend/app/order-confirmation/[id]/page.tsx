@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
+import RoleGuard from "../../components/RoleGuard";
 
 export default function OrderConfirmationPage() {
   const params = useParams();
@@ -9,7 +10,8 @@ export default function OrderConfirmationPage() {
   const orderId = params.id;
 
   return (
-    <main className="min-h-screen bg-white text-black">
+    <RoleGuard allowedRoles={["CUSTOMER"]}>
+      <main className="min-h-screen bg-white text-black">
       <section className="mx-auto flex min-h-screen max-w-3xl items-center px-6 py-16">
         <div className="w-full rounded-3xl border border-neutral-200 bg-white p-8 text-center shadow-sm sm:p-12">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-black text-2xl text-white">
@@ -56,6 +58,7 @@ export default function OrderConfirmationPage() {
           </div>
         </div>
       </section>
-    </main>
+      </main>
+    </RoleGuard>
   );
 }

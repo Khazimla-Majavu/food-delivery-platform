@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import RoleGuard from "../components/RoleGuard";
 import {
   getFinancialRecord,
   backfillFinancialRecords,
@@ -157,7 +158,8 @@ export default function AdminPage() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl p-6">
+    <RoleGuard allowedRoles={["ADMIN"]}>
+      <main className="mx-auto max-w-6xl p-6">
       <h1 className="mb-6 text-3xl font-bold">Admin Dashboard</h1>
 
       <div className="mb-8 rounded-lg border p-6">
@@ -463,6 +465,7 @@ export default function AdminPage() {
           </div>
         )}
       </div>
-    </main>
+      </main>
+    </RoleGuard>
   );
 }

@@ -1,5 +1,7 @@
 "use client";
 
+import RoleGuard from "../components/RoleGuard";
+
 import { useEffect, useState } from "react";
 import {
   getMyRestaurants,
@@ -14,7 +16,7 @@ import {
   MenuItem,
 } from "../../lib/api";
 
-export default function RestaurantDashboard() {
+function RestaurantDashboardContent() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [orders, setOrders] = useState<OrderResponse[]>([]);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -357,16 +359,6 @@ export default function RestaurantDashboard() {
       }
 
       try {
-        const user = JSON.parse(userJson);
-
-        if (user.role !== "RESTAURANT") {
-          setError(
-            "You do not have permission to access the restaurant dashboard.",
-          );
-          setLoading(false);
-          return;
-        }
-
         const myRestaurants = await getMyRestaurants(token);
 
         setRestaurants(myRestaurants);
@@ -425,7 +417,7 @@ export default function RestaurantDashboard() {
   }
 
   return (
-    <main className="min-h-screen bg-white text-black">
+      <main className="min-h-screen bg-white text-black">
       <section className="border-b border-neutral-200">
         <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
           <a
@@ -911,6 +903,14 @@ export default function RestaurantDashboard() {
           )}
         </div>
       </section>
-    </main>
+      </main>
+  );
+}
+
+export default function RestaurantDashboard() {
+  return (
+    <RoleGuard allowedRoles={["RESTAURANT"]}>
+      <RestaurantDashboardContent />
+    </RoleGuard>
   );
 }

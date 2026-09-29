@@ -8,6 +8,20 @@ interface LoginFormProps {
   redirect?: string;
 }
 
+function getRoleRoute(role: string): string {
+  switch (role) {
+    case "RESTAURANT":
+      return "/restaurant-dashboard";
+    case "DRIVER":
+      return "/driver-dashboard";
+    case "ADMIN":
+      return "/admin";
+    case "CUSTOMER":
+    default:
+      return "/";
+  }
+}
+
 export default function LoginForm({ redirect = "/" }: LoginFormProps) {
   const router = useRouter();
 
@@ -30,7 +44,14 @@ export default function LoginForm({ redirect = "/" }: LoginFormProps) {
 
       window.dispatchEvent(new Event("auth-change"));
 
-      router.push(redirect);
+      const role = data.user.role;
+
+      if (role === "CUSTOMER" && redirect !== "/") {
+        router.push(redirect);
+      } else {
+        router.push(getRoleRoute(role));
+      }
+
       router.refresh();
     } catch {
       setError("Login failed. Please check your email and password.");

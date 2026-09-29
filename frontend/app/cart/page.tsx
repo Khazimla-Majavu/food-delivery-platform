@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "../context/CartContext";
+import RoleGuard from "../components/RoleGuard";
 import {
   createOrder,
   createPayment,
@@ -216,7 +217,8 @@ export default function CartPage() {
   }
 
   return (
-    <main className="min-h-screen bg-white text-black">
+    <RoleGuard allowedRoles={["CUSTOMER"]}>
+      <main className="min-h-screen bg-white text-black">
       <section className="mx-auto max-w-4xl px-6 py-12">
         <div className="mb-8">
           <button
@@ -503,6 +505,7 @@ export default function CartPage() {
           </div>
         )}
       </section>
-    </main>
+      </main>
+    </RoleGuard>
   );
 }

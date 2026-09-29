@@ -1,11 +1,42 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import RestaurantList from "./components/RestaurantList";
+import { getToken, getUser } from "../lib/auth";
 
 export default function Home() {
+  const router = useRouter();
+  const [checkingAccess, setCheckingAccess] = useState(true);
+
+  useEffect(() => {
+    const token = getToken();
+    const user = getUser();
+
+    if (token && user && user.role !== "CUSTOMER") {
+      const roleRoutes: Record<string, string> = {
+        RESTAURANT: "/restaurant-dashboard",
+        DRIVER: "/driver-dashboard",
+        ADMIN: "/admin",
+      };
+
+      router.replace(roleRoutes[user.role] || "/");
+      return;
+    }
+
+    setCheckingAccess(false);
+  }, [router]);
+
+  if (checkingAccess) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-white text-black">
+        <p className="text-sm text-neutral-500">Checking access...</p>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-white text-black">
-      {/* Hero */}
       <section className="border-b border-neutral-200">
         <div className="mx-auto max-w-7xl px-6 py-24 lg:px-8 lg:py-32">
           <div className="max-w-4xl">
@@ -43,7 +74,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Restaurant Discovery */}
       <section
         id="restaurants"
         className="mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-24"

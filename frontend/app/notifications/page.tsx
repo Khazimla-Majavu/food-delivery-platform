@@ -8,6 +8,7 @@ import {
   NotificationResponse,
 } from "../../lib/api";
 import { getToken, getUser } from "../../lib/auth";
+import RoleGuard from "../components/RoleGuard";
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<NotificationResponse[]>([]);
@@ -66,7 +67,8 @@ export default function NotificationsPage() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-6 py-10">
+    <RoleGuard allowedRoles={["CUSTOMER"]}>
+      <main className="mx-auto w-full max-w-4xl px-6 py-10">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
@@ -127,6 +129,7 @@ export default function NotificationsPage() {
           ))}
         </div>
       )}
-    </main>
+      </main>
+    </RoleGuard>
   );
 }

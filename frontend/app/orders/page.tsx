@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import RoleGuard from "../components/RoleGuard";
 import {
   getMyOrders,
   getDeliveryDistance,
@@ -175,7 +176,8 @@ export default function OrdersPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-white text-black">
+    <RoleGuard allowedRoles={["CUSTOMER"]}>
+      <main className="min-h-screen bg-white text-black">
       <section className="border-b border-neutral-200">
         <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
           <a
@@ -345,6 +347,7 @@ export default function OrdersPage() {
           </div>
         )}
       </section>
-    </main>
+      </main>
+    </RoleGuard>
   );
 }
