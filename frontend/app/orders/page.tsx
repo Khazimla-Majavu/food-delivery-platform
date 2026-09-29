@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getMyOrders, getDeliveryDistance, OrderResponse } from "../../lib/api";
+import {
+  getMyOrders,
+  getDeliveryDistance,
+  OrderResponse,
+} from "../../lib/api";
 
 const statusSteps = [
   {
@@ -37,10 +41,10 @@ function getStatusIndex(status: string) {
 function OrderStatusTracker({ status }: { status: string }) {
   if (status === "CANCELLED") {
     return (
-      <div className="mt-6 rounded-lg border border-red-200 bg-red-50 p-4">
-        <p className="font-semibold text-red-700">Order cancelled</p>
+      <div className="mt-8 rounded-2xl border border-neutral-200 bg-neutral-50 p-5">
+        <p className="font-semibold text-black">Order cancelled</p>
 
-        <p className="mt-1 text-sm text-red-600">
+        <p className="mt-1 text-sm text-neutral-500">
           This order has been cancelled.
         </p>
       </div>
@@ -50,10 +54,18 @@ function OrderStatusTracker({ status }: { status: string }) {
   const currentIndex = getStatusIndex(status);
 
   return (
-    <div className="mt-6">
-      <h3 className="mb-4 text-sm font-semibold text-gray-700">
-        Order progress
-      </h3>
+    <div className="mt-8">
+      <div className="mb-5 flex items-center justify-between">
+        <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-neutral-500">
+          Order progress
+        </h3>
+
+        {status === "DELIVERED" && (
+          <span className="text-sm font-semibold text-black">
+            Complete
+          </span>
+        )}
+      </div>
 
       <div className="space-y-4">
         {statusSteps.map((step, index) => {
@@ -64,10 +76,10 @@ function OrderStatusTracker({ status }: { status: string }) {
             <div key={step.status} className="flex items-start gap-4">
               <div className="flex flex-col items-center">
                 <div
-                  className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
+                  className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold ${
                     completed
-                      ? "bg-orange-600 text-white"
-                      : "border-2 border-gray-300 bg-white text-gray-400"
+                      ? "bg-black text-white"
+                      : "border border-neutral-300 bg-white text-neutral-400"
                   }`}
                 >
                   {completed ? "✓" : index + 1}
@@ -75,8 +87,10 @@ function OrderStatusTracker({ status }: { status: string }) {
 
                 {index < statusSteps.length - 1 && (
                   <div
-                    className={`mt-1 h-6 w-0.5 ${
-                      index < currentIndex ? "bg-orange-600" : "bg-gray-300"
+                    className={`mt-1 h-6 w-px ${
+                      index < currentIndex
+                        ? "bg-black"
+                        : "bg-neutral-200"
                     }`}
                   />
                 )}
@@ -86,17 +100,19 @@ function OrderStatusTracker({ status }: { status: string }) {
                 <p
                   className={`font-semibold ${
                     current
-                      ? "text-orange-600"
+                      ? "text-black"
                       : completed
-                        ? "text-gray-900"
-                        : "text-gray-400"
+                        ? "text-neutral-700"
+                        : "text-neutral-400"
                   }`}
                 >
                   {step.label}
                 </p>
 
                 {current && status !== "DELIVERED" && (
-                  <p className="mt-1 text-sm text-gray-500">Current status</p>
+                  <p className="mt-1 text-sm text-neutral-500">
+                    Current status
+                  </p>
                 )}
               </div>
             </div>
@@ -109,7 +125,9 @@ function OrderStatusTracker({ status }: { status: string }) {
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<OrderResponse[]>([]);
-  const [deliveryDistances, setDeliveryDistances] = useState<Record<number, number>>({});
+  const [deliveryDistances, setDeliveryDistances] = useState<
+    Record<number, number>
+  >({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -141,7 +159,8 @@ export default function OrdersPage() {
         setDeliveryDistances(
           Object.fromEntries(
             distanceEntries.filter(
-              (entry): entry is readonly [number, number] => entry !== null,
+              (entry): entry is readonly [number, number] =>
+                entry !== null,
             ),
           ),
         );
@@ -156,48 +175,64 @@ export default function OrdersPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <nav className="border-b border-gray-200 bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <a href="/" className="text-2xl font-bold text-orange-600">
-            FoodDelivery
-          </a>
-
+    <main className="min-h-screen bg-white text-black">
+      <section className="border-b border-neutral-200">
+        <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
           <a
             href="/"
-            className="text-sm font-medium text-gray-700 hover:text-orange-600"
+            className="mb-8 inline-flex items-center text-sm font-medium text-neutral-500 transition hover:text-black"
           >
-            Continue shopping
+            ← Continue shopping
           </a>
+
+          <div className="max-w-3xl">
+            <p className="text-sm font-medium uppercase tracking-[0.2em] text-neutral-500">
+              Your account
+            </p>
+
+            <h1 className="mt-3 text-5xl font-semibold tracking-[-0.04em] sm:text-6xl">
+              My Orders
+            </h1>
+
+            <p className="mt-5 max-w-2xl text-lg leading-8 text-neutral-500">
+              Track your current orders and view your previous orders.
+            </p>
+          </div>
         </div>
-      </nav>
+      </section>
 
-      {/* Orders */}
-      <section className="mx-auto max-w-4xl px-6 py-12">
-        <h1 className="text-4xl font-bold text-gray-900">My Orders</h1>
+      <section className="mx-auto max-w-4xl px-6 py-16 lg:px-8 lg:py-20">
+        {loading && (
+          <div className="py-12">
+            <p className="text-sm text-neutral-500">
+              Loading orders...
+            </p>
+          </div>
+        )}
 
-        <p className="mt-2 text-gray-600">
-          View your previous and current orders.
-        </p>
-
-        {loading && <p className="mt-8 text-gray-600">Loading orders...</p>}
-
-        {error && <p className="mt-8 text-red-600">{error}</p>}
+        {error && (
+          <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-6">
+            <p className="text-sm text-neutral-700">{error}</p>
+          </div>
+        )}
 
         {!loading && !error && orders.length === 0 && (
-          <div className="mt-8 rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-            <h2 className="text-xl font-semibold text-gray-900">
+          <div className="rounded-3xl border border-neutral-200 bg-neutral-50 p-10 text-center sm:p-14">
+            <p className="text-sm font-medium uppercase tracking-[0.15em] text-neutral-500">
+              Nothing here yet
+            </p>
+
+            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.03em]">
               No orders yet
             </h2>
 
-            <p className="mt-2 text-gray-600">
+            <p className="mx-auto mt-3 max-w-md text-neutral-500">
               Your orders will appear here after you place one.
             </p>
 
             <a
               href="/"
-              className="mt-6 inline-block rounded-lg bg-orange-600 px-6 py-3 font-semibold text-white hover:bg-orange-700"
+              className="mt-7 inline-flex rounded-full bg-black px-7 py-4 text-sm font-semibold text-white transition hover:bg-neutral-800"
             >
               Browse restaurants
             </a>
@@ -205,90 +240,107 @@ export default function OrdersPage() {
         )}
 
         {!loading && !error && orders.length > 0 && (
-          <div className="mt-8 space-y-6">
+          <div className="space-y-8">
             {orders.map((order) => (
-              <div
+              <article
                 key={order.id}
-                className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+                className="overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm"
               >
-                {/* Order header */}
-                <div className="flex flex-col gap-3 border-b border-gray-100 pb-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <h2 className="text-xl font-bold text-gray-900">
-                      Order #{order.id}
-                    </h2>
-
-                    <p className="mt-1 text-sm font-medium text-gray-700">
-                      {order.restaurantName}
-                    </p>
-
-                    <p className="mt-1 text-sm text-gray-500">
-                      {order.restaurantAddress}
-                    </p>
-
-                    {deliveryDistances[order.id] !== undefined && (
-                      <p className="mt-1 text-sm font-medium text-gray-700">
-                        Delivery distance: {deliveryDistances[order.id].toFixed(2)} km
+                <div className="border-b border-neutral-200 p-6 sm:p-8">
+                  <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <p className="text-sm font-medium uppercase tracking-[0.15em] text-neutral-500">
+                        Order #{order.id}
                       </p>
-                    )}
+
+                      <h2 className="mt-2 text-2xl font-semibold tracking-[-0.02em]">
+                        {order.restaurantName}
+                      </h2>
+
+                      <p className="mt-2 text-sm text-neutral-500">
+                        {order.restaurantAddress}
+                      </p>
+
+                      {deliveryDistances[order.id] !== undefined && (
+                        <p className="mt-2 text-sm font-medium text-neutral-700">
+                          {deliveryDistances[order.id].toFixed(2)} km delivery
+                        </p>
+                      )}
+                    </div>
+
+                    <span
+                      className={`inline-flex w-fit rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] ${
+                        order.status === "CANCELLED"
+                          ? "bg-neutral-100 text-neutral-600"
+                          : order.status === "DELIVERED"
+                            ? "bg-black text-white"
+                            : "border border-neutral-300 bg-white text-black"
+                      }`}
+                    >
+                      {order.status.replaceAll("_", " ")}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-6 sm:p-8">
+                  <OrderStatusTracker status={order.status} />
+
+                  <div className="mt-10 border-t border-neutral-200 pt-8">
+                    <div className="mb-5 flex items-center justify-between">
+                      <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-neutral-500">
+                        Items
+                      </h3>
+
+                      <span className="text-sm text-neutral-500">
+                        {order.items.length}{" "}
+                        {order.items.length === 1 ? "item" : "items"}
+                      </span>
+                    </div>
+
+                    <div className="space-y-5">
+                      {order.items.map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center justify-between gap-6"
+                        >
+                          <div>
+                            <p className="font-semibold text-black">
+                              {item.menuItemName}
+                            </p>
+
+                            <p className="mt-1 text-sm text-neutral-500">
+                              {item.quantity} × R
+                              {Number(item.price).toFixed(2)}
+                            </p>
+                          </div>
+
+                          <p className="shrink-0 font-semibold text-black">
+                            R{Number(item.subtotal).toFixed(2)}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
-                  <span
-                    className={`inline-flex w-fit rounded-full px-3 py-1 text-sm font-semibold ${
-                      order.status === "CANCELLED"
-                        ? "bg-red-100 text-red-700"
-                        : order.status === "DELIVERED"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-orange-100 text-orange-700"
-                    }`}
-                  >
-                    {order.status}
-                  </span>
-                </div>
+                  <div className="mt-8 flex items-end justify-between border-t border-neutral-200 pt-6">
+                    <div>
+                      <p className="text-sm text-neutral-500">
+                        Total
+                      </p>
 
-                {/* Status tracker */}
-                <OrderStatusTracker status={order.status} />
-
-                {/* Items */}
-                <div className="mt-6 space-y-4 border-t border-gray-100 pt-6">
-                  <h3 className="text-sm font-semibold text-gray-700">Items</h3>
-
-                  {order.items.map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex items-center justify-between"
-                    >
-                      <div>
-                        <p className="font-medium text-gray-900">
-                          {item.menuItemName}
-                        </p>
-
-                        <p className="text-sm text-gray-500">
-                          {item.quantity} × R{Number(item.price).toFixed(2)}
-                        </p>
-                      </div>
-
-                      <p className="font-semibold text-gray-900">
-                        R{Number(item.subtotal).toFixed(2)}
+                      <p className="mt-1 text-3xl font-semibold tracking-[-0.03em]">
+                        R{Number(order.totalAmount).toFixed(2)}
                       </p>
                     </div>
-                  ))}
+
+                    <p className="text-right text-xs text-neutral-400">
+                      Placed
+                      <br />
+                      {new Date(order.createdAt).toLocaleString()}
+                    </p>
+                  </div>
                 </div>
-
-                {/* Order total */}
-                <div className="mt-5 flex items-center justify-between border-t border-gray-100 pt-5">
-                  <span className="font-medium text-gray-700">Total</span>
-
-                  <span className="text-xl font-bold text-orange-600">
-                    R{Number(order.totalAmount).toFixed(2)}
-                  </span>
-                </div>
-
-                {/* Date */}
-                <p className="mt-3 text-xs text-gray-500">
-                  Placed {new Date(order.createdAt).toLocaleString()}
-                </p>
-              </div>
+              </article>
             ))}
           </div>
         )}

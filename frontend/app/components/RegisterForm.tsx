@@ -48,11 +48,11 @@ export default function RegisterForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-5">
       <div>
         <label
           htmlFor="name"
-          className="mb-1 block text-sm font-medium text-gray-700"
+          className="mb-2 block text-sm font-medium text-black"
         >
           Full name
         </label>
@@ -63,7 +63,7 @@ export default function RegisterForm() {
           value={name}
           onChange={(event) => setName(event.target.value)}
           required
-          className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 outline-none focus:border-orange-500"
+          className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3.5 text-black outline-none transition placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black"
           placeholder="Your name"
         />
       </div>
@@ -71,7 +71,7 @@ export default function RegisterForm() {
       <div>
         <label
           htmlFor="email"
-          className="mb-1 block text-sm font-medium text-gray-700"
+          className="mb-2 block text-sm font-medium text-black"
         >
           Email
         </label>
@@ -82,7 +82,7 @@ export default function RegisterForm() {
           value={email}
           onChange={(event) => setEmail(event.target.value)}
           required
-          className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 outline-none focus:border-orange-500"
+          className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3.5 text-black outline-none transition placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black"
           placeholder="you@example.com"
         />
       </div>
@@ -90,7 +90,7 @@ export default function RegisterForm() {
       <div>
         <label
           htmlFor="phone"
-          className="mb-1 block text-sm font-medium text-gray-700"
+          className="mb-2 block text-sm font-medium text-black"
         >
           Phone
         </label>
@@ -101,7 +101,7 @@ export default function RegisterForm() {
           value={phone}
           onChange={(event) => setPhone(event.target.value)}
           required
-          className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 outline-none focus:border-orange-500"
+          className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3.5 text-black outline-none transition placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black"
           placeholder="0821234567"
         />
       </div>
@@ -109,7 +109,7 @@ export default function RegisterForm() {
       <div>
         <label
           htmlFor="password"
-          className="mb-1 block text-sm font-medium text-gray-700"
+          className="mb-2 block text-sm font-medium text-black"
         >
           Password
         </label>
@@ -121,7 +121,7 @@ export default function RegisterForm() {
           onChange={(event) => setPassword(event.target.value)}
           required
           minLength={8}
-          className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 outline-none focus:border-orange-500"
+          className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3.5 text-black outline-none transition placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black"
           placeholder="At least 8 characters"
         />
       </div>
@@ -129,7 +129,7 @@ export default function RegisterForm() {
       <div>
         <label
           htmlFor="confirmPassword"
-          className="mb-1 block text-sm font-medium text-gray-700"
+          className="mb-2 block text-sm font-medium text-black"
         >
           Confirm password
         </label>
@@ -141,19 +141,27 @@ export default function RegisterForm() {
           onChange={(event) => setConfirmPassword(event.target.value)}
           required
           minLength={8}
-          className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 outline-none focus:border-orange-500"
+          className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3.5 text-black outline-none transition placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black"
           placeholder="Repeat your password"
         />
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && (
+        <div className="rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3">
+          <p className="text-sm text-neutral-700">{error}</p>
+        </div>
+      )}
 
-      {success && <p className="text-sm text-green-600">{success}</p>}
+      {success && (
+        <div className="rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3">
+          <p className="text-sm text-neutral-700">{success}</p>
+        </div>
+      )}
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-lg bg-orange-600 px-4 py-3 font-semibold text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50"
+        className="w-full rounded-full bg-black px-5 py-4 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {loading ? "Creating account..." : "Create account"}
       </button>
