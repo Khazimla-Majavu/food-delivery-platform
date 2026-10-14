@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import RoleGuard from "../components/RoleGuard";
+import { isOrderHistory, sortOrdersBySection } from "../../lib/orderSorting";
 import {
   getMyOrders,
   getDeliveryDistance,
@@ -243,7 +244,24 @@ export default function OrdersPage() {
 
         {!loading && !error && orders.length > 0 && (
           <div className="space-y-8">
-            {orders.map((order) => (
+            {sortOrdersBySection(orders).map((order, index, sortedOrders) => (
+              <>
+              {(index === 0 ||
+                  isOrderHistory(order) !==
+                    isOrderHistory(sortedOrders[index - 1])) && (
+                  <div className="pb-1 pt-2">
+                    <h2 className="text-2xl font-semibold tracking-[-0.03em]">
+                      {isOrderHistory(order)
+                        ? "Order History"
+                        : "Ongoing Orders"}
+                    </h2>
+                    <p className="mt-2 text-sm text-neutral-500">
+                      {isOrderHistory(order)
+                        ? "Delivered and cancelled orders."
+                        : "Orders that are still being processed or delivered."}
+                    </p>
+                  </div>
+                )}
               <article
                 key={order.id}
                 className="overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm"
@@ -343,6 +361,7 @@ export default function OrdersPage() {
                   </div>
                 </div>
               </article>
+              </>
             ))}
           </div>
         )}

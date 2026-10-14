@@ -1,8 +1,9 @@
 "use client";
 
 import RoleGuard from "../components/RoleGuard";
+import { isOrderHistory, sortOrdersBySection, sortOrdersNewestFirst } from "../../lib/orderSorting";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import {
   claimOrder,
   completeDelivery,
@@ -206,7 +207,7 @@ function DriverDashboardContent() {
               </div>
             ) : (
               <div className="mt-8 grid gap-6 lg:grid-cols-2">
-                {availableOrders.map((order) => (
+                {sortOrdersNewestFirst(availableOrders).map((order) => (
                   <div
                     key={order.id}
                     className="overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
@@ -310,7 +311,7 @@ function DriverDashboardContent() {
                 </h2>
 
                 <p className="mt-3 max-w-xl text-neutral-500">
-                  Orders currently assigned to you.
+                  Track active deliveries and review your delivery history.
                 </p>
               </div>
 
@@ -327,8 +328,25 @@ function DriverDashboardContent() {
               </div>
             ) : (
               <div className="mt-8 space-y-6">
-                {myOrders.map((order) => (
-                  <div
+                {sortOrdersBySection(myOrders).map((order, index, sortedOrders) => (
+                  <Fragment key={order.id}>
+                {(index === 0 ||
+                  isOrderHistory(order) !==
+                    isOrderHistory(sortedOrders[index - 1])) && (
+                  <div className="pb-1 pt-2">
+                    <h2 className="text-2xl font-semibold tracking-[-0.03em]">
+                      {isOrderHistory(order)
+                        ? "Order History"
+                        : "Ongoing Orders"}
+                    </h2>
+                    <p className="mt-2 text-sm text-neutral-500">
+                      {isOrderHistory(order)
+                        ? "Delivered and cancelled orders."
+                        : "Orders that are still being processed or delivered."}
+                    </p>
+                  </div>
+                )}
+                <div
                     key={order.id}
                     className="overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm"
                   >
@@ -439,7 +457,8 @@ function DriverDashboardContent() {
                       )}
                     </div>
                   </div>
-                ))}
+                </Fragment>
+            ))}
               </div>
             )}
           </div>

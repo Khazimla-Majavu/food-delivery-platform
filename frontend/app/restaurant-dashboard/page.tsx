@@ -1,6 +1,7 @@
 "use client";
 
 import RoleGuard from "../components/RoleGuard";
+import { isOrderHistory, sortOrdersBySection } from "../../lib/orderSorting";
 
 import { useEffect, useState } from "react";
 import {
@@ -795,11 +796,11 @@ function RestaurantDashboardContent() {
               </p>
 
               <h2 className="mt-2 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
-                Incoming Orders
+                Restaurant Orders
               </h2>
 
               <p className="mt-3 max-w-xl text-neutral-500">
-                Orders placed at your restaurant.
+                Manage current orders and review previous orders.
               </p>
             </div>
 
@@ -814,8 +815,25 @@ function RestaurantDashboardContent() {
             </div>
           ) : (
             <div className="mt-8 space-y-6">
-              {orders.map((order) => (
-                <div
+              {sortOrdersBySection(orders).map((order, index, sortedOrders) => (
+                <>
+              {(index === 0 ||
+                  isOrderHistory(order) !==
+                    isOrderHistory(sortedOrders[index - 1])) && (
+                  <div className="pb-1 pt-2">
+                    <h2 className="text-2xl font-semibold tracking-[-0.03em]">
+                      {isOrderHistory(order)
+                        ? "Order History"
+                        : "Ongoing Orders"}
+                    </h2>
+                    <p className="mt-2 text-sm text-neutral-500">
+                      {isOrderHistory(order)
+                        ? "Delivered and cancelled orders."
+                        : "Orders that are still being processed or delivered."}
+                    </p>
+                  </div>
+                )}
+              <div
                   key={order.id}
                   className="overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm"
                 >
@@ -898,7 +916,8 @@ function RestaurantDashboardContent() {
                     </div>
                   </div>
                 </div>
-              ))}
+              </>
+            ))}
             </div>
           )}
         </div>
