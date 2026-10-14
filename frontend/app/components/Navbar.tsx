@@ -149,6 +149,13 @@ export default function Navbar() {
           ) : (
             <>
               <Link
+                href="/work-with-chow"
+                className="rounded-full px-4 py-2.5 text-sm font-medium text-neutral-300 transition hover:bg-white hover:text-black"
+              >
+                Work with Chow
+              </Link>
+
+              <Link
                 href="/login"
                 className="rounded-full px-4 py-2.5 text-sm font-medium text-neutral-300 transition hover:bg-white hover:text-black"
               >
