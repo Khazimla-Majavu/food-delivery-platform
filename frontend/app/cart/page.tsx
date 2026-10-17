@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "../context/CartContext";
 import RoleGuard from "../components/RoleGuard";
@@ -18,6 +18,15 @@ interface Pricing {
   totalAmount: number;
 }
 
+interface AddressSuggestion {
+  properties: {
+    formatted?: string;
+    lat?: number;
+    lon?: number;
+    place_id?: string;
+  };
+}
+
 export default function CartPage() {
   const router = useRouter();
 
@@ -29,31 +38,89 @@ export default function CartPage() {
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
   const [deliveryAddress, setDeliveryAddress] = useState("");
+  const [selectedAddress, setSelectedAddress] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
+  const [addressSuggestions, setAddressSuggestions] = useState<
+    AddressSuggestion[]
+  >([]);
+  const [addressSearching, setAddressSearching] = useState(false);
+  const [addressSearchError, setAddressSearchError] = useState("");
   const [pricing, setPricing] = useState<Pricing | null>(null);
   const [pendingOrderId, setPendingOrderId] = useState<number | null>(null);
   const [paymentId, setPaymentId] = useState<number | null>(null);
 
-  function getCurrentLocation(): Promise<{
-    latitude: number;
-    longitude: number;
-  }> {
-    return new Promise((resolve, reject) => {
-      if (!navigator.geolocation) {
-        reject(new Error("Geolocation is not supported by this browser."));
-        return;
-      }
+  useEffect(() => {
+    const query = deliveryAddress.trim();
 
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          resolve({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          });
-        },
-        () => reject(new Error("Unable to get your location.")),
+    if (query.length < 3 || selectedAddress === deliveryAddress) {
+      setAddressSuggestions([]);
+      setAddressSearching(false);
+      setAddressSearchError("");
+      return;
+    }
+
+    const apiKey = process.env.NEXT_PUBLIC_GEOAPIFY_API_KEY;
+
+    if (!apiKey) {
+      setAddressSuggestions([]);
+      setAddressSearchError(
+        "Address search is not configured yet. Please try again later.",
       );
-    });
-  }
+      return;
+    }
+
+    const controller = new AbortController();
+
+    const timeout = setTimeout(async () => {
+      setAddressSearching(true);
+      setAddressSearchError("");
+
+      try {
+        const params = new URLSearchParams({
+          text: query,
+          filter: "countrycode:za",
+          format: "geojson",
+          apiKey,
+        });
+
+        const response = await fetch(
+          `https://api.geoapify.com/v1/geocode/autocomplete?${params}`,
+          { signal: controller.signal },
+        );
+
+        if (!response.ok) {
+          throw new Error("Address search request failed.");
+        }
+
+        const data = (await response.json()) as {
+          features?: AddressSuggestion[];
+        };
+
+        setAddressSuggestions(data.features ?? []);
+      } catch (error) {
+        if (error instanceof Error && error.name === "AbortError") {
+          return;
+        }
+
+        setAddressSuggestions([]);
+        setAddressSearchError(
+          "Unable to search addresses. Please try again.",
+        );
+      } finally {
+        if (!controller.signal.aborted) {
+          setAddressSearching(false);
+        }
+      }
+    }, 350);
+
+    return () => {
+      clearTimeout(timeout);
+      controller.abort();
+    };
+  }, [deliveryAddress, selectedAddress]);
 
   function handleProceedToCheckout() {
     setCheckoutError("");
@@ -87,8 +154,11 @@ export default function CartPage() {
   async function handleContinueToPayment() {
     setCheckoutError("");
 
-    if (!deliveryAddress.trim()) {
-      setCheckoutError("Please enter your delivery address.");
+    if (!deliveryAddress.trim() || !selectedLocation ||
+        selectedAddress !== deliveryAddress) {
+      setCheckoutError(
+        "Please select a delivery address from the suggestions.",
+      );
       return;
     }
 
@@ -118,7 +188,7 @@ export default function CartPage() {
     setCheckoutLoading(true);
 
     try {
-      const location = await getCurrentLocation();
+      const location = selectedLocation;
       const restaurantId = restaurantIds[0];
 
       const orderItems = items.map((item) => ({
@@ -368,20 +438,111 @@ export default function CartPage() {
                   Delivery address
                 </label>
 
-                <textarea
-                  id="deliveryAddress"
-                  value={deliveryAddress}
-                  onChange={(event) =>
-                    setDeliveryAddress(event.target.value)
-                  }
-                  placeholder="Enter your delivery address"
-                  rows={4}
-                  className="mt-2 w-full rounded-xl border border-neutral-300 px-4 py-3 outline-none transition focus:border-black"
-                />
+                <div className="relative mt-2">
+                  <input
+                    id="deliveryAddress"
+                    type="text"
+                    autoComplete="street-address"
+                    role="combobox"
+                    aria-autocomplete="list"
+                    aria-expanded={addressSuggestions.length > 0}
+                    aria-controls="delivery-address-suggestions"
+                    value={deliveryAddress}
+                    onChange={(event) => {
+                      setDeliveryAddress(event.target.value);
+                      setSelectedAddress("");
+                      setSelectedLocation(null);
+                      setCheckoutError("");
+                    }}
+                    placeholder="Start typing a South African address"
+                    className="w-full rounded-xl border border-neutral-300 px-4 py-3 outline-none transition focus:border-black"
+                  />
+
+                  {addressSearching && (
+                    <p className="mt-2 text-sm text-neutral-500">
+                      Searching addresses...
+                    </p>
+                  )}
+
+                  {addressSuggestions.length > 0 && (
+                    <ul
+                      id="delivery-address-suggestions"
+                      role="listbox"
+                      className="absolute z-20 mt-2 max-h-64 w-full overflow-y-auto rounded-xl border border-neutral-200 bg-white py-2 shadow-lg"
+                    >
+                      {addressSuggestions.map((suggestion, index) => {
+                        const properties = suggestion.properties;
+                        const formatted = properties.formatted;
+
+                        if (
+                          !formatted ||
+                          typeof properties.lat !== "number" ||
+                          typeof properties.lon !== "number"
+                        ) {
+                          return null;
+                        }
+
+                        return (
+                          <li
+                            key={
+                              properties.place_id ??
+                              `${formatted}-${index}`
+                            }
+                            role="option"
+                            aria-selected={false}
+                          >
+                            <button
+                              type="button"
+                              className="w-full px-4 py-3 text-left text-sm transition hover:bg-neutral-100"
+                              onClick={() => {
+                                setDeliveryAddress(formatted);
+                                setSelectedAddress(formatted);
+                                setSelectedLocation({
+                                  latitude: properties.lat!,
+                                  longitude: properties.lon!,
+                                });
+                                setAddressSuggestions([]);
+                                setAddressSearchError("");
+                                setCheckoutError("");
+                              }}
+                            >
+                              {formatted}
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+
+                  {addressSearchError && (
+                    <p className="mt-2 text-sm text-red-600" role="status">
+                      {addressSearchError}
+                    </p>
+                  )}
+
+                  {selectedLocation &&
+                    selectedAddress === deliveryAddress && (
+                      <p className="mt-2 text-sm text-neutral-600">
+                        Delivery address selected.
+                      </p>
+                    )}
+                </div>
 
                 <p className="mt-3 text-xs text-neutral-500">
-                  Your location will also be used to calculate the
-                  delivery fee.
+                  Select a suggested address to calculate the delivery fee.
+                  You can enter an address for someone else.
+                </p>
+
+                <p className="mt-2 text-xs text-neutral-500">
+                  Address search by{" "}
+                  <a
+                    href="https://www.geoapify.com/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline"
+                  >
+                    Geoapify
+                  </a>
                 </p>
               </div>
             )}
