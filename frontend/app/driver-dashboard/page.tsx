@@ -3,13 +3,14 @@
 import RoleGuard from "../components/RoleGuard";
 import { isOrderHistory, sortOrdersBySection, sortOrdersNewestFirst } from "../../lib/orderSorting";
 
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import {
   claimOrder,
   completeDelivery,
   getAvailableDriverOrders,
   getDriverOrders,
   getDeliveryLocation,
+  updateDriverLocation,
   OrderResponse,
 } from "../../lib/api";
 
@@ -22,6 +23,9 @@ function DriverDashboardContent() {
   const [deliveryAddresses, setDeliveryAddresses] = useState<
     Record<number, string>
   >({});
+  const [trackingMessage, setTrackingMessage] = useState("");
+  const lastLocationSentAt = useRef<Record<number, number>>({});
+
 
   async function loadDashboard() {
     const token = localStorage.getItem("token");
@@ -65,6 +69,87 @@ function DriverDashboardContent() {
   useEffect(() => {
     loadDashboard();
   }, []);
+
+  useEffect(() => {
+    const activeOrderIds = myOrders
+      .filter((order) => order.status === "OUT_FOR_DELIVERY")
+      .map((order) => order.id);
+
+    if (activeOrderIds.length === 0) {
+      setTrackingMessage("");
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      setTrackingMessage("Please log in again to share your location.");
+      return;
+    }
+
+    if (!navigator.geolocation) {
+      setTrackingMessage("This browser does not support location sharing.");
+      return;
+    }
+
+    let cancelled = false;
+    setTrackingMessage("Requesting permission to share your location...");
+
+    const watchId = navigator.geolocation.watchPosition(
+      async (position) => {
+        if (cancelled) return;
+
+        const now = Date.now();
+        const orderIdsToUpdate = activeOrderIds.filter(
+          (orderId) => now - (lastLocationSentAt.current[orderId] ?? 0) >= 8000,
+        );
+
+        if (orderIdsToUpdate.length === 0) return;
+
+        const { latitude, longitude } = position.coords;
+
+        const results = await Promise.allSettled(
+          orderIdsToUpdate.map(async (orderId) => {
+            lastLocationSentAt.current[orderId] = now;
+            await updateDriverLocation(orderId, latitude, longitude, token);
+          }),
+        );
+
+        if (cancelled) return;
+
+        if (results.every((result) => result.status === "fulfilled")) {
+          setTrackingMessage("Live location sharing is active for your ongoing deliveries.");
+        } else {
+          setTrackingMessage(
+            "Location sharing could not update for every delivery. Check your connection and keep location permission enabled.",
+          );
+        }
+      },
+      (locationError) => {
+        if (cancelled) return;
+
+        if (locationError.code === locationError.PERMISSION_DENIED) {
+          setTrackingMessage(
+            "Location permission is off. Allow location access in your browser to share your live position with customers.",
+          );
+        } else if (locationError.code === locationError.TIMEOUT) {
+          setTrackingMessage("Waiting for a GPS location. Keep location services enabled.");
+        } else {
+          setTrackingMessage("Unable to access your location. Check your device settings.");
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 5000,
+        timeout: 15000,
+      },
+    );
+
+    return () => {
+      cancelled = true;
+      navigator.geolocation.clearWatch(watchId);
+    };
+  }, [myOrders]);
 
   async function handleClaim(orderId: number) {
     const token = localStorage.getItem("token");
@@ -165,6 +250,14 @@ function DriverDashboardContent() {
           {error && (
             <div className="mb-8 rounded-2xl border border-neutral-200 bg-neutral-50 p-5">
               <p className="text-sm text-neutral-700">{error}</p>
+            </div>
+          )}
+
+          {trackingMessage && (
+            <div className="mb-8 rounded-2xl border border-neutral-200 bg-neutral-50 px-5 py-4">
+              <p className="text-sm font-medium text-neutral-700">
+                {trackingMessage}
+              </p>
             </div>
           )}
 

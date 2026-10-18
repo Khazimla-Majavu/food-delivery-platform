@@ -129,6 +129,14 @@ public class SecurityConfig {
                         ).hasRole("ADMIN")
                         .requestMatchers(
                                 HttpMethod.POST,
+                                "/api/driver-tracking/order/*"
+                        ).hasRole("DRIVER")
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/driver-tracking/order/*"
+                        ).authenticated()
+                        .requestMatchers(
+                                HttpMethod.POST,
                                 "/api/delivery-locations/order/*"
                         ).hasRole("CUSTOMER")
                         .requestMatchers(

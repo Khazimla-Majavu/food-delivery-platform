@@ -189,6 +189,7 @@ export default function CartPage() {
 
     try {
       const location = selectedLocation;
+
       const restaurantId = restaurantIds[0];
 
       const orderItems = items.map((item) => ({

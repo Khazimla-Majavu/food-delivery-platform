@@ -1,7 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import RoleGuard from "../components/RoleGuard";
+
+const DriverTrackingMap = dynamic(
+  () => import("../components/DriverTrackingMap"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="mt-8 rounded-2xl border border-neutral-200 bg-neutral-50 p-6">
+        <p className="text-sm text-neutral-500">Loading live tracking map...</p>
+      </div>
+    ),
+  },
+);
 import { isOrderHistory, sortOrdersBySection } from "../../lib/orderSorting";
 import {
   getMyOrders,
@@ -132,6 +145,22 @@ export default function OrdersPage() {
   >({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const interval = window.setInterval(async () => {
+      try {
+        const latestOrders = await getMyOrders(token);
+        setOrders(latestOrders);
+      } catch {
+        // Keep the current order display if a refresh temporarily fails.
+      }
+    }, 15000);
+
+    return () => window.clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     async function loadOrders() {
@@ -304,6 +333,10 @@ export default function OrdersPage() {
 
                 <div className="p-6 sm:p-8">
                   <OrderStatusTracker status={order.status} />
+
+                  {order.status === "OUT_FOR_DELIVERY" && (
+                    <DriverTrackingMap orderId={order.id} />
+                  )}
 
                   <div className="mt-10 border-t border-neutral-200 pt-8">
                     <div className="mb-5 flex items-center justify-between">

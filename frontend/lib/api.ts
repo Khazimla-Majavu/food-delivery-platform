@@ -648,6 +648,58 @@ export async function getDeliveryLocation(
   return response.json();
 }
 
+export interface DriverLocationResponse {
+  orderId: number;
+  latitude: number;
+  longitude: number;
+  updatedAt: string;
+}
+
+export async function updateDriverLocation(
+  orderId: number,
+  latitude: number,
+  longitude: number,
+  token: string,
+): Promise<DriverLocationResponse> {
+  const response = await fetch(
+    `${API_URL}/api/driver-tracking/order/${orderId}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ latitude, longitude }),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to update driver location: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export async function getDriverTrackingLocation(
+  orderId: number,
+  token: string,
+): Promise<DriverLocationResponse> {
+  const response = await fetch(
+    `${API_URL}/api/driver-tracking/order/${orderId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch driver location: ${response.status}`);
+  }
+
+  return response.json();
+}
+
 export async function getDeliveryDistance(
   orderId: number,
   token: string,
