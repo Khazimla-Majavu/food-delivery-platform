@@ -66,7 +66,7 @@ export default function Navbar() {
           aria-label="Chow home"
         >
           <img
-            src="/chow-logo.jpeg"
+            src="/Chow-logo.jpeg"
             alt="Chow logo"
             className="h-10 w-auto transition-transform duration-200 group-hover:scale-105"
           />
