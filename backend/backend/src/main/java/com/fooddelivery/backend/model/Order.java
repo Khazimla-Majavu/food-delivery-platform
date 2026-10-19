@@ -41,6 +41,9 @@ public class Order {
     @Column(nullable = false)
     private Status status;
 
+    @Column(name = "delivery_pin", length = 6)
+    private String deliveryPin;
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
@@ -127,6 +130,14 @@ public class Order {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public String getDeliveryPin() {
+        return deliveryPin;
+    }
+
+    public void setDeliveryPin(String deliveryPin) {
+        this.deliveryPin = deliveryPin;
     }
 
     public LocalDateTime getCreatedAt() {

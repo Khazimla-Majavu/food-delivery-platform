@@ -3,7 +3,7 @@
 import RoleGuard from "../components/RoleGuard";
 import { isOrderHistory, sortOrdersBySection } from "../../lib/orderSorting";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import {
   getMyRestaurants,
   getRestaurantOrders,
@@ -816,7 +816,7 @@ function RestaurantDashboardContent() {
           ) : (
             <div className="mt-8 space-y-6">
               {sortOrdersBySection(orders).map((order, index, sortedOrders) => (
-                <>
+                <Fragment key={order.id}>
               {(index === 0 ||
                   isOrderHistory(order) !==
                     isOrderHistory(sortedOrders[index - 1])) && (
@@ -916,7 +916,7 @@ function RestaurantDashboardContent() {
                     </div>
                   </div>
                 </div>
-              </>
+              </Fragment>
             ))}
             </div>
           )}

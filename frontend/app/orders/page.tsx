@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import RoleGuard from "../components/RoleGuard";
 
@@ -19,6 +19,7 @@ import { isOrderHistory, sortOrdersBySection } from "../../lib/orderSorting";
 import {
   getMyOrders,
   getDeliveryDistance,
+  getDeliveryPin,
   OrderResponse,
 } from "../../lib/api";
 
@@ -145,6 +146,7 @@ export default function OrdersPage() {
   >({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [deliveryPins, setDeliveryPins] = useState<Record<number, string>>({});
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -161,6 +163,47 @@ export default function OrdersPage() {
 
     return () => window.clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    const activeOrders = orders.filter(
+      (order) => order.status === "OUT_FOR_DELIVERY",
+    );
+    if (activeOrders.length === 0) return;
+
+    let cancelled = false;
+
+    async function loadDeliveryPins() {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const entries = await Promise.all(
+        activeOrders.map(async (order) => {
+          try {
+            const result = await getDeliveryPin(order.id, token);
+            return [order.id, result.pin] as const;
+          } catch {
+            return null;
+          }
+        }),
+      );
+
+      if (cancelled) return;
+      const validEntries = entries.filter(
+        (entry): entry is readonly [number, string] => entry !== null,
+      );
+      if (validEntries.length > 0) {
+        setDeliveryPins((current) => ({
+          ...current,
+          ...Object.fromEntries(validEntries),
+        }));
+      }
+    }
+
+    void loadDeliveryPins();
+    return () => {
+      cancelled = true;
+    };
+  }, [orders]);
 
   useEffect(() => {
     async function loadOrders() {
@@ -274,7 +317,7 @@ export default function OrdersPage() {
         {!loading && !error && orders.length > 0 && (
           <div className="space-y-8">
             {sortOrdersBySection(orders).map((order, index, sortedOrders) => (
-              <>
+              <Fragment key={order.id}>
               {(index === 0 ||
                   isOrderHistory(order) !==
                     isOrderHistory(sortedOrders[index - 1])) && (
@@ -335,7 +378,20 @@ export default function OrdersPage() {
                   <OrderStatusTracker status={order.status} />
 
                   {order.status === "OUT_FOR_DELIVERY" && (
-                    <DriverTrackingMap orderId={order.id} />
+                    <>
+                      <div className="mt-8 rounded-3xl border border-neutral-200 bg-neutral-50 p-6 sm:p-8">
+                        <p className="text-sm font-semibold uppercase tracking-[0.15em] text-neutral-500">
+                          Delivery confirmation PIN
+                        </p>
+                        <p className="mt-3 text-3xl font-semibold tracking-[0.3em] text-black">
+                          {deliveryPins[order.id] ?? "------"}
+                        </p>
+                        <p className="mt-3 text-sm text-neutral-600">
+                          Give this six-digit PIN to your driver when your order arrives. The driver needs it to complete the delivery.
+                        </p>
+                      </div>
+                      <DriverTrackingMap orderId={order.id} />
+                    </>
                   )}
 
                   <div className="mt-10 border-t border-neutral-200 pt-8">
@@ -394,7 +450,7 @@ export default function OrdersPage() {
                   </div>
                 </div>
               </article>
-              </>
+              </Fragment>
             ))}
           </div>
         )}

@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8080";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
 export interface Restaurant {
   id: number;
@@ -299,15 +299,37 @@ export async function getDriverOrders(token: string): Promise<OrderResponse[]> {
   return response.json();
 }
 
+export async function getDeliveryPin(
+  orderId: number,
+  token: string,
+): Promise<{ pin: string }> {
+  const response = await fetch(
+    `${API_URL}/api/orders/${orderId}/delivery-pin`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: "no-store",
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to retrieve delivery PIN: ${response.status}`);
+  }
+
+  return response.json();
+}
+
 export async function completeDelivery(
   orderId: number,
+  pin: string,
   token: string,
 ): Promise<OrderResponse> {
   const response = await fetch(`${API_URL}/api/orders/${orderId}/complete`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
     },
+    body: JSON.stringify({ pin }),
   });
 
   if (!response.ok) {

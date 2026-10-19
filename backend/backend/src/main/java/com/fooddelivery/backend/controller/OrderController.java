@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import com.fooddelivery.backend.model.Order;
 
 @RestController
@@ -90,14 +91,27 @@ public class OrderController {
         );
     }
 
+    @GetMapping("/{orderId}/delivery-pin")
+    public Map<String, String> getDeliveryPin(
+            @PathVariable Long orderId,
+            Authentication authentication
+    ) {
+        return Map.of("pin", orderService.getDeliveryPin(
+                orderId,
+                authentication.getName()
+        ));
+    }
+
     @PostMapping("/{orderId}/complete")
     public OrderResponse completeDelivery(
             @PathVariable Long orderId,
+            @RequestBody(required = false) Map<String, String> request,
             Authentication authentication
     ) {
         return orderService.completeDelivery(
                 orderId,
-                authentication.getName()
+                authentication.getName(),
+                request == null ? null : request.get("pin")
         );
     }
 

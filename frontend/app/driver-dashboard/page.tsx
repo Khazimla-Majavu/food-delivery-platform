@@ -19,6 +19,7 @@ function DriverDashboardContent() {
   const [myOrders, setMyOrders] = useState<OrderResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
+  const [deliveryPinInputs, setDeliveryPinInputs] = useState<Record<number, string>>({});
   const [error, setError] = useState("");
   const [deliveryAddresses, setDeliveryAddresses] = useState<
     Record<number, string>
@@ -174,9 +175,15 @@ function DriverDashboardContent() {
 
   async function handleComplete(orderId: number) {
     const token = localStorage.getItem("token");
+    const pin = (deliveryPinInputs[orderId] ?? "").trim();
 
     if (!token) {
       setError("Please log in again.");
+      return;
+    }
+
+    if (!/^\d{6}$/.test(pin)) {
+      setError("Enter the customer's six-digit delivery PIN.");
       return;
     }
 
@@ -184,10 +191,11 @@ function DriverDashboardContent() {
     setError("");
 
     try {
-      await completeDelivery(orderId, token);
+      await completeDelivery(orderId, pin, token);
+      setDeliveryPinInputs((current) => ({ ...current, [orderId]: "" }));
       await loadDashboard();
     } catch {
-      setError("Unable to complete this delivery.");
+      setError("Delivery could not be completed. Check the customer's PIN and try again.");
     } finally {
       setActionLoading(null);
     }
@@ -530,15 +538,33 @@ function DriverDashboardContent() {
                       </div>
 
                       {order.status === "OUT_FOR_DELIVERY" && (
-                        <button
-                          onClick={() => handleComplete(order.id)}
-                          disabled={actionLoading === order.id}
-                          className="mt-7 w-full rounded-full bg-black px-5 py-4 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                          {actionLoading === order.id
-                            ? "Completing..."
-                            : "Mark Delivered"}
-                        </button>
+                        <div className="mt-7 space-y-3">
+                          <label className="block text-sm font-medium text-neutral-700" htmlFor={`delivery-pin-${order.id}`}>
+                            Customer delivery PIN
+                          </label>
+                          <input
+                            id={`delivery-pin-${order.id}`}
+                            type="text"
+                            inputMode="numeric"
+                            autoComplete="off"
+                            maxLength={6}
+                            pattern="[0-9]{6}"
+                            placeholder="Enter 6-digit PIN"
+                            value={deliveryPinInputs[order.id] ?? ""}
+                            onChange={(event) => setDeliveryPinInputs((current) => ({
+                              ...current,
+                              [order.id]: event.target.value.replace(/\D/g, "").slice(0, 6),
+                            }))}
+                            className="w-full rounded-2xl border border-neutral-300 px-4 py-3 text-base tracking-[0.25em] outline-none focus:border-black"
+                          />
+                          <button
+                            onClick={() => handleComplete(order.id)}
+                            disabled={actionLoading === order.id || (deliveryPinInputs[order.id] ?? "").length !== 6}
+                            className="w-full rounded-full bg-black px-5 py-4 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            {actionLoading === order.id ? "Verifying PIN..." : "Verify PIN & Mark Delivered"}
+                          </button>
+                        </div>
                       )}
 
                       {order.status === "DELIVERED" && (

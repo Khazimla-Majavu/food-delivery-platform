@@ -23,9 +23,16 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.security.SecureRandom;
 
 @Service
 public class OrderService {
+
+    private static final SecureRandom PIN_RANDOM = new SecureRandom();
+
+    private String generateDeliveryPin() {
+        return String.format("%06d", PIN_RANDOM.nextInt(1_000_000));
+    }
 
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
@@ -87,6 +94,7 @@ public class OrderService {
         order.setCustomer(customer);
         order.setRestaurant(restaurant);
         order.setStatus(Order.Status.PENDING);
+        order.setDeliveryPin(generateDeliveryPin());
         order.setCreatedAt(LocalDateTime.now());
 
         BigDecimal total = BigDecimal.ZERO;
@@ -337,6 +345,9 @@ public class OrderService {
         }
 
         order.setDriver(driver);
+        if (order.getDeliveryPin() == null || order.getDeliveryPin().isBlank()) {
+            order.setDeliveryPin(generateDeliveryPin());
+        }
         order.setStatus(Order.Status.OUT_FOR_DELIVERY);
 
         Order savedOrder = orderRepository.save(order);
@@ -368,9 +379,37 @@ public class OrderService {
                 .toList();
     }
 
+    public String getDeliveryPin(Long orderId, String customerEmail) {
+        User customer = userRepository.findByEmail(customerEmail)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+        if (customer.getRole() != User.Role.CUSTOMER) {
+            throw new RuntimeException("User is not a customer");
+        }
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        if (order.getCustomer() == null ||
+                !order.getCustomer().getId().equals(customer.getId())) {
+            throw new RuntimeException("You are not authorized to view this delivery PIN");
+        }
+
+        if (order.getStatus() != Order.Status.OUT_FOR_DELIVERY) {
+            throw new RuntimeException("The delivery PIN is only available while the order is out for delivery");
+        }
+
+        if (order.getDeliveryPin() == null || order.getDeliveryPin().isBlank()) {
+            throw new RuntimeException("Delivery PIN is not available");
+        }
+
+        return order.getDeliveryPin();
+    }
+
     public OrderResponse completeDelivery(
             Long orderId,
-            String driverEmail
+            String driverEmail,
+            String submittedPin
     ) {
         User driver = userRepository.findByEmail(driverEmail)
                 .orElseThrow(() -> new RuntimeException("Driver not found"));
@@ -393,6 +432,13 @@ public class OrderService {
             throw new RuntimeException(
                     "Only OUT_FOR_DELIVERY orders can be marked as delivered"
             );
+        }
+
+        if (submittedPin == null ||
+                !submittedPin.matches("\\d{6}") ||
+                order.getDeliveryPin() == null ||
+                !order.getDeliveryPin().equals(submittedPin)) {
+            throw new RuntimeException("Delivery PIN does not match");
         }
 
         order.setStatus(Order.Status.DELIVERED);
