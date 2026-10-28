@@ -19,3 +19,21 @@ spring:
     properties:
       hibernate:
         format_sql: ${FORMAT_SQL:true}
+
+  mail:
+    host: ${SMTP_HOST:mail.chowdelivery.co.za}
+    port: ${SMTP_PORT:465}
+    username: ${SMTP_USERNAME:noreply@chowdelivery.co.za}
+    password: ${SMTP_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+app:
+  frontend-url: ${CHOW_FRONTEND_URL:http://localhost:3000}

@@ -2,7 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { login } from "../../lib/api";
+import { login, resendVerification } from "../../lib/api";
 
 interface LoginFormProps {
   redirect?: string;
@@ -29,6 +29,8 @@ export default function LoginForm({ redirect = "/" }: LoginFormProps) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resendMessage, setResendMessage] = useState("");
+  const [resending, setResending] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -53,8 +55,8 @@ export default function LoginForm({ redirect = "/" }: LoginFormProps) {
       }
 
       router.refresh();
-    } catch {
-      setError("Login failed. Please check your email and password.");
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Login failed. Please check your email and password.");
     } finally {
       setLoading(false);
     }
@@ -103,6 +105,27 @@ export default function LoginForm({ redirect = "/" }: LoginFormProps) {
       {error && (
         <div className="rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3">
           <p className="text-sm text-neutral-700">{error}</p>
+          {error.toLowerCase().includes("verify your email") && (
+            <button
+              type="button"
+              disabled={resending || !email.trim()}
+              onClick={async () => {
+                setResending(true);
+                setResendMessage("");
+                try {
+                  setResendMessage(await resendVerification(email.trim()));
+                } catch (resendError) {
+                  setResendMessage(resendError instanceof Error ? resendError.message : "Unable to resend verification email.");
+                } finally {
+                  setResending(false);
+                }
+              }}
+              className="mt-3 text-sm font-semibold text-black underline disabled:opacity-50"
+            >
+              {resending ? "Sending..." : "Resend verification email"}
+            </button>
+          )}
+          {resendMessage && <p className="mt-2 text-sm text-neutral-700">{resendMessage}</p>}
         </div>
       )}
 

@@ -39,6 +39,13 @@ public class PaymentService {
             throw new RuntimeException("User is not a customer");
         }
 
+        if (!customer.isEmailVerified()) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.FORBIDDEN,
+                    "Please verify your email address before making payments."
+            );
+        }
+
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
@@ -75,6 +82,13 @@ public class PaymentService {
             throw new RuntimeException("User is not a customer");
         }
 
+        if (!customer.isEmailVerified()) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.FORBIDDEN,
+                    "Please verify your email address before making payments."
+            );
+        }
+
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
@@ -102,6 +116,13 @@ public class PaymentService {
 
         if (customer.getRole() != User.Role.CUSTOMER) {
             throw new RuntimeException("User is not a customer");
+        }
+
+        if (!customer.isEmailVerified()) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.FORBIDDEN,
+                    "Please verify your email address before making payments."
+            );
         }
 
         Order order = orderRepository.findById(orderId)

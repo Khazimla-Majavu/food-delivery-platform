@@ -7,6 +7,7 @@ import com.fooddelivery.backend.dto.UserResponse;
 import com.fooddelivery.backend.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -38,5 +39,19 @@ public class AuthController {
         );
 
         return ResponseEntity.ok(userResponse);
+    }
+    @PostMapping("/verify-email")
+    public ResponseEntity<Map<String, String>> verifyEmail(@RequestParam String token) {
+        userService.verifyEmail(token);
+        return ResponseEntity.ok(Map.of("message", "Your email has been verified. You can now log in."));
+    }
+
+    @PostMapping("/resend-verification")
+    public ResponseEntity<Map<String, String>> resendVerification(@RequestParam String email) {
+        userService.resendVerification(email);
+        return ResponseEntity.ok(Map.of(
+                "message",
+                "If the address belongs to an unverified customer account, a verification email will be sent."
+        ));
     }
 }

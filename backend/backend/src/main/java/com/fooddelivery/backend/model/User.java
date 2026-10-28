@@ -23,6 +23,16 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    // Existing database rows default to verified; public registration explicitly sets false.
+    @Column(name = "email_verified", nullable = false, columnDefinition = "boolean default true")
+    private boolean emailVerified = true;
+
+    @Column(name = "email_verification_token_hash")
+    private String emailVerificationTokenHash;
+
+    @Column(name = "email_verification_expires_at")
+    private java.time.Instant emailVerificationExpiresAt;
+
     public enum Role {
         CUSTOMER,
         DRIVER,
@@ -31,6 +41,30 @@ public class User {
     }
 
     public User() {
+    }
+
+    public boolean isEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
+
+    public String getEmailVerificationTokenHash() {
+        return emailVerificationTokenHash;
+    }
+
+    public void setEmailVerificationTokenHash(String tokenHash) {
+        this.emailVerificationTokenHash = tokenHash;
+    }
+
+    public java.time.Instant getEmailVerificationExpiresAt() {
+        return emailVerificationExpiresAt;
+    }
+
+    public void setEmailVerificationExpiresAt(java.time.Instant expiresAt) {
+        this.emailVerificationExpiresAt = expiresAt;
     }
 
     public Long getId() {

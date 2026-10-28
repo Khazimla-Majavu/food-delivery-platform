@@ -16,15 +16,18 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final EmailVerificationService emailVerificationService;
 
     public UserService(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
-            JwtService jwtService
+            JwtService jwtService,
+            EmailVerificationService emailVerificationService
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.emailVerificationService = emailVerificationService;
     }
 
     public List<UserResponse> getAllUsers() {
@@ -43,9 +46,11 @@ public class UserService {
 
     public UserResponse createUser(User user) {
         user.setRole(User.Role.CUSTOMER);
+        user.setEmailVerified(false);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         User savedUser = userRepository.save(user);
+        emailVerificationService.issueAndSendVerification(savedUser);
 
         return UserResponse.fromUser(savedUser);
     }
@@ -56,7 +61,18 @@ public class UserService {
             String phone,
             String password
     ) {
-        if (userRepository.existsByEmail(email)) {
+        String normalizedEmail = email == null ? "" : email.trim();
+
+        java.util.Optional<User> existingUser = userRepository.findByEmail(normalizedEmail);
+        if (existingUser.isPresent()) {
+            User existing = existingUser.get();
+
+            if (existing.getRole() == User.Role.CUSTOMER && !existing.isEmailVerified()) {
+                // Reuse the pending account and issue a fresh verification link.
+                emailVerificationService.issueAndSendVerification(existing);
+                return UserResponse.fromUser(existing);
+            }
+
             throw new RuntimeException("Email is already registered");
         }
 
@@ -68,13 +84,23 @@ public class UserService {
 
         // Public registration always creates a CUSTOMER account.
         user.setRole(User.Role.CUSTOMER);
+        user.setEmailVerified(false);
 
         // Never store the plain-text password.
         user.setPassword(passwordEncoder.encode(password));
 
         User savedUser = userRepository.save(user);
+        emailVerificationService.issueAndSendVerification(savedUser);
 
         return UserResponse.fromUser(savedUser);
+    }
+
+    public void verifyEmail(String token) {
+        emailVerificationService.verify(token);
+    }
+
+    public void resendVerification(String email) {
+        emailVerificationService.resend(email);
     }
 
     public LoginResponse login(String email, String password) {
@@ -83,6 +109,10 @@ public class UserService {
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new RuntimeException("Invalid email or password");
+        }
+
+        if (!user.isEmailVerified()) {
+            throw new EmailNotVerifiedException();
         }
 
         String token = jwtService.generateToken(

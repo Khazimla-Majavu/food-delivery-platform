@@ -29,7 +29,7 @@ export default function RegisterForm() {
     try {
       await register(name, email, phone, password);
 
-      setSuccess("Account created successfully. You can now log in.");
+      setSuccess("Account created. Check your email to verify your address before logging in.");
 
       setName("");
       setEmail("");

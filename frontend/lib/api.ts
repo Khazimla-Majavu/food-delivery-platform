@@ -81,7 +81,12 @@ export async function login(
   });
 
   if (!response.ok) {
-    throw new Error(`Login failed: ${response.status}`);
+    let message = `Login failed: ${response.status}`;
+    try {
+      const body = await response.json();
+      message = body.detail || body.message || body.error || message;
+    } catch {}
+    throw new Error(message);
   }
 
   return response.json();
@@ -107,11 +112,15 @@ export async function register(
   });
 
   if (!response.ok) {
+    let message = `Registration failed: ${response.status}`;
+    try {
+      const body = await response.json();
+      message = body.detail || body.message || body.error || message;
+    } catch {}
     if (response.status === 409) {
-      throw new Error("This email is already registered.");
+      message = "This email is already registered.";
     }
-
-    throw new Error(`Registration failed: ${response.status}`);
+    throw new Error(message);
   }
 
   return response.json();
@@ -821,4 +830,29 @@ export async function getAdminRestaurants(
   }
 
   return response.json();
+}
+
+
+export async function verifyEmail(token: string): Promise<string> {
+  const response = await fetch(
+    `${API_URL}/api/auth/verify-email?token=${encodeURIComponent(token)}`,
+    { method: "POST" }
+  );
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(body.detail || body.message || body.error || "Verification failed. Request a new email.");
+  }
+  return body.message || "Your email has been verified. You can now log in.";
+}
+
+export async function resendVerification(email: string): Promise<string> {
+  const response = await fetch(
+    `${API_URL}/api/auth/resend-verification?email=${encodeURIComponent(email)}`,
+    { method: "POST" }
+  );
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(body.detail || body.message || body.error || "Unable to request a verification email.");
+  }
+  return body.message || "If the address belongs to an unverified customer account, a verification email will be sent.";
 }
