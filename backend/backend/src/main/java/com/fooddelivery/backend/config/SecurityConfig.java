@@ -158,6 +158,7 @@ public class SecurityConfig {
                                 HttpMethod.GET,
                                 "/api/delivery-distance/order/*"
                         ).authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/work-with-chow").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(

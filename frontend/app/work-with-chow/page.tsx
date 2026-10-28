@@ -1,13 +1,48 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { submitWorkWithChowEnquiry } from "@/lib/api";
 
 export default function WorkWithChowPage() {
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSubmitted(true);
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const type = String(formData.get("type") ?? "");
+
+    if (type !== "RESTAURANT" && type !== "DRIVER") {
+      setErrorMessage("Please choose Restaurant or Driver.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrorMessage("");
+
+    try {
+      await submitWorkWithChowEnquiry({
+        name: String(formData.get("name") ?? ""),
+        phone: String(formData.get("phone") ?? ""),
+        email: String(formData.get("email") ?? ""),
+        type,
+        message: String(formData.get("message") ?? ""),
+        website: String(formData.get("company-website-check") ?? ""),
+      });
+
+      setSubmitted(true);
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "We couldn't send your enquiry. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   if (submitted) {
@@ -67,6 +102,20 @@ export default function WorkWithChowPage() {
 
           <div className="rounded-3xl border border-neutral-200 bg-neutral-50 p-6 sm:p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
+              <div
+                aria-hidden="true"
+                className="absolute -left-[9999px] h-px w-px overflow-hidden"
+              >
+                <label htmlFor="company-website-check">Leave this field empty</label>
+                <input
+                  id="company-website-check"
+                  name="company-website-check"
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                />
+              </div>
               <div>
                 <label
                   htmlFor="name"
@@ -175,11 +224,18 @@ export default function WorkWithChowPage() {
                 />
               </div>
 
+              {errorMessage && (
+                <p role="alert" className="text-sm text-red-700">
+                  {errorMessage}
+                </p>
+              )}
+
               <button
                 type="submit"
-                className="w-full rounded-full bg-black px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-neutral-800"
+                disabled={isSubmitting}
+                className="w-full rounded-full bg-black px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Send enquiry
+                {isSubmitting ? "Sending..." : "Send enquiry"}
               </button>
 
               <p className="text-center text-xs leading-5 text-neutral-500">

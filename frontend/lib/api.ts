@@ -856,3 +856,30 @@ export async function resendVerification(email: string): Promise<string> {
   }
   return body.message || "If the address belongs to an unverified customer account, a verification email will be sent.";
 }
+
+
+export async function submitWorkWithChowEnquiry(data: {
+  name: string;
+  phone: string;
+  email: string;
+  type: "RESTAURANT" | "DRIVER";
+  message: string;
+  website?: string;
+}): Promise<void> {
+  const response = await fetch(`${API_URL}/api/work-with-chow`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  const body = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(
+      body.detail ||
+      body.message ||
+      body.error ||
+      "We couldn't send your enquiry. Please try again."
+    );
+  }
+}
