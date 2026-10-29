@@ -162,6 +162,24 @@ export default function AdminPage() {
       <main className="mx-auto max-w-6xl p-6">
       <h1 className="mb-6 text-3xl font-bold">Admin Dashboard</h1>
 
+      <div className="mb-8 rounded-lg border border-neutral-200 p-5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="font-semibold">Order issue reports</h2>
+            <p className="mt-1 text-sm text-neutral-500">
+              Review customer and driver reports and track their resolution.
+            </p>
+          </div>
+          <a
+            href="/admin/reports"
+            className="inline-flex w-fit rounded-full bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-neutral-800"
+          >
+            Manage reports
+          </a>
+        </div>
+      </div>
+
+
       <div className="mb-8 rounded-lg border p-6">
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-xl font-semibold">

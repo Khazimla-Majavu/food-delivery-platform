@@ -159,6 +159,31 @@ public class SecurityConfig {
                                 "/api/delivery-distance/order/*"
                         ).authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/work-with-chow").permitAll()
+                        // Order chat: only customers and drivers.
+                        .requestMatchers(
+                                HttpMethod.GET, "/api/orders/*/chat"
+                        ).hasAnyRole("CUSTOMER", "DRIVER")
+                        .requestMatchers(
+                                HttpMethod.POST, "/api/orders/*/chat"
+                        ).hasAnyRole("CUSTOMER", "DRIVER")
+
+                        // Issue reports: order participants only.
+                        .requestMatchers(
+                                HttpMethod.POST, "/api/orders/*/reports"
+                        ).hasAnyRole("CUSTOMER", "DRIVER")
+                        .requestMatchers(
+                                HttpMethod.GET, "/api/order-issues/mine"
+                        ).hasAnyRole("CUSTOMER", "DRIVER")
+
+                        // Report administration: admins only.
+                        .requestMatchers(
+                                HttpMethod.GET, "/api/order-issues/admin/all"
+                        ).hasRole("ADMIN")
+                        .requestMatchers(
+                                HttpMethod.PUT,
+                                "/api/order-issues/admin/*/status"
+                        ).hasRole("ADMIN")
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(

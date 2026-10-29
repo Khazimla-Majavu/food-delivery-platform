@@ -1,6 +1,8 @@
 "use client";
 
 import RoleGuard from "../components/RoleGuard";
+import OrderChatPanel from "../components/OrderChatPanel";
+import ReportOrderIssueForm from "../components/ReportOrderIssueForm";
 import { isOrderHistory, sortOrdersBySection, sortOrdersNewestFirst } from "../../lib/orderSorting";
 
 import { Fragment, useEffect, useRef, useState } from "react";
@@ -250,6 +252,15 @@ function DriverDashboardContent() {
               <p className="mt-5 max-w-2xl text-lg leading-8 text-neutral-500">
                 Find available deliveries and manage your assigned orders.
               </p>
+
+              <div className="mt-6">
+                <a
+                  href="/issue-reports"
+                  className="inline-flex rounded-full border border-neutral-300 px-5 py-3 text-sm font-semibold transition hover:border-black"
+                >
+                  My issue reports
+                </a>
+              </div>
             </div>
           </div>
         </section>
@@ -490,6 +501,18 @@ function DriverDashboardContent() {
                     </div>
 
                     <div className="p-7 sm:p-8">
+                      {order.status !== "DELIVERED" && (
+                        <div className="mb-8 space-y-6">
+                          <OrderChatPanel
+                            orderId={order.id}
+                            orderStatus={order.status}
+                          />
+                          <ReportOrderIssueForm
+                            orderId={order.id}
+                            role="DRIVER"
+                          />
+                        </div>
+                      )}
                       <div>
                         <div className="mb-5 flex items-center justify-between">
                           <h4 className="text-sm font-semibold uppercase tracking-[0.15em] text-neutral-500">

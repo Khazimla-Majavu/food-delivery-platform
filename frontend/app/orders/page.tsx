@@ -3,6 +3,8 @@
 import { Fragment, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import RoleGuard from "../components/RoleGuard";
+import OrderChatPanel from "../components/OrderChatPanel";
+import ReportOrderIssueForm from "../components/ReportOrderIssueForm";
 
 const DriverTrackingMap = dynamic(
   () => import("../components/DriverTrackingMap"),
@@ -272,6 +274,15 @@ export default function OrdersPage() {
             <p className="mt-5 max-w-2xl text-lg leading-8 text-neutral-500">
               Track your current orders and view your previous orders.
             </p>
+
+            <div className="mt-6">
+              <a
+                href="/issue-reports"
+                className="inline-flex rounded-full border border-neutral-300 px-5 py-3 text-sm font-semibold transition hover:border-black"
+              >
+                My issue reports
+              </a>
+            </div>
           </div>
         </div>
       </section>
@@ -392,6 +403,19 @@ export default function OrdersPage() {
                       </div>
                       <DriverTrackingMap orderId={order.id} />
                     </>
+                  )}
+
+                  {order.driverId != null && (
+                    <div className="mt-8 space-y-6">
+                      <OrderChatPanel
+                        orderId={order.id}
+                        orderStatus={order.status}
+                      />
+                      <ReportOrderIssueForm
+                        orderId={order.id}
+                        role="CUSTOMER"
+                      />
+                    </div>
                   )}
 
                   <div className="mt-10 border-t border-neutral-200 pt-8">

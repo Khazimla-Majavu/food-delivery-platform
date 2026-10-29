@@ -833,6 +833,154 @@ export async function getAdminRestaurants(
 }
 
 
+export interface OrderChatMessageResponse {
+  id: number;
+  orderId: number;
+  senderId: number;
+  senderName: string;
+  senderRole: string;
+  message: string;
+  createdAt: string;
+}
+
+export type OrderIssueCategory =
+  | "MISSING_ITEMS"
+  | "WRONG_ORDER"
+  | "LATE_DELIVERY"
+  | "RESTAURANT_ISSUE"
+  | "DELIVERY_ADDRESS"
+  | "PAYMENT_ISSUE"
+  | "DRIVER_CONDUCT"
+  | "CUSTOMER_CONDUCT"
+  | "SAFETY_CONCERN"
+  | "OTHER";
+
+export type OrderIssueStatus = "OPEN" | "IN_REVIEW" | "RESOLVED";
+
+export interface OrderIssueReportResponse {
+  id: number;
+  orderId: number;
+  reporterId: number;
+  reporterName: string;
+  reporterRole: string;
+  reportedUserId: number | null;
+  category: OrderIssueCategory;
+  description: string;
+  status: OrderIssueStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export async function getOrderChatMessages(
+  orderId: number,
+  token: string,
+): Promise<OrderChatMessageResponse[]> {
+  const response = await fetch(`${API_URL}/api/orders/${orderId}/chat`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to load chat: ${response.status}`);
+  }
+  return response.json();
+}
+
+export async function sendOrderChatMessage(
+  orderId: number,
+  message: string,
+  token: string,
+): Promise<OrderChatMessageResponse> {
+  const response = await fetch(`${API_URL}/api/orders/${orderId}/chat`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ message }),
+  });
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(
+      body.detail || body.message || body.error || "Unable to send message.",
+    );
+  }
+  return body;
+}
+
+export async function createOrderIssueReport(
+  orderId: number,
+  category: OrderIssueCategory,
+  description: string,
+  token: string,
+): Promise<OrderIssueReportResponse> {
+  const response = await fetch(`${API_URL}/api/orders/${orderId}/reports`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ category, description }),
+  });
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(
+      body.detail || body.message || body.error || "Unable to submit report.",
+    );
+  }
+  return body;
+}
+
+export async function getMyOrderIssueReports(
+  token: string,
+): Promise<OrderIssueReportResponse[]> {
+  const response = await fetch(`${API_URL}/api/order-issues/mine`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to load your reports: ${response.status}`);
+  }
+  return response.json();
+}
+
+export async function getAdminOrderIssueReports(
+  token: string,
+): Promise<OrderIssueReportResponse[]> {
+  const response = await fetch(`${API_URL}/api/order-issues/admin/all`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to load issue reports: ${response.status}`);
+  }
+  return response.json();
+}
+
+export async function updateOrderIssueReportStatus(
+  reportId: number,
+  status: OrderIssueStatus,
+  token: string,
+): Promise<OrderIssueReportResponse> {
+  const response = await fetch(
+    `${API_URL}/api/order-issues/admin/${reportId}/status`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status }),
+    },
+  );
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(
+      body.detail || body.message || body.error || "Unable to update report.",
+    );
+  }
+  return body;
+}
+
 export async function verifyEmail(token: string): Promise<string> {
   const response = await fetch(
     `${API_URL}/api/auth/verify-email?token=${encodeURIComponent(token)}`,
