@@ -5,11 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.mail.MailException;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.client.RestClientException;
 
 import java.util.Locale;
 import java.util.regex.Pattern;
@@ -23,19 +21,15 @@ public class WorkWithChowEmailService {
     private static final Pattern EMAIL_PATTERN =
             Pattern.compile("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$");
 
-    private final JavaMailSender mailSender;
-    private final String senderAddress;
+    private final BrevoEmailService brevoEmailService;
     private final String adminEmail;
 
     public WorkWithChowEmailService(
-            JavaMailSender mailSender,
-            @Value("${spring.mail.username:noreply@chowdelivery.co.za}")
-            String senderAddress,
+            BrevoEmailService brevoEmailService,
             @Value("${CHOW_ADMIN_EMAIL:admin@chowdelivery.co.za}")
             String adminEmail
     ) {
-        this.mailSender = mailSender;
-        this.senderAddress = senderAddress;
+        this.brevoEmailService = brevoEmailService;
         this.adminEmail = adminEmail;
     }
 
@@ -72,25 +66,28 @@ public class WorkWithChowEmailService {
             throw badRequest("Your message must be 2,000 characters or fewer.");
         }
 
-        SimpleMailMessage mail = new SimpleMailMessage();
-        mail.setFrom(senderAddress);
-        mail.setTo(adminEmail);
-        mail.setReplyTo(email);
-        mail.setSubject("New Work with Chow enquiry: " + type);
-        mail.setText(
+        String content =
                 "A new enquiry was submitted through Work with Chow.\n\n" +
                 "Name: " + name + "\n" +
                 "Phone: " + phone + "\n" +
                 "Email: " + email + "\n" +
                 "Interested in: " + type + "\n\n" +
                 "Message:\n" +
-                (messageText.isBlank() ? "(No message provided)" : messageText)
-        );
+                (messageText.isBlank() ? "(No message provided)" : messageText);
 
         try {
-            mailSender.send(mail);
-        } catch (MailException exception) {
-            log.warn("Could not send a Work with Chow enquiry. Check SMTP configuration.");
+            brevoEmailService.sendTextEmail(
+                    adminEmail,
+                    "New Work with Chow enquiry: " + type,
+                    content,
+                    email
+            );
+        } catch (RestClientException | IllegalStateException exception) {
+            log.warn(
+                    "Could not send a Work with Chow enquiry through Brevo: {}",
+                    exception.getMessage(),
+                    exception
+            );
             throw new ResponseStatusException(
                     HttpStatus.SERVICE_UNAVAILABLE,
                     "We couldn't send your enquiry right now. Please try again later."

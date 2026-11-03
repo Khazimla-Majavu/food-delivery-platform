@@ -3,10 +3,8 @@ package com.fooddelivery.backend.service;
 import com.fooddelivery.backend.model.User;
 import com.fooddelivery.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.MailException;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
@@ -26,20 +24,17 @@ public class EmailVerificationService {
     private static final SecureRandom RANDOM = new SecureRandom();
 
     private final UserRepository userRepository;
-    private final JavaMailSender mailSender;
+    private final BrevoEmailService brevoEmailService;
     private final String frontendUrl;
-    private final String senderAddress;
 
     public EmailVerificationService(
             UserRepository userRepository,
-            JavaMailSender mailSender,
-            @Value("${app.frontend-url:http://localhost:3000}") String frontendUrl,
-            @Value("${spring.mail.username:noreply@chowdelivery.co.za}") String senderAddress
+            BrevoEmailService brevoEmailService,
+            @Value("${app.frontend-url:http://localhost:3000}") String frontendUrl
     ) {
         this.userRepository = userRepository;
-        this.mailSender = mailSender;
+        this.brevoEmailService = brevoEmailService;
         this.frontendUrl = frontendUrl.replaceAll("/+$", "");
-        this.senderAddress = senderAddress;
     }
 
     @Transactional
@@ -54,23 +49,23 @@ public class EmailVerificationService {
         userRepository.save(user);
 
         String link = frontendUrl + "/verify-email?token=" + rawToken;
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(senderAddress);
-        message.setTo(user.getEmail());
-        message.setSubject("Verify your Chow account");
-        message.setText(
+        String content =
                 "Hi " + user.getName() + ",\n\n" +
                 "Please verify your email address to activate your Chow account.\n\n" +
                 link + "\n\n" +
-                "This link expires in 24 hours. If you did not create this account, you can ignore this email."
-        );
+                "This link expires in 24 hours. If you did not create this account, you can ignore this email.";
 
         try {
-            mailSender.send(message);
-        } catch (MailException exception) {
+            brevoEmailService.sendTextEmail(
+                    user.getEmail(),
+                    "Verify your Chow account",
+                    content,
+                    null
+            );
+        } catch (RestClientException | IllegalStateException exception) {
             // The account and token remain saved so the user can request another email.
             log.warn(
-                    "Could not send verification email to {}. SMTP error: {}",
+                    "Could not send verification email to {}. Brevo error: {}",
                     user.getEmail(),
                     exception.getMessage(),
                     exception
