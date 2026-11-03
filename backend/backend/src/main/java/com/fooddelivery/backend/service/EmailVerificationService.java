@@ -69,7 +69,12 @@ public class EmailVerificationService {
             mailSender.send(message);
         } catch (MailException exception) {
             // The account and token remain saved so the user can request another email.
-            log.warn("Could not send verification email to {}. Check SMTP configuration.", user.getEmail());
+            log.warn(
+                    "Could not send verification email to {}. SMTP error: {}",
+                    user.getEmail(),
+                    exception.getMessage(),
+                    exception
+            );
         }
     }
 
