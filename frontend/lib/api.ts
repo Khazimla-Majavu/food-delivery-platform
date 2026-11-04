@@ -8,6 +8,12 @@ export interface Restaurant {
   ownerId: number;
 }
 
+export interface CreateRestaurantRequest {
+  name: string;
+  description: string;
+  address: string;
+}
+
 export interface MenuItem {
   id: number;
   name: string;
@@ -211,6 +217,31 @@ export async function getMyRestaurants(token: string): Promise<Restaurant[]> {
 
   if (!response.ok) {
     throw new Error(`Failed to fetch restaurants: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export async function createRestaurant(
+  request: CreateRestaurantRequest,
+  token: string,
+): Promise<Restaurant> {
+  const response = await fetch(`${API_URL}/api/restaurants`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(request),
+  });
+
+  if (!response.ok) {
+    let message = `Failed to create restaurant: ${response.status}`;
+    try {
+      const body = await response.json();
+      message = body.detail || body.message || body.error || message;
+    } catch {}
+    throw new Error(message);
   }
 
   return response.json();

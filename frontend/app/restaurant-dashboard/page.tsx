@@ -6,6 +6,7 @@ import { isOrderHistory, sortOrdersBySection } from "../../lib/orderSorting";
 import { Fragment, useEffect, useState } from "react";
 import {
   getMyRestaurants,
+  createRestaurant,
   getRestaurantOrders,
   getRestaurantMenu,
   createMenuItem,
@@ -13,6 +14,7 @@ import {
   deleteMenuItem,
   updateOrderStatus,
   Restaurant,
+  CreateRestaurantRequest,
   OrderResponse,
   MenuItem,
 } from "../../lib/api";
@@ -21,6 +23,12 @@ function RestaurantDashboardContent() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [orders, setOrders] = useState<OrderResponse[]>([]);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+
+  const [restaurantName, setRestaurantName] = useState("");
+  const [restaurantDescription, setRestaurantDescription] = useState("");
+  const [restaurantAddress, setRestaurantAddress] = useState("");
+  const [restaurantError, setRestaurantError] = useState("");
+  const [restaurantSubmitting, setRestaurantSubmitting] = useState(false);
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [menuName, setMenuName] = useState("");
@@ -42,6 +50,55 @@ function RestaurantDashboardContent() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  async function handleCreateRestaurant(event: React.FormEvent) {
+    event.preventDefault();
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      setRestaurantError("Please log in again.");
+      return;
+    }
+
+    if (
+      !restaurantName.trim() ||
+      !restaurantDescription.trim() ||
+      !restaurantAddress.trim()
+    ) {
+      setRestaurantError("Please complete all fields.");
+      return;
+    }
+
+    const request: CreateRestaurantRequest = {
+      name: restaurantName.trim(),
+      description: restaurantDescription.trim(),
+      address: restaurantAddress.trim(),
+    };
+
+    try {
+      setRestaurantSubmitting(true);
+      setRestaurantError("");
+
+      const newRestaurant = await createRestaurant(request, token);
+
+      setRestaurants((current) => [...current, newRestaurant]);
+      setMenuItems([]);
+      setOrders([]);
+
+      setRestaurantName("");
+      setRestaurantDescription("");
+      setRestaurantAddress("");
+    } catch (error) {
+      setRestaurantError(
+        error instanceof Error
+          ? error.message
+          : "Unable to create your restaurant.",
+      );
+    } finally {
+      setRestaurantSubmitting(false);
+    }
+  }
 
   async function handleAddMenuItem(event: React.FormEvent) {
     event.preventDefault();
@@ -458,10 +515,98 @@ function RestaurantDashboardContent() {
           </div>
 
           {restaurants.length === 0 ? (
-            <div className="rounded-3xl border border-neutral-200 bg-neutral-50 p-8">
-              <p className="text-neutral-500">
-                You don't have any restaurants yet.
-              </p>
+            <div className="rounded-3xl border border-neutral-200 bg-neutral-50 p-8 sm:p-10">
+              <div className="max-w-2xl">
+                <h3 className="text-2xl font-semibold tracking-[-0.02em]">
+                  Create your restaurant
+                </h3>
+
+                <p className="mt-3 leading-7 text-neutral-500">
+                  Set up your restaurant profile before adding menu items and
+                  receiving orders.
+                </p>
+
+                {restaurantError && (
+                  <div className="mt-6 rounded-2xl border border-neutral-300 bg-white p-4">
+                    <p className="text-sm text-neutral-700">
+                      {restaurantError}
+                    </p>
+                  </div>
+                )}
+
+                <form onSubmit={handleCreateRestaurant} className="mt-8 space-y-5">
+                  <div>
+                    <label
+                      htmlFor="restaurantName"
+                      className="mb-2 block text-sm font-medium text-black"
+                    >
+                      Restaurant Name
+                    </label>
+                    <input
+                      id="restaurantName"
+                      type="text"
+                      value={restaurantName}
+                      onChange={(event) => setRestaurantName(event.target.value)}
+                      placeholder="e.g. Chow Burger Co."
+                      maxLength={100}
+                      required
+                      className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3.5 text-black outline-none transition placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="restaurantDescription"
+                      className="mb-2 block text-sm font-medium text-black"
+                    >
+                      Description
+                    </label>
+                    <textarea
+                      id="restaurantDescription"
+                      value={restaurantDescription}
+                      onChange={(event) =>
+                        setRestaurantDescription(event.target.value)
+                      }
+                      placeholder="Tell customers about your restaurant"
+                      rows={3}
+                      maxLength={1000}
+                      required
+                      className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3.5 text-black outline-none transition placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="restaurantAddress"
+                      className="mb-2 block text-sm font-medium text-black"
+                    >
+                      Restaurant Address
+                    </label>
+                    <textarea
+                      id="restaurantAddress"
+                      value={restaurantAddress}
+                      onChange={(event) =>
+                        setRestaurantAddress(event.target.value)
+                      }
+                      placeholder="Enter the restaurant's full street address"
+                      rows={2}
+                      maxLength={500}
+                      required
+                      className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3.5 text-black outline-none transition placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={restaurantSubmitting}
+                    className="w-full rounded-full bg-black px-5 py-4 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:min-w-56"
+                  >
+                    {restaurantSubmitting
+                      ? "Creating Restaurant..."
+                      : "Create Restaurant"}
+                  </button>
+                </form>
+              </div>
             </div>
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
