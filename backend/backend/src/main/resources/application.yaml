@@ -22,3 +22,11 @@ spring:
 
 app:
   frontend-url: ${CHOW_FRONTEND_URL:http://localhost:3000}
+
+
+chow:
+  demo-mode: ${CHOW_DEMO_MODE:false}
+  local-admin:
+    enabled: ${CHOW_LOCAL_ADMIN_ENABLED:false}
+    email: ${CHOW_LOCAL_ADMIN_EMAIL:}
+    password: ${CHOW_LOCAL_ADMIN_PASSWORD:}

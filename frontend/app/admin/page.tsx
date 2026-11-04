@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import RoleGuard from "../components/RoleGuard";
 import {
+  createAdminAccount,
   getFinancialRecord,
   backfillFinancialRecords,
   getFinancialSummary,
@@ -10,6 +11,7 @@ import {
   getAdminOrders,
   getAdminRestaurants,
   getAdminPayments,
+  AdminCreateAccountRequest,
   FinancialRecordResponse,
   FinancialSummaryResponse,
   PaymentResponse,
@@ -30,6 +32,17 @@ export default function AdminPage() {
   const [payments, setPayments] = useState<PaymentResponse[]>([]);
   const [error, setError] = useState("");
   const [usersError, setUsersError] = useState("");
+
+  const [accountName, setAccountName] = useState("");
+  const [accountEmail, setAccountEmail] = useState("");
+  const [accountPhone, setAccountPhone] = useState("");
+  const [accountPassword, setAccountPassword] = useState("");
+  const [accountRole, setAccountRole] =
+    useState<AdminCreateAccountRequest["role"]>("CUSTOMER");
+  const [accountMessage, setAccountMessage] = useState("");
+  const [accountError, setAccountError] = useState("");
+  const [creatingAccount, setCreatingAccount] = useState(false);
+
   const [ordersError, setOrdersError] = useState("");
   const [restaurantsError, setRestaurantsError] = useState("");
   const [paymentsError, setPaymentsError] = useState("");
@@ -156,6 +169,60 @@ export default function AdminPage() {
       setError("Unable to load financial record.");
     }
   }
+
+  async function handleCreateAccount() {
+    const token = localStorage.getItem("token");
+
+    setAccountMessage("");
+    setAccountError("");
+
+    if (!token) {
+      setAccountError("You must be logged in.");
+      return;
+    }
+
+    if (!accountName.trim() || !accountEmail.trim() || !accountPassword) {
+      setAccountError("Name, email and password are required.");
+      return;
+    }
+
+    if (accountPassword.length < 8) {
+      setAccountError("Password must be at least 8 characters.");
+      return;
+    }
+
+    setCreatingAccount(true);
+
+    try {
+      const request: AdminCreateAccountRequest = {
+        name: accountName.trim(),
+        email: accountEmail.trim().toLowerCase(),
+        phone: accountPhone.trim(),
+        password: accountPassword,
+        role: accountRole,
+      };
+
+      const createdUser = await createAdminAccount(request, token);
+      const updatedUsers = await getUsers(token);
+
+      setUsers(updatedUsers);
+      setAccountName("");
+      setAccountEmail("");
+      setAccountPhone("");
+      setAccountPassword("");
+      setAccountRole("CUSTOMER");
+      setAccountMessage(
+        `${createdUser.role} account created successfully for ${createdUser.name}.`
+      );
+    } catch (error) {
+      setAccountError(
+        error instanceof Error ? error.message : "Unable to create account."
+      );
+    } finally {
+      setCreatingAccount(false);
+    }
+  }
+
 
   return (
     <RoleGuard allowedRoles={["ADMIN"]}>
@@ -436,6 +503,109 @@ export default function AdminPage() {
             </table>
           </div>
         )}
+      </div>
+
+      <div className="mb-8 rounded-lg border border-neutral-200 p-6">
+        <h2 className="mb-2 text-xl font-semibold">
+          Account Management
+        </h2>
+        <p className="mb-6 text-sm text-neutral-500">
+          Create customer, restaurant-owner and driver accounts for the controlled demo.
+        </p>
+
+        {accountMessage && (
+          <p className="mb-4 rounded-lg border border-neutral-200 p-3 text-sm">
+            {accountMessage}
+          </p>
+        )}
+
+        {accountError && (
+          <p className="mb-4 rounded-lg border border-red-200 p-3 text-sm text-red-700">
+            {accountError}
+          </p>
+        )}
+
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            handleCreateAccount();
+          }}
+        >
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="text-sm font-medium">
+              Full name
+              <input
+                required
+                value={accountName}
+                onChange={(event) => setAccountName(event.target.value)}
+                className="mt-2 w-full rounded-lg border border-neutral-300 px-3 py-3 font-normal"
+                placeholder="Account holder name"
+              />
+            </label>
+
+            <label className="text-sm font-medium">
+              Email address
+              <input
+                required
+                type="email"
+                value={accountEmail}
+                onChange={(event) => setAccountEmail(event.target.value)}
+                className="mt-2 w-full rounded-lg border border-neutral-300 px-3 py-3 font-normal"
+                placeholder="name@demo.chow.test"
+              />
+            </label>
+
+            <label className="text-sm font-medium">
+              Phone number
+              <input
+                type="tel"
+                value={accountPhone}
+                onChange={(event) => setAccountPhone(event.target.value)}
+                className="mt-2 w-full rounded-lg border border-neutral-300 px-3 py-3 font-normal"
+                placeholder="Optional"
+              />
+            </label>
+
+            <label className="text-sm font-medium">
+              Temporary password
+              <input
+                required
+                type="password"
+                minLength={8}
+                value={accountPassword}
+                onChange={(event) => setAccountPassword(event.target.value)}
+                className="mt-2 w-full rounded-lg border border-neutral-300 px-3 py-3 font-normal"
+                placeholder="At least 8 characters"
+                autoComplete="new-password"
+              />
+            </label>
+
+            <label className="text-sm font-medium sm:col-span-2">
+              Account role
+              <select
+                value={accountRole}
+                onChange={(event) =>
+                  setAccountRole(
+                    event.target.value as AdminCreateAccountRequest["role"]
+                  )
+                }
+                className="mt-2 w-full rounded-lg border border-neutral-300 bg-white px-3 py-3 font-normal"
+              >
+                <option value="CUSTOMER">Customer</option>
+                <option value="RESTAURANT">Restaurant owner</option>
+                <option value="DRIVER">Driver</option>
+              </select>
+            </label>
+          </div>
+
+          <button
+            type="submit"
+            disabled={creatingAccount}
+            className="mt-6 rounded-full bg-black px-6 py-3 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {creatingAccount ? "Creating account..." : "Create account"}
+          </button>
+        </form>
       </div>
 
       <div className="rounded-lg border p-6">

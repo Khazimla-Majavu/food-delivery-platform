@@ -1,14 +1,19 @@
 package com.fooddelivery.backend.service;
 
 import com.fooddelivery.backend.dto.LoginResponse;
+import com.fooddelivery.backend.dto.AdminCreateAccountRequest;
 import com.fooddelivery.backend.dto.UserResponse;
 import com.fooddelivery.backend.model.User;
 import com.fooddelivery.backend.repository.UserRepository;
 import com.fooddelivery.backend.security.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class UserService {
@@ -17,6 +22,9 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final EmailVerificationService emailVerificationService;
+
+    @Value("${chow.demo-mode:false}")
+    private boolean demoMode;
 
     public UserService(
             UserRepository userRepository,
@@ -91,6 +99,62 @@ public class UserService {
 
         User savedUser = userRepository.save(user);
         emailVerificationService.issueAndSendVerification(savedUser);
+
+        return UserResponse.fromUser(savedUser);
+    }
+
+
+    public UserResponse createManagedAccount(AdminCreateAccountRequest request) {
+
+        if (!demoMode) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Managed account invitations are not enabled. Demo mode is disabled."
+            );
+        }
+
+        if (request == null
+                || request.getName() == null || request.getName().isBlank()
+                || request.getEmail() == null || request.getEmail().isBlank()
+                || request.getPassword() == null || request.getPassword().length() < 8
+                || request.getRole() == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Name, email, role and a password of at least 8 characters are required."
+            );
+        }
+
+        User.Role role = request.getRole();
+
+        if (role != User.Role.CUSTOMER
+                && role != User.Role.RESTAURANT
+                && role != User.Role.DRIVER) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Only CUSTOMER, RESTAURANT and DRIVER accounts can be created."
+            );
+        }
+
+        String normalizedEmail = request.getEmail().trim().toLowerCase(Locale.ROOT);
+
+        if (userRepository.existsByEmail(normalizedEmail)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "An account with this email address already exists."
+            );
+        }
+
+        User user = new User();
+        user.setName(request.getName().trim());
+        user.setEmail(normalizedEmail);
+        user.setPhone(request.getPhone() == null ? "" : request.getPhone().trim());
+        user.setRole(role);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        // Demo accounts do not need real inboxes or verification emails.
+        user.setEmailVerified(true);
+
+        User savedUser = userRepository.save(user);
 
         return UserResponse.fromUser(savedUser);
     }

@@ -517,6 +517,39 @@ export interface FinancialRecordResponse {
   platformRevenue: number;
 }
 
+export interface AdminCreateAccountRequest {
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+  role: "CUSTOMER" | "RESTAURANT" | "DRIVER";
+}
+
+export async function createAdminAccount(
+  request: AdminCreateAccountRequest,
+  token: string,
+): Promise<UserResponse> {
+  const response = await fetch(`${API_URL}/api/admin/accounts`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(request),
+  });
+
+  const body = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(
+      body.detail || body.message || body.error ||
+      `Unable to create account: ${response.status}`,
+    );
+  }
+
+  return body;
+}
+
 export async function getUsers(
   token: string,
 ): Promise<UserResponse[]> {
