@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import RoleGuard from "../components/RoleGuard";
 import { isOrderHistory, sortOrdersBySection } from "../../lib/orderSorting";
 
@@ -305,7 +306,7 @@ function RestaurantDashboardContent() {
             type="button"
             disabled={isUpdating}
             onClick={() => handleOrderStatusUpdate(order.id, "ACCEPTED")}
-            className="rounded-full bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-full bg-[#A8DFC5] px-5 py-3 text-sm font-semibold text-[#14191B] transition hover:bg-[#BDE9D3] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isUpdating ? "Updating..." : "Accept Order"}
           </button>
@@ -314,7 +315,7 @@ function RestaurantDashboardContent() {
             type="button"
             disabled={isUpdating}
             onClick={() => handleOrderStatusUpdate(order.id, "CANCELLED")}
-            className="rounded-full border border-neutral-300 px-5 py-3 text-sm font-semibold text-black transition hover:border-black disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-full border border-[#465453] px-5 py-3 text-sm font-semibold text-[#F3EFE5] transition hover:border-[#A8DFC5] disabled:cursor-not-allowed disabled:opacity-50"
           >
             Cancel Order
           </button>
@@ -329,7 +330,7 @@ function RestaurantDashboardContent() {
             type="button"
             disabled={isUpdating}
             onClick={() => handleOrderStatusUpdate(order.id, "PREPARING")}
-            className="rounded-full bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-full bg-[#A8DFC5] px-5 py-3 text-sm font-semibold text-[#14191B] transition hover:bg-[#BDE9D3] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isUpdating ? "Updating..." : "Start Preparing"}
           </button>
@@ -338,7 +339,7 @@ function RestaurantDashboardContent() {
             type="button"
             disabled={isUpdating}
             onClick={() => handleOrderStatusUpdate(order.id, "CANCELLED")}
-            className="rounded-full border border-neutral-300 px-5 py-3 text-sm font-semibold text-black transition hover:border-black disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-full border border-[#465453] px-5 py-3 text-sm font-semibold text-[#F3EFE5] transition hover:border-[#A8DFC5] disabled:cursor-not-allowed disabled:opacity-50"
           >
             Cancel Order
           </button>
@@ -353,7 +354,7 @@ function RestaurantDashboardContent() {
             type="button"
             disabled={isUpdating}
             onClick={() => handleOrderStatusUpdate(order.id, "READY")}
-            className="rounded-full bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-full bg-[#A8DFC5] px-5 py-3 text-sm font-semibold text-[#14191B] transition hover:bg-[#BDE9D3] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isUpdating ? "Updating..." : "Mark Ready"}
           </button>
@@ -362,7 +363,7 @@ function RestaurantDashboardContent() {
             type="button"
             disabled={isUpdating}
             onClick={() => handleOrderStatusUpdate(order.id, "CANCELLED")}
-            className="rounded-full border border-neutral-300 px-5 py-3 text-sm font-semibold text-black transition hover:border-black disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-full border border-[#465453] px-5 py-3 text-sm font-semibold text-[#F3EFE5] transition hover:border-[#A8DFC5] disabled:cursor-not-allowed disabled:opacity-50"
           >
             Cancel Order
           </button>
@@ -372,7 +373,7 @@ function RestaurantDashboardContent() {
 
     if (order.status === "READY") {
       return (
-        <p className="text-sm font-medium text-neutral-500">
+        <p className="text-sm font-medium text-[#B8B7AE]">
           Ready for driver pickup.
         </p>
       );
@@ -380,7 +381,7 @@ function RestaurantDashboardContent() {
 
     if (order.status === "OUT_FOR_DELIVERY") {
       return (
-        <p className="text-sm font-medium text-neutral-500">
+        <p className="text-sm font-medium text-[#B8B7AE]">
           Order is out for delivery.
         </p>
       );
@@ -388,7 +389,7 @@ function RestaurantDashboardContent() {
 
     if (order.status === "DELIVERED") {
       return (
-        <p className="text-sm font-medium text-neutral-700">
+        <p className="text-sm font-medium text-[#B8B7AE]">
           Order delivered.
         </p>
       );
@@ -396,7 +397,7 @@ function RestaurantDashboardContent() {
 
     if (order.status === "CANCELLED") {
       return (
-        <p className="text-sm font-medium text-neutral-500">
+        <p className="text-sm font-medium text-[#B8B7AE]">
           Order cancelled.
         </p>
       );
@@ -444,9 +445,9 @@ function RestaurantDashboardContent() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-white text-black">
+      <main className="min-h-screen bg-[var(--chow-bg)] text-[#F3EFE5]">
         <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
-          <p className="text-sm text-neutral-500">
+          <p className="text-sm text-[#B8B7AE]">
             Loading restaurant dashboard...
           </p>
         </div>
@@ -456,18 +457,18 @@ function RestaurantDashboardContent() {
 
   if (error) {
     return (
-      <main className="min-h-screen bg-white text-black">
+      <main className="min-h-screen bg-[var(--chow-bg)] text-[#F3EFE5]">
         <section className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
-          <div className="rounded-3xl border border-neutral-200 bg-neutral-50 p-8">
-            <p className="text-sm font-medium uppercase tracking-[0.15em] text-neutral-500">
+          <div className="rounded-3xl border border-[#303D3E] bg-[#202B2D] p-8">
+            <p className="text-sm font-medium uppercase tracking-[0.15em] text-[#B8B7AE]">
               Dashboard
             </p>
 
-            <h1 className="mt-3 text-3xl font-semibold tracking-[-0.03em]">
+            <h1 className="font-serif mt-3 text-3xl font-semibold tracking-[-0.03em]">
               Something went wrong
             </h1>
 
-            <p className="mt-3 text-neutral-500">{error}</p>
+            <p className="mt-3 text-[#B8B7AE]">{error}</p>
           </div>
         </section>
       </main>
@@ -475,26 +476,26 @@ function RestaurantDashboardContent() {
   }
 
   return (
-      <main className="min-h-screen bg-white text-black">
-      <section className="border-b border-neutral-200">
+      <main className="min-h-screen bg-[var(--chow-bg)] text-[#F3EFE5]">
+      <section className="border-b border-[#303D3E]">
         <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
-          <a
+          <Link
             href="/"
-            className="mb-8 inline-flex items-center text-sm font-medium text-neutral-500 transition hover:text-black"
+            className="mb-8 inline-flex items-center text-sm font-medium text-[#B8B7AE] transition hover:text-[#F3EFE5]"
           >
             ← Back to Chow
-          </a>
+          </Link>
 
           <div className="max-w-4xl">
-            <p className="text-sm font-medium uppercase tracking-[0.2em] text-neutral-500">
+            <p className="text-sm font-medium uppercase tracking-[0.2em] text-[#B8B7AE]">
               Restaurant Management
             </p>
 
-            <h1 className="mt-3 text-5xl font-semibold tracking-[-0.04em] sm:text-6xl">
+            <h1 className="font-serif mt-3 text-5xl font-semibold tracking-[-0.04em] sm:text-6xl">
               Restaurant Dashboard
             </h1>
 
-            <p className="mt-5 max-w-2xl text-lg leading-8 text-neutral-500">
+            <p className="mt-5 max-w-2xl text-lg leading-8 text-[#B8B7AE]">
               Manage your restaurant, menu, and incoming orders from one place.
             </p>
           </div>
@@ -505,30 +506,30 @@ function RestaurantDashboardContent() {
         {/* Restaurant overview */}
         <div>
           <div className="mb-8">
-            <p className="text-sm font-medium uppercase tracking-[0.2em] text-neutral-500">
+            <p className="text-sm font-medium uppercase tracking-[0.2em] text-[#B8B7AE]">
               Overview
             </p>
 
-            <h2 className="mt-2 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
+            <h2 className="font-serif mt-2 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
               Your Restaurants
             </h2>
           </div>
 
           {restaurants.length === 0 ? (
-            <div className="rounded-3xl border border-neutral-200 bg-neutral-50 p-8 sm:p-10">
+            <div className="rounded-3xl border border-[#303D3E] bg-[#202B2D] p-8 sm:p-10">
               <div className="max-w-2xl">
-                <h3 className="text-2xl font-semibold tracking-[-0.02em]">
+                <h3 className="font-serif text-2xl font-semibold tracking-[-0.02em]">
                   Create your restaurant
                 </h3>
 
-                <p className="mt-3 leading-7 text-neutral-500">
+                <p className="mt-3 leading-7 text-[#B8B7AE]">
                   Set up your restaurant profile before adding menu items and
                   receiving orders.
                 </p>
 
                 {restaurantError && (
-                  <div className="mt-6 rounded-2xl border border-neutral-300 bg-white p-4">
-                    <p className="text-sm text-neutral-700">
+                  <div className="mt-6 rounded-2xl border border-[#465453] bg-[#1C2728] p-4">
+                    <p className="text-sm text-[#B8B7AE]">
                       {restaurantError}
                     </p>
                   </div>
@@ -538,7 +539,7 @@ function RestaurantDashboardContent() {
                   <div>
                     <label
                       htmlFor="restaurantName"
-                      className="mb-2 block text-sm font-medium text-black"
+                      className="mb-2 block text-sm font-medium text-[#F3EFE5]"
                     >
                       Restaurant Name
                     </label>
@@ -550,14 +551,14 @@ function RestaurantDashboardContent() {
                       placeholder="e.g. Chow Burger Co."
                       maxLength={100}
                       required
-                      className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3.5 text-black outline-none transition placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black"
+                      className="w-full rounded-xl border border-[#465453] bg-[#1C2728] px-4 py-3.5 text-[#F3EFE5] outline-none transition placeholder:text-[#89938E] focus:border-[#A8DFC5] focus:ring-1 focus:ring-[#A8DFC5]"
                     />
                   </div>
 
                   <div>
                     <label
                       htmlFor="restaurantDescription"
-                      className="mb-2 block text-sm font-medium text-black"
+                      className="mb-2 block text-sm font-medium text-[#F3EFE5]"
                     >
                       Description
                     </label>
@@ -571,14 +572,14 @@ function RestaurantDashboardContent() {
                       rows={3}
                       maxLength={1000}
                       required
-                      className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3.5 text-black outline-none transition placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black"
+                      className="w-full rounded-xl border border-[#465453] bg-[#1C2728] px-4 py-3.5 text-[#F3EFE5] outline-none transition placeholder:text-[#89938E] focus:border-[#A8DFC5] focus:ring-1 focus:ring-[#A8DFC5]"
                     />
                   </div>
 
                   <div>
                     <label
                       htmlFor="restaurantAddress"
-                      className="mb-2 block text-sm font-medium text-black"
+                      className="mb-2 block text-sm font-medium text-[#F3EFE5]"
                     >
                       Restaurant Address
                     </label>
@@ -592,14 +593,14 @@ function RestaurantDashboardContent() {
                       rows={2}
                       maxLength={500}
                       required
-                      className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3.5 text-black outline-none transition placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black"
+                      className="w-full rounded-xl border border-[#465453] bg-[#1C2728] px-4 py-3.5 text-[#F3EFE5] outline-none transition placeholder:text-[#89938E] focus:border-[#A8DFC5] focus:ring-1 focus:ring-[#A8DFC5]"
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={restaurantSubmitting}
-                    className="w-full rounded-full bg-black px-5 py-4 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:min-w-56"
+                    className="w-full rounded-full bg-[#A8DFC5] px-5 py-4 text-sm font-semibold text-[#14191B] transition hover:bg-[#BDE9D3] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:min-w-56"
                   >
                     {restaurantSubmitting
                       ? "Creating Restaurant..."
@@ -613,26 +614,26 @@ function RestaurantDashboardContent() {
               {restaurants.map((restaurant) => (
                 <div
                   key={restaurant.id}
-                  className="rounded-3xl border border-neutral-200 bg-white p-7 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+                  className="rounded-3xl border border-[#303D3E] bg-[#1C2728] p-7 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
                 >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-black text-lg font-semibold text-white">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#A8DFC5] text-lg font-semibold text-[#14191B]">
                     {restaurant.name.charAt(0).toUpperCase()}
                   </div>
 
-                  <h3 className="mt-6 text-2xl font-semibold tracking-[-0.02em]">
+                  <h3 className="font-serif mt-6 text-2xl font-semibold tracking-[-0.02em]">
                     {restaurant.name}
                   </h3>
 
-                  <p className="mt-3 text-sm leading-6 text-neutral-500">
+                  <p className="mt-3 text-sm leading-6 text-[#B8B7AE]">
                     {restaurant.description}
                   </p>
 
-                  <div className="mt-6 border-t border-neutral-200 pt-5">
-                    <p className="text-xs font-medium uppercase tracking-[0.15em] text-neutral-400">
+                  <div className="mt-6 border-t border-[#303D3E] pt-5">
+                    <p className="text-xs font-medium uppercase tracking-[0.15em] text-[#89938E]">
                       Address
                     </p>
 
-                    <p className="mt-2 text-sm font-medium text-neutral-700">
+                    <p className="mt-2 text-sm font-medium text-[#B8B7AE]">
                       {restaurant.address}
                     </p>
                   </div>
@@ -644,23 +645,23 @@ function RestaurantDashboardContent() {
 
         {/* Menu */}
         <div className="mt-20">
-          <div className="flex flex-col gap-5 border-b border-neutral-200 pb-8 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex flex-col gap-5 border-b border-[#303D3E] pb-8 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-sm font-medium uppercase tracking-[0.2em] text-neutral-500">
+              <p className="text-sm font-medium uppercase tracking-[0.2em] text-[#B8B7AE]">
                 Menu
               </p>
 
-              <h2 className="mt-2 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
+              <h2 className="font-serif mt-2 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
                 Your Menu
               </h2>
 
-              <p className="mt-3 max-w-xl text-neutral-500">
+              <p className="mt-3 max-w-xl text-[#B8B7AE]">
                 Manage the food items available at your restaurant.
               </p>
             </div>
 
             <div className="flex items-center gap-3">
-              <span className="rounded-full border border-neutral-200 bg-neutral-50 px-4 py-2 text-sm font-semibold text-neutral-700">
+              <span className="rounded-full border border-[#303D3E] bg-[#202B2D] px-4 py-2 text-sm font-semibold text-[#B8B7AE]">
                 {menuItems.length}{" "}
                 {menuItems.length === 1 ? "item" : "items"}
               </span>
@@ -672,7 +673,7 @@ function RestaurantDashboardContent() {
                     setShowAddForm((current) => !current);
                     setMenuError("");
                   }}
-                  className="rounded-full bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-neutral-800"
+                  className="rounded-full bg-[#A8DFC5] px-5 py-3 text-sm font-semibold text-[#14191B] transition hover:bg-[#BDE9D3]"
                 >
                   {showAddForm ? "Cancel" : "Add Menu Item"}
                 </button>
@@ -681,23 +682,23 @@ function RestaurantDashboardContent() {
           </div>
 
           {showAddForm && (
-            <div className="mt-8 rounded-3xl border border-neutral-200 bg-neutral-50 p-7 sm:p-8">
+            <div className="mt-8 rounded-3xl border border-[#303D3E] bg-[#202B2D] p-7 sm:p-8">
               <div className="max-w-2xl">
-                <p className="text-sm font-medium uppercase tracking-[0.15em] text-neutral-500">
+                <p className="text-sm font-medium uppercase tracking-[0.15em] text-[#B8B7AE]">
                   New item
                 </p>
 
-                <h3 className="mt-2 text-2xl font-semibold tracking-[-0.02em]">
+                <h3 className="font-serif mt-2 text-2xl font-semibold tracking-[-0.02em]">
                   Add Menu Item
                 </h3>
 
-                <p className="mt-2 text-sm text-neutral-500">
+                <p className="mt-2 text-sm text-[#B8B7AE]">
                   Add a new food item to your restaurant menu.
                 </p>
 
                 {menuError && (
-                  <div className="mt-5 rounded-2xl border border-neutral-200 bg-white p-4">
-                    <p className="text-sm text-neutral-700">{menuError}</p>
+                  <div className="mt-5 rounded-2xl border border-[#303D3E] bg-[#1C2728] p-4">
+                    <p className="text-sm text-[#B8B7AE]">{menuError}</p>
                   </div>
                 )}
 
@@ -705,7 +706,7 @@ function RestaurantDashboardContent() {
                   <div>
                     <label
                       htmlFor="menuName"
-                      className="mb-2 block text-sm font-medium text-black"
+                      className="mb-2 block text-sm font-medium text-[#F3EFE5]"
                     >
                       Item Name
                     </label>
@@ -716,14 +717,14 @@ function RestaurantDashboardContent() {
                       value={menuName}
                       onChange={(event) => setMenuName(event.target.value)}
                       placeholder="e.g. Chicken Burger"
-                      className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3.5 text-black outline-none transition placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black"
+                      className="w-full rounded-xl border border-[#465453] bg-[#1C2728] px-4 py-3.5 text-[#F3EFE5] outline-none transition placeholder:text-[#89938E] focus:border-[#A8DFC5] focus:ring-1 focus:ring-[#A8DFC5]"
                     />
                   </div>
 
                   <div>
                     <label
                       htmlFor="menuDescription"
-                      className="mb-2 block text-sm font-medium text-black"
+                      className="mb-2 block text-sm font-medium text-[#F3EFE5]"
                     >
                       Description
                     </label>
@@ -736,20 +737,20 @@ function RestaurantDashboardContent() {
                       }
                       placeholder="Describe the menu item"
                       rows={3}
-                      className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3.5 text-black outline-none transition placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black"
+                      className="w-full rounded-xl border border-[#465453] bg-[#1C2728] px-4 py-3.5 text-[#F3EFE5] outline-none transition placeholder:text-[#89938E] focus:border-[#A8DFC5] focus:ring-1 focus:ring-[#A8DFC5]"
                     />
                   </div>
 
                   <div>
                     <label
                       htmlFor="menuPrice"
-                      className="mb-2 block text-sm font-medium text-black"
+                      className="mb-2 block text-sm font-medium text-[#F3EFE5]"
                     >
                       Price
                     </label>
 
                     <div className="flex">
-                      <span className="flex items-center rounded-l-xl border border-r-0 border-neutral-300 bg-white px-4 text-neutral-500">
+                      <span className="flex items-center rounded-l-xl border border-r-0 border-[#465453] bg-[#1C2728] px-4 text-[#B8B7AE]">
                         R
                       </span>
 
@@ -761,7 +762,7 @@ function RestaurantDashboardContent() {
                         value={menuPrice}
                         onChange={(event) => setMenuPrice(event.target.value)}
                         placeholder="75.00"
-                        className="w-full rounded-r-xl border border-neutral-300 bg-white px-4 py-3.5 text-black outline-none transition placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black"
+                        className="w-full rounded-r-xl border border-[#465453] bg-[#1C2728] px-4 py-3.5 text-[#F3EFE5] outline-none transition placeholder:text-[#89938E] focus:border-[#A8DFC5] focus:ring-1 focus:ring-[#A8DFC5]"
                       />
                     </div>
                   </div>
@@ -769,7 +770,7 @@ function RestaurantDashboardContent() {
                   <button
                     type="submit"
                     disabled={menuSubmitting}
-                    className="w-full rounded-full bg-black px-5 py-4 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="w-full rounded-full bg-[#A8DFC5] px-5 py-4 text-sm font-semibold text-[#14191B] transition hover:bg-[#BDE9D3] disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {menuSubmitting ? "Adding..." : "Add Menu Item"}
                   </button>
@@ -779,9 +780,9 @@ function RestaurantDashboardContent() {
           )}
 
           {menuItems.length === 0 ? (
-            <div className="mt-8 rounded-3xl border border-neutral-200 bg-neutral-50 p-10 text-center">
-              <p className="text-neutral-500">
-                You don't have any menu items yet.
+            <div className="mt-8 rounded-3xl border border-[#303D3E] bg-[#202B2D] p-10 text-center">
+              <p className="text-[#B8B7AE]">
+                You don&apos;t have any menu items yet.
               </p>
             </div>
           ) : (
@@ -789,24 +790,24 @@ function RestaurantDashboardContent() {
               {menuItems.map((item) => (
                 <div
                   key={item.id}
-                  className="overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+                  className="overflow-hidden rounded-3xl border border-[#303D3E] bg-[#1C2728] shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
                 >
                   {editingMenuItemId === item.id ? (
                     <form
                       onSubmit={(event) => handleUpdateMenuItem(event, item.id)}
                       className="p-7"
                     >
-                      <p className="text-sm font-medium uppercase tracking-[0.15em] text-neutral-500">
+                      <p className="text-sm font-medium uppercase tracking-[0.15em] text-[#B8B7AE]">
                         Editing
                       </p>
 
-                      <h3 className="mt-2 text-2xl font-semibold tracking-[-0.02em]">
+                      <h3 className="font-serif mt-2 text-2xl font-semibold tracking-[-0.02em]">
                         {item.name}
                       </h3>
 
                       {editMenuError && (
-                        <div className="mt-5 rounded-2xl border border-neutral-200 bg-neutral-50 p-4">
-                          <p className="text-sm text-neutral-700">
+                        <div className="mt-5 rounded-2xl border border-[#303D3E] bg-[#202B2D] p-4">
+                          <p className="text-sm text-[#B8B7AE]">
                             {editMenuError}
                           </p>
                         </div>
@@ -814,7 +815,7 @@ function RestaurantDashboardContent() {
 
                       <div className="mt-6 space-y-5">
                         <div>
-                          <label className="mb-2 block text-sm font-medium text-black">
+                          <label className="mb-2 block text-sm font-medium text-[#F3EFE5]">
                             Item Name
                           </label>
 
@@ -824,12 +825,12 @@ function RestaurantDashboardContent() {
                             onChange={(event) =>
                               setEditMenuName(event.target.value)
                             }
-                            className="w-full rounded-xl border border-neutral-300 px-4 py-3.5 text-black outline-none transition focus:border-black focus:ring-1 focus:ring-black"
+                            className="w-full rounded-xl border border-[#465453] px-4 py-3.5 text-[#F3EFE5] outline-none transition focus:border-[#A8DFC5] focus:ring-1 focus:ring-[#A8DFC5]"
                           />
                         </div>
 
                         <div>
-                          <label className="mb-2 block text-sm font-medium text-black">
+                          <label className="mb-2 block text-sm font-medium text-[#F3EFE5]">
                             Description
                           </label>
 
@@ -839,17 +840,17 @@ function RestaurantDashboardContent() {
                               setEditMenuDescription(event.target.value)
                             }
                             rows={3}
-                            className="w-full rounded-xl border border-neutral-300 px-4 py-3.5 text-black outline-none transition focus:border-black focus:ring-1 focus:ring-black"
+                            className="w-full rounded-xl border border-[#465453] px-4 py-3.5 text-[#F3EFE5] outline-none transition focus:border-[#A8DFC5] focus:ring-1 focus:ring-[#A8DFC5]"
                           />
                         </div>
 
                         <div>
-                          <label className="mb-2 block text-sm font-medium text-black">
+                          <label className="mb-2 block text-sm font-medium text-[#F3EFE5]">
                             Price
                           </label>
 
                           <div className="flex">
-                            <span className="flex items-center rounded-l-xl border border-r-0 border-neutral-300 bg-neutral-50 px-4 text-neutral-500">
+                            <span className="flex items-center rounded-l-xl border border-r-0 border-[#465453] bg-[#202B2D] px-4 text-[#B8B7AE]">
                               R
                             </span>
 
@@ -861,7 +862,7 @@ function RestaurantDashboardContent() {
                               onChange={(event) =>
                                 setEditMenuPrice(event.target.value)
                               }
-                              className="w-full rounded-r-xl border border-neutral-300 px-4 py-3.5 text-black outline-none transition focus:border-black focus:ring-1 focus:ring-black"
+                              className="w-full rounded-r-xl border border-[#465453] px-4 py-3.5 text-[#F3EFE5] outline-none transition focus:border-[#A8DFC5] focus:ring-1 focus:ring-[#A8DFC5]"
                             />
                           </div>
                         </div>
@@ -870,7 +871,7 @@ function RestaurantDashboardContent() {
                           <button
                             type="submit"
                             disabled={editMenuSubmitting}
-                            className="flex-1 rounded-full bg-black px-4 py-3 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
+                            className="flex-1 rounded-full bg-[#A8DFC5] px-4 py-3 text-sm font-semibold text-[#14191B] transition hover:bg-[#BDE9D3] disabled:cursor-not-allowed disabled:opacity-50"
                           >
                             {editMenuSubmitting ? "Saving..." : "Save"}
                           </button>
@@ -878,7 +879,7 @@ function RestaurantDashboardContent() {
                           <button
                             type="button"
                             onClick={cancelEditingMenuItem}
-                            className="rounded-full border border-neutral-300 px-5 py-3 text-sm font-semibold text-black transition hover:border-black"
+                            className="rounded-full border border-[#465453] px-5 py-3 text-sm font-semibold text-[#F3EFE5] transition hover:border-[#A8DFC5]"
                           >
                             Cancel
                           </button>
@@ -887,18 +888,18 @@ function RestaurantDashboardContent() {
                     </form>
                   ) : (
                     <>
-                      <div className="flex h-40 items-center justify-center bg-neutral-100">
-                        <span className="text-sm font-medium uppercase tracking-[0.15em] text-neutral-400">
+                      <div className="flex h-40 items-center justify-center bg-[#263234]">
+                        <span className="text-sm font-medium uppercase tracking-[0.15em] text-[#89938E]">
                           Food
                         </span>
                       </div>
 
                       <div className="p-7">
-                        <h3 className="text-2xl font-semibold tracking-[-0.02em]">
+                        <h3 className="font-serif text-2xl font-semibold tracking-[-0.02em]">
                           {item.name}
                         </h3>
 
-                        <p className="mt-3 min-h-12 text-sm leading-6 text-neutral-500">
+                        <p className="mt-3 min-h-12 text-sm leading-6 text-[#B8B7AE]">
                           {item.description}
                         </p>
 
@@ -910,7 +911,7 @@ function RestaurantDashboardContent() {
                           <button
                             type="button"
                             onClick={() => startEditingMenuItem(item)}
-                            className="flex-1 rounded-full border border-neutral-300 px-4 py-3 text-sm font-semibold text-black transition hover:border-black"
+                            className="flex-1 rounded-full border border-[#465453] px-4 py-3 text-sm font-semibold text-[#F3EFE5] transition hover:border-[#A8DFC5]"
                           >
                             Edit
                           </button>
@@ -918,7 +919,7 @@ function RestaurantDashboardContent() {
                           <button
                             type="button"
                             onClick={() => handleDeleteMenuItem(item.id)}
-                            className="rounded-full border border-neutral-300 px-4 py-3 text-sm font-semibold text-neutral-600 transition hover:border-black hover:text-black"
+                            className="rounded-full border border-[#465453] px-4 py-3 text-sm font-semibold text-[#B8B7AE] transition hover:border-[#A8DFC5] hover:text-[#F3EFE5]"
                           >
                             Delete
                           </button>
@@ -934,29 +935,29 @@ function RestaurantDashboardContent() {
 
         {/* Orders */}
         <div className="mt-20">
-          <div className="flex flex-col gap-5 border-b border-neutral-200 pb-8 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex flex-col gap-5 border-b border-[#303D3E] pb-8 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-sm font-medium uppercase tracking-[0.2em] text-neutral-500">
+              <p className="text-sm font-medium uppercase tracking-[0.2em] text-[#B8B7AE]">
                 Orders
               </p>
 
-              <h2 className="mt-2 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
+              <h2 className="font-serif mt-2 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
                 Restaurant Orders
               </h2>
 
-              <p className="mt-3 max-w-xl text-neutral-500">
+              <p className="mt-3 max-w-xl text-[#B8B7AE]">
                 Manage current orders and review previous orders.
               </p>
             </div>
 
-            <span className="w-fit rounded-full border border-neutral-200 bg-neutral-50 px-4 py-2 text-sm font-semibold text-neutral-700">
+            <span className="w-fit rounded-full border border-[#303D3E] bg-[#202B2D] px-4 py-2 text-sm font-semibold text-[#B8B7AE]">
               {orders.length} {orders.length === 1 ? "order" : "orders"}
             </span>
           </div>
 
           {orders.length === 0 ? (
-            <div className="mt-8 rounded-3xl border border-neutral-200 bg-neutral-50 p-10 text-center">
-              <p className="text-neutral-500">No orders yet.</p>
+            <div className="mt-8 rounded-3xl border border-[#303D3E] bg-[#202B2D] p-10 text-center">
+              <p className="text-[#B8B7AE]">No orders yet.</p>
             </div>
           ) : (
             <div className="mt-8 space-y-6">
@@ -966,12 +967,12 @@ function RestaurantDashboardContent() {
                   isOrderHistory(order) !==
                     isOrderHistory(sortedOrders[index - 1])) && (
                   <div className="pb-1 pt-2">
-                    <h2 className="text-2xl font-semibold tracking-[-0.03em]">
+                    <h2 className="font-serif text-2xl font-semibold tracking-[-0.03em]">
                       {isOrderHistory(order)
                         ? "Order History"
                         : "Ongoing Orders"}
                     </h2>
-                    <p className="mt-2 text-sm text-neutral-500">
+                    <p className="mt-2 text-sm text-[#B8B7AE]">
                       {isOrderHistory(order)
                         ? "Delivered and cancelled orders."
                         : "Orders that are still being processed or delivered."}
@@ -980,16 +981,16 @@ function RestaurantDashboardContent() {
                 )}
               <div
                   key={order.id}
-                  className="overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm"
+                  className="overflow-hidden rounded-3xl border border-[#303D3E] bg-[#1C2728] shadow-sm"
                 >
-                  <div className="border-b border-neutral-200 p-7 sm:p-8">
+                  <div className="border-b border-[#303D3E] p-7 sm:p-8">
                     <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
                       <div>
-                        <p className="text-sm font-medium uppercase tracking-[0.15em] text-neutral-500">
+                        <p className="text-sm font-medium uppercase tracking-[0.15em] text-[#B8B7AE]">
                           Order #{order.id}
                         </p>
 
-                        <h3 className="mt-2 text-2xl font-semibold tracking-[-0.02em]">
+                        <h3 className="font-serif mt-2 text-2xl font-semibold tracking-[-0.02em]">
                           Customer #{order.customerId}
                         </h3>
                       </div>
@@ -997,10 +998,10 @@ function RestaurantDashboardContent() {
                       <span
                         className={`w-fit rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] ${
                           order.status === "DELIVERED"
-                            ? "bg-black text-white"
+                            ? "bg-[#A8DFC5] text-[#14191B]"
                             : order.status === "CANCELLED"
-                              ? "bg-neutral-100 text-neutral-500"
-                              : "border border-neutral-300 bg-white text-black"
+                              ? "bg-[#263234] text-[#B8B7AE]"
+                              : "border border-[#465453] bg-[#1C2728] text-[#F3EFE5]"
                         }`}
                       >
                         {order.status.replaceAll("_", " ")}
@@ -1011,11 +1012,11 @@ function RestaurantDashboardContent() {
                   <div className="p-7 sm:p-8">
                     <div>
                       <div className="mb-5 flex items-center justify-between">
-                        <h4 className="text-sm font-semibold uppercase tracking-[0.15em] text-neutral-500">
+                        <h4 className="text-sm font-semibold uppercase tracking-[0.15em] text-[#B8B7AE]">
                           Items
                         </h4>
 
-                        <span className="text-sm text-neutral-400">
+                        <span className="text-sm text-[#89938E]">
                           {order.items.length}{" "}
                           {order.items.length === 1 ? "item" : "items"}
                         </span>
@@ -1028,17 +1029,17 @@ function RestaurantDashboardContent() {
                             className="flex items-center justify-between gap-6"
                           >
                             <div>
-                              <p className="font-semibold text-black">
+                              <p className="font-semibold text-[#F3EFE5]">
                                 {item.menuItemName}
                               </p>
 
-                              <p className="mt-1 text-sm text-neutral-500">
+                              <p className="mt-1 text-sm text-[#B8B7AE]">
                                 {item.quantity} × R
                                 {Number(item.price).toFixed(2)}
                               </p>
                             </div>
 
-                            <span className="shrink-0 font-semibold text-black">
+                            <span className="shrink-0 font-semibold text-[#F3EFE5]">
                               R{Number(item.subtotal).toFixed(2)}
                             </span>
                           </div>
@@ -1046,8 +1047,8 @@ function RestaurantDashboardContent() {
                       </div>
                     </div>
 
-                    <div className="mt-7 flex items-end justify-between border-t border-neutral-200 pt-6">
-                      <span className="text-sm text-neutral-500">
+                    <div className="mt-7 flex items-end justify-between border-t border-[#303D3E] pt-6">
+                      <span className="text-sm text-[#B8B7AE]">
                         Order Total
                       </span>
 
@@ -1056,7 +1057,7 @@ function RestaurantDashboardContent() {
                       </span>
                     </div>
 
-                    <div className="mt-7 border-t border-neutral-200 pt-6">
+                    <div className="mt-7 border-t border-[#303D3E] pt-6">
                       {renderOrderActions(order)}
                     </div>
                   </div>

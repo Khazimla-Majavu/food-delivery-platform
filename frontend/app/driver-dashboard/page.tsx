@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import RoleGuard from "../components/RoleGuard";
 import OrderChatPanel from "../components/OrderChatPanel";
 import ReportOrderIssueForm from "../components/ReportOrderIssueForm";
@@ -70,6 +71,7 @@ function DriverDashboardContent() {
   }
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Existing async dashboard loader.
     loadDashboard();
   }, []);
 
@@ -79,6 +81,7 @@ function DriverDashboardContent() {
       .map((order) => order.id);
 
     if (activeOrderIds.length === 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Clear tracking status when there are no active deliveries.
       setTrackingMessage("");
       return;
     }
@@ -205,9 +208,9 @@ function DriverDashboardContent() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-white text-black">
+      <main className="min-h-screen bg-[var(--chow-bg)] text-[#F3EFE5]">
         <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
-          <p className="text-sm text-neutral-500">
+          <p className="text-sm text-[#B8B7AE]">
             Loading driver dashboard...
           </p>
         </div>
@@ -217,18 +220,18 @@ function DriverDashboardContent() {
 
   if (error && !availableOrders.length && !myOrders.length) {
     return (
-      <main className="min-h-screen bg-white text-black">
+      <main className="min-h-screen bg-[var(--chow-bg)] text-[#F3EFE5]">
         <section className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
-          <div className="rounded-3xl border border-neutral-200 bg-neutral-50 p-8">
-            <p className="text-sm font-medium uppercase tracking-[0.15em] text-neutral-500">
+          <div className="rounded-3xl border border-[#303D3E] bg-[#202B2D] p-8">
+            <p className="text-sm font-medium uppercase tracking-[0.15em] text-[#B8B7AE]">
               Driver Dashboard
             </p>
 
-            <h1 className="mt-3 text-3xl font-semibold tracking-[-0.03em]">
+            <h1 className="font-serif mt-3 text-3xl font-semibold tracking-[-0.03em]">
               Something went wrong
             </h1>
 
-            <p className="mt-3 text-neutral-500">{error}</p>
+            <p className="mt-3 text-[#B8B7AE]">{error}</p>
           </div>
         </section>
       </main>
@@ -236,30 +239,30 @@ function DriverDashboardContent() {
   }
 
   return (
-    <main className="min-h-screen bg-white text-black">
-        <section className="border-b border-neutral-200">
+    <main className="min-h-screen bg-[var(--chow-bg)] text-[#F3EFE5]">
+        <section className="border-b border-[#303D3E]">
           <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
 
             <div className="max-w-4xl">
-              <p className="text-sm font-medium uppercase tracking-[0.2em] text-neutral-500">
+              <p className="text-sm font-medium uppercase tracking-[0.2em] text-[#B8B7AE]">
                 Driver Management
               </p>
 
-              <h1 className="mt-3 text-5xl font-semibold tracking-[-0.04em] sm:text-6xl">
+              <h1 className="font-serif mt-3 text-5xl font-semibold tracking-[-0.04em] sm:text-6xl">
                 Driver Dashboard
               </h1>
 
-              <p className="mt-5 max-w-2xl text-lg leading-8 text-neutral-500">
+              <p className="mt-5 max-w-2xl text-lg leading-8 text-[#B8B7AE]">
                 Find available deliveries and manage your assigned orders.
               </p>
 
               <div className="mt-6">
-                <a
+                <Link
                   href="/issue-reports"
-                  className="inline-flex rounded-full border border-neutral-300 px-5 py-3 text-sm font-semibold transition hover:border-black"
+                  className="inline-flex rounded-full border border-[#465453] px-5 py-3 text-sm font-semibold transition hover:border-[#A8DFC5]"
                 >
                   My issue reports
-                </a>
+                </Link>
               </div>
             </div>
           </div>
@@ -267,14 +270,14 @@ function DriverDashboardContent() {
 
         <section className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-20">
           {error && (
-            <div className="mb-8 rounded-2xl border border-neutral-200 bg-neutral-50 p-5">
-              <p className="text-sm text-neutral-700">{error}</p>
+            <div className="mb-8 rounded-2xl border border-[#303D3E] bg-[#202B2D] p-5">
+              <p className="text-sm text-[#B8B7AE]">{error}</p>
             </div>
           )}
 
           {trackingMessage && (
-            <div className="mb-8 rounded-2xl border border-neutral-200 bg-neutral-50 px-5 py-4">
-              <p className="text-sm font-medium text-neutral-700">
+            <div className="mb-8 rounded-2xl border border-[#303D3E] bg-[#202B2D] px-5 py-4">
+              <p className="text-sm font-medium text-[#B8B7AE]">
                 {trackingMessage}
               </p>
             </div>
@@ -282,38 +285,38 @@ function DriverDashboardContent() {
 
           {/* Available deliveries */}
           <div>
-            <div className="flex flex-col gap-5 border-b border-neutral-200 pb-8 sm:flex-row sm:items-end sm:justify-between">
+            <div className="flex flex-col gap-5 border-b border-[#303D3E] pb-8 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <p className="text-sm font-medium uppercase tracking-[0.2em] text-neutral-500">
+                <p className="text-sm font-medium uppercase tracking-[0.2em] text-[#B8B7AE]">
                   Available now
                 </p>
 
-                <h2 className="mt-2 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
+                <h2 className="font-serif mt-2 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
                   Available Deliveries
                 </h2>
 
-                <p className="mt-3 max-w-xl text-neutral-500">
+                <p className="mt-3 max-w-xl text-[#B8B7AE]">
                   Orders ready to be collected.
                 </p>
               </div>
 
-              <span className="w-fit rounded-full border border-neutral-200 bg-neutral-50 px-4 py-2 text-sm font-semibold text-neutral-700">
+              <span className="w-fit rounded-full border border-[#303D3E] bg-[#202B2D] px-4 py-2 text-sm font-semibold text-[#B8B7AE]">
                 {availableOrders.length}{" "}
                 {availableOrders.length === 1 ? "order" : "orders"}
               </span>
             </div>
 
             {availableOrders.length === 0 ? (
-              <div className="mt-8 rounded-3xl border border-neutral-200 bg-neutral-50 p-10 text-center">
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-white text-lg font-semibold shadow-sm">
+              <div className="mt-8 rounded-3xl border border-[#303D3E] bg-[#202B2D] p-10 text-center">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#1C2728] text-lg font-semibold shadow-sm">
                   —
                 </div>
 
-                <h3 className="mt-5 text-xl font-semibold tracking-[-0.02em]">
+                <h3 className="font-serif mt-5 text-xl font-semibold tracking-[-0.02em]">
                   No deliveries available
                 </h3>
 
-                <p className="mt-2 text-neutral-500">
+                <p className="mt-2 text-[#B8B7AE]">
                   There are currently no orders waiting for a driver.
                 </p>
               </div>
@@ -322,25 +325,25 @@ function DriverDashboardContent() {
                 {sortOrdersNewestFirst(availableOrders).map((order) => (
                   <div
                     key={order.id}
-                    className="overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+                    className="overflow-hidden rounded-3xl border border-[#303D3E] bg-[#1C2728] shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
                   >
-                    <div className="border-b border-neutral-200 p-7">
+                    <div className="border-b border-[#303D3E] p-7">
                       <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
                         <div>
-                          <p className="text-sm font-medium uppercase tracking-[0.15em] text-neutral-500">
+                          <p className="text-sm font-medium uppercase tracking-[0.15em] text-[#B8B7AE]">
                             Order #{order.id}
                           </p>
 
-                          <h3 className="mt-2 text-2xl font-semibold tracking-[-0.02em]">
+                          <h3 className="font-serif mt-2 text-2xl font-semibold tracking-[-0.02em]">
                             {order.restaurantName}
                           </h3>
 
-                          <p className="mt-2 text-sm text-neutral-500">
+                          <p className="mt-2 text-sm text-[#B8B7AE]">
                             {order.restaurantAddress}
                           </p>
                         </div>
 
-                        <span className="w-fit rounded-full bg-black px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-white">
+                        <span className="w-fit rounded-full bg-[#A8DFC5] px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-[#14191B]">
                           {order.status.replaceAll("_", " ")}
                         </span>
                       </div>
@@ -349,11 +352,11 @@ function DriverDashboardContent() {
                     <div className="p-7">
                       <div>
                         <div className="mb-5 flex items-center justify-between">
-                          <h4 className="text-sm font-semibold uppercase tracking-[0.15em] text-neutral-500">
+                          <h4 className="text-sm font-semibold uppercase tracking-[0.15em] text-[#B8B7AE]">
                             Items
                           </h4>
 
-                          <span className="text-sm text-neutral-400">
+                          <span className="text-sm text-[#89938E]">
                             {order.items.length}{" "}
                             {order.items.length === 1 ? "item" : "items"}
                           </span>
@@ -366,17 +369,17 @@ function DriverDashboardContent() {
                               className="flex items-center justify-between gap-6"
                             >
                               <div>
-                                <p className="font-semibold text-black">
+                                <p className="font-semibold text-[#F3EFE5]">
                                   {item.menuItemName}
                                 </p>
 
-                                <p className="mt-1 text-sm text-neutral-500">
+                                <p className="mt-1 text-sm text-[#B8B7AE]">
                                   {item.quantity} × R
                                   {Number(item.price).toFixed(2)}
                                 </p>
                               </div>
 
-                              <span className="shrink-0 font-semibold text-black">
+                              <span className="shrink-0 font-semibold text-[#F3EFE5]">
                                 R{Number(item.subtotal).toFixed(2)}
                               </span>
                             </div>
@@ -384,8 +387,8 @@ function DriverDashboardContent() {
                         </div>
                       </div>
 
-                      <div className="mt-7 flex items-end justify-between border-t border-neutral-200 pt-6">
-                        <span className="text-sm text-neutral-500">
+                      <div className="mt-7 flex items-end justify-between border-t border-[#303D3E] pt-6">
+                        <span className="text-sm text-[#B8B7AE]">
                           Order Total
                         </span>
 
@@ -397,7 +400,7 @@ function DriverDashboardContent() {
                       <button
                         onClick={() => handleClaim(order.id)}
                         disabled={actionLoading === order.id}
-                        className="mt-7 w-full rounded-full bg-black px-5 py-4 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="mt-7 w-full rounded-full bg-[#A8DFC5] px-5 py-4 text-sm font-semibold text-[#14191B] transition hover:bg-[#BDE9D3] disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         {actionLoading === order.id
                           ? "Claiming..."
@@ -412,30 +415,30 @@ function DriverDashboardContent() {
 
           {/* My deliveries */}
           <div className="mt-20">
-            <div className="flex flex-col gap-5 border-b border-neutral-200 pb-8 sm:flex-row sm:items-end sm:justify-between">
+            <div className="flex flex-col gap-5 border-b border-[#303D3E] pb-8 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <p className="text-sm font-medium uppercase tracking-[0.2em] text-neutral-500">
+                <p className="text-sm font-medium uppercase tracking-[0.2em] text-[#B8B7AE]">
                   Your deliveries
                 </p>
 
-                <h2 className="mt-2 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
+                <h2 className="font-serif mt-2 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
                   My Deliveries
                 </h2>
 
-                <p className="mt-3 max-w-xl text-neutral-500">
+                <p className="mt-3 max-w-xl text-[#B8B7AE]">
                   Track active deliveries and review your delivery history.
                 </p>
               </div>
 
-              <span className="w-fit rounded-full border border-neutral-200 bg-neutral-50 px-4 py-2 text-sm font-semibold text-neutral-700">
+              <span className="w-fit rounded-full border border-[#303D3E] bg-[#202B2D] px-4 py-2 text-sm font-semibold text-[#B8B7AE]">
                 {myOrders.length} {myOrders.length === 1 ? "order" : "orders"}
               </span>
             </div>
 
             {myOrders.length === 0 ? (
-              <div className="mt-8 rounded-3xl border border-neutral-200 bg-neutral-50 p-10 text-center">
-                <p className="text-neutral-500">
-                  You don't have any assigned deliveries yet.
+              <div className="mt-8 rounded-3xl border border-[#303D3E] bg-[#202B2D] p-10 text-center">
+                <p className="text-[#B8B7AE]">
+                  You don&apos;t have any assigned deliveries yet.
                 </p>
               </div>
             ) : (
@@ -446,12 +449,12 @@ function DriverDashboardContent() {
                   isOrderHistory(order) !==
                     isOrderHistory(sortedOrders[index - 1])) && (
                   <div className="pb-1 pt-2">
-                    <h2 className="text-2xl font-semibold tracking-[-0.03em]">
+                    <h2 className="font-serif text-2xl font-semibold tracking-[-0.03em]">
                       {isOrderHistory(order)
                         ? "Order History"
                         : "Ongoing Orders"}
                     </h2>
-                    <p className="mt-2 text-sm text-neutral-500">
+                    <p className="mt-2 text-sm text-[#B8B7AE]">
                       {isOrderHistory(order)
                         ? "Delivered and cancelled orders."
                         : "Orders that are still being processed or delivered."}
@@ -460,29 +463,29 @@ function DriverDashboardContent() {
                 )}
                 <div
                     key={order.id}
-                    className="overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm"
+                    className="overflow-hidden rounded-3xl border border-[#303D3E] bg-[#1C2728] shadow-sm"
                   >
-                    <div className="border-b border-neutral-200 p-7 sm:p-8">
+                    <div className="border-b border-[#303D3E] p-7 sm:p-8">
                       <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
                         <div>
-                          <p className="text-sm font-medium uppercase tracking-[0.15em] text-neutral-500">
+                          <p className="text-sm font-medium uppercase tracking-[0.15em] text-[#B8B7AE]">
                             Order #{order.id}
                           </p>
 
-                          <h3 className="mt-2 text-2xl font-semibold tracking-[-0.02em]">
+                          <h3 className="font-serif mt-2 text-2xl font-semibold tracking-[-0.02em]">
                             {order.restaurantName}
                           </h3>
 
-                          <p className="mt-2 text-sm text-neutral-500">
+                          <p className="mt-2 text-sm text-[#B8B7AE]">
                             {order.restaurantAddress}
                           </p>
 
-                          <div className="mt-5 rounded-2xl bg-neutral-50 p-4">
-                            <p className="text-xs font-medium uppercase tracking-[0.15em] text-neutral-400">
+                          <div className="mt-5 rounded-2xl bg-[#202B2D] p-4">
+                            <p className="text-xs font-medium uppercase tracking-[0.15em] text-[#89938E]">
                               Delivery address
                             </p>
 
-                            <p className="mt-2 text-sm font-medium text-neutral-800">
+                            <p className="mt-2 text-sm font-medium text-[#B8B7AE]">
                               {deliveryAddresses[order.id] || "Loading..."}
                             </p>
                           </div>
@@ -491,8 +494,8 @@ function DriverDashboardContent() {
                         <span
                           className={`w-fit rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] ${
                             order.status === "DELIVERED"
-                              ? "bg-black text-white"
-                              : "border border-neutral-300 bg-white text-black"
+                              ? "bg-[#A8DFC5] text-[#14191B]"
+                              : "border border-[#465453] bg-[#1C2728] text-[#F3EFE5]"
                           }`}
                         >
                           {order.status.replaceAll("_", " ")}
@@ -515,11 +518,11 @@ function DriverDashboardContent() {
                       )}
                       <div>
                         <div className="mb-5 flex items-center justify-between">
-                          <h4 className="text-sm font-semibold uppercase tracking-[0.15em] text-neutral-500">
+                          <h4 className="text-sm font-semibold uppercase tracking-[0.15em] text-[#B8B7AE]">
                             Items
                           </h4>
 
-                          <span className="text-sm text-neutral-400">
+                          <span className="text-sm text-[#89938E]">
                             {order.items.length}{" "}
                             {order.items.length === 1 ? "item" : "items"}
                           </span>
@@ -532,17 +535,17 @@ function DriverDashboardContent() {
                               className="flex items-center justify-between gap-6"
                             >
                               <div>
-                                <p className="font-semibold text-black">
+                                <p className="font-semibold text-[#F3EFE5]">
                                   {item.menuItemName}
                                 </p>
 
-                                <p className="mt-1 text-sm text-neutral-500">
+                                <p className="mt-1 text-sm text-[#B8B7AE]">
                                   {item.quantity} × R
                                   {Number(item.price).toFixed(2)}
                                 </p>
                               </div>
 
-                              <span className="shrink-0 font-semibold text-black">
+                              <span className="shrink-0 font-semibold text-[#F3EFE5]">
                                 R{Number(item.subtotal).toFixed(2)}
                               </span>
                             </div>
@@ -550,8 +553,8 @@ function DriverDashboardContent() {
                         </div>
                       </div>
 
-                      <div className="mt-7 flex items-end justify-between border-t border-neutral-200 pt-6">
-                        <span className="text-sm text-neutral-500">
+                      <div className="mt-7 flex items-end justify-between border-t border-[#303D3E] pt-6">
+                        <span className="text-sm text-[#B8B7AE]">
                           Order Total
                         </span>
 
@@ -562,7 +565,7 @@ function DriverDashboardContent() {
 
                       {order.status === "OUT_FOR_DELIVERY" && (
                         <div className="mt-7 space-y-3">
-                          <label className="block text-sm font-medium text-neutral-700" htmlFor={`delivery-pin-${order.id}`}>
+                          <label className="block text-sm font-medium text-[#B8B7AE]" htmlFor={`delivery-pin-${order.id}`}>
                             Customer delivery PIN
                           </label>
                           <input
@@ -578,12 +581,12 @@ function DriverDashboardContent() {
                               ...current,
                               [order.id]: event.target.value.replace(/\D/g, "").slice(0, 6),
                             }))}
-                            className="w-full rounded-2xl border border-neutral-300 px-4 py-3 text-base tracking-[0.25em] outline-none focus:border-black"
+                            className="w-full rounded-2xl border border-[#465453] px-4 py-3 text-base tracking-[0.25em] outline-none focus:border-[#A8DFC5]"
                           />
                           <button
                             onClick={() => handleComplete(order.id)}
                             disabled={actionLoading === order.id || (deliveryPinInputs[order.id] ?? "").length !== 6}
-                            className="w-full rounded-full bg-black px-5 py-4 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
+                            className="w-full rounded-full bg-[#A8DFC5] px-5 py-4 text-sm font-semibold text-[#14191B] transition hover:bg-[#BDE9D3] disabled:cursor-not-allowed disabled:opacity-50"
                           >
                             {actionLoading === order.id ? "Verifying PIN..." : "Verify PIN & Mark Delivered"}
                           </button>
@@ -591,8 +594,8 @@ function DriverDashboardContent() {
                       )}
 
                       {order.status === "DELIVERED" && (
-                        <div className="mt-7 rounded-2xl border border-neutral-200 bg-neutral-50 px-5 py-4 text-center">
-                          <p className="text-sm font-semibold text-black">
+                        <div className="mt-7 rounded-2xl border border-[#303D3E] bg-[#202B2D] px-5 py-4 text-center">
+                          <p className="text-sm font-semibold text-[#F3EFE5]">
                             Delivery completed
                           </p>
                         </div>

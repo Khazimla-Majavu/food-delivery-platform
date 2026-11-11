@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { getRestaurants, Restaurant } from "../../lib/api";
 
 export default function RestaurantList() {
@@ -16,7 +17,7 @@ export default function RestaurantList() {
         const data = await getRestaurants(token || "");
         setRestaurants(data);
       } catch {
-        setError("Unable to load restaurants.");
+        setError("We couldn't load the restaurants. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -27,62 +28,99 @@ export default function RestaurantList() {
 
   if (loading) {
     return (
-      <p className="py-10 text-sm text-neutral-500">
-        Loading restaurants...
-      </p>
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {[1, 2, 3].map((item) => (
+          <div
+            key={item}
+            className="animate-pulse overflow-hidden rounded-2xl border border-[var(--chow-border)] bg-[var(--chow-bg-card)]"
+          >
+            <div className="h-52 bg-[var(--chow-bg-elevated)]" />
+            <div className="space-y-3 p-6">
+              <div className="h-5 w-2/3 rounded bg-[var(--chow-bg-elevated)]" />
+              <div className="h-3 w-full rounded bg-[var(--chow-bg-elevated)]" />
+              <div className="h-3 w-1/2 rounded bg-[var(--chow-bg-elevated)]" />
+            </div>
+          </div>
+        ))}
+      </div>
     );
   }
 
   if (error) {
     return (
-      <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-6">
-        <p className="text-sm text-neutral-600">{error}</p>
+      <div className="rounded-2xl border border-[var(--chow-border)] bg-[var(--chow-bg-card)] p-8">
+        <p className="text-sm text-[var(--chow-text-muted)]">{error}</p>
       </div>
     );
   }
 
   if (restaurants.length === 0) {
     return (
-      <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-10 text-center">
-        <p className="text-neutral-500">No restaurants available yet.</p>
+      <div className="relative overflow-hidden rounded-3xl border border-[var(--chow-border)] bg-[var(--chow-bg-card)] px-6 py-16 text-center sm:px-12">
+        <div className="absolute -right-12 -top-20 h-56 w-56 rounded-full bg-[var(--chow-mint)] opacity-[0.06] blur-3xl" />
+        <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-[var(--chow-border)] bg-[var(--chow-bg-elevated)] text-3xl">
+          🍽️
+        </div>
+        <h3 className="relative mt-6 font-serif text-3xl">
+          Something good is coming.
+        </h3>
+        <p className="relative mx-auto mt-3 max-w-md text-sm leading-7 text-[var(--chow-text-muted)]">
+          We&apos;re getting local restaurants ready for you. Check back soon to
+          discover what&apos;s cooking.
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {restaurants.map((restaurant) => (
-        <a
+    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {restaurants.map((restaurant, index) => (
+        <Link
           key={restaurant.id}
           href={`/restaurants/${restaurant.id}`}
-          className="group overflow-hidden rounded-2xl border border-neutral-200 bg-white transition duration-200 hover:-translate-y-1 hover:border-neutral-300 hover:shadow-xl"
+          className="group overflow-hidden rounded-2xl border border-[var(--chow-border)] bg-[var(--chow-bg-card)] transition duration-300 hover:-translate-y-1 hover:border-[var(--chow-border-strong)] hover:shadow-2xl hover:shadow-black/20"
         >
-          <div className="flex h-52 items-center justify-center bg-neutral-100">
-            <span className="text-sm font-medium uppercase tracking-[0.15em] text-neutral-400">
-              Restaurant
+          <div
+            className={`relative flex h-52 items-center justify-center overflow-hidden ${
+              index % 3 === 0
+                ? "bg-[radial-gradient(ellipse_at_center,_#46594c,_#26362f_70%)]"
+                : index % 3 === 1
+                  ? "bg-[radial-gradient(ellipse_at_center,_#60473e,_#342823_70%)]"
+                  : "bg-[radial-gradient(ellipse_at_center,_#66583d,_#393225_70%)]"
+            }`}
+          >
+            <div className="absolute inset-5 rounded-full border border-white/10" />
+            <div className="absolute inset-9 rounded-full border border-white/10" />
+            <span className="relative text-7xl drop-shadow-xl transition duration-500 group-hover:scale-110">
+              {index % 3 === 0 ? "🍔" : index % 3 === 1 ? "🍕" : "🍗"}
+            </span>
+            <span className="absolute bottom-4 left-4 rounded-full border border-white/15 bg-black/25 px-3 py-1.5 text-[10px] uppercase tracking-[0.16em] text-white/80 backdrop-blur">
+              Local restaurant
+            </span>
+            <span className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur transition group-hover:bg-[var(--chow-mint)] group-hover:text-[#17201d]">
+              ↗
             </span>
           </div>
 
           <div className="p-6">
-            <div className="flex items-start justify-between gap-4">
-              <h3 className="text-xl font-semibold tracking-[-0.02em] text-black">
-                {restaurant.name}
-              </h3>
+            <h3 className="truncate text-xl font-semibold tracking-tight text-[var(--chow-text)]">
+              {restaurant.name}
+            </h3>
 
-              <span className="text-xl text-neutral-400 transition-transform duration-200 group-hover:translate-x-1">
-                →
+            <p className="mt-3 line-clamp-2 min-h-12 text-sm leading-6 text-[var(--chow-text-muted)]">
+              {restaurant.description || "Discover what&apos;s on the menu."}
+            </p>
+
+            <div className="mt-5 flex items-center justify-between gap-3 border-t border-[var(--chow-border)] pt-4">
+              <p className="truncate text-xs text-[var(--chow-text-subtle)]">
+                {restaurant.address}
+              </p>
+              <span className="shrink-0 text-xs font-semibold text-[var(--chow-mint)] transition group-hover:translate-x-1">
+                Explore →
               </span>
             </div>
-
-            <p className="mt-3 line-clamp-2 text-sm leading-6 text-neutral-500">
-              {restaurant.description}
-            </p>
-
-            <p className="mt-5 text-sm font-medium text-neutral-700">
-              {restaurant.address}
-            </p>
           </div>
-        </a>
+        </Link>
       ))}
     </div>
   );

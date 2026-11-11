@@ -1,21 +1,40 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #0a0a0a;
+  color-scheme: dark;
 
-  --chow-black: #000000;
-  --chow-white: #ffffff;
-  --chow-gray-50: #fafafa;
-  --chow-gray-100: #f4f4f4;
-  --chow-gray-200: #e5e5e5;
-  --chow-gray-500: #737373;
-  --chow-gray-700: #404040;
+  --background: #14191b;
+  --foreground: #f3efe5;
+
+  --chow-bg: #14191b;
+  --chow-bg-soft: #1c2728;
+  --chow-bg-card: #202b2d;
+  --chow-bg-elevated: #263234;
+
+  --chow-text: #f3efe5;
+  --chow-text-muted: #b8b7ae;
+  --chow-text-subtle: #89938e;
+
+  --chow-mint: #a8dfc5;
+  --chow-mint-hover: #bcebd5;
+  --chow-coral: #ff8068;
+  --chow-coral-hover: #ff927e;
+
+  --chow-border: #303d3e;
+  --chow-border-strong: #465453;
+
+  --background: var(--chow-bg);
+  --foreground: var(--chow-text);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-chow-bg: var(--chow-bg);
+  --color-chow-bg-soft: var(--chow-bg-soft);
+  --color-chow-card: var(--chow-bg-card);
+  --color-chow-mint: var(--chow-mint);
+  --color-chow-coral: var(--chow-coral);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -25,18 +44,199 @@
 }
 
 html {
+  min-height: 100%;
   scroll-behavior: smooth;
+  scroll-padding-top: 6rem;
+  background: var(--chow-bg);
 }
 
 body {
+  min-height: 100vh;
   margin: 0;
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--chow-bg);
+  color: var(--chow-text);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 button,
-input {
+input,
+textarea,
+select {
   font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+}
+
+::selection {
+  background: var(--chow-mint);
+  color: var(--chow-bg);
+}
+
+:focus-visible {
+  outline: 2px solid var(--chow-mint);
+  outline-offset: 3px;
+}
+
+img {
+  max-width: 100%;
+}
+
+.chow-page {
+  min-height: 100vh;
+  background: var(--chow-bg);
+  color: var(--chow-text);
+}
+
+.chow-section {
+  padding: 5rem 0;
+}
+
+.chow-container {
+  width: min(100% - 3rem, 1160px);
+  margin-inline: auto;
+}
+
+.chow-eyebrow {
+  color: var(--chow-coral);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.chow-card {
+  border: 1px solid var(--chow-border);
+  border-radius: 1rem;
+  background: var(--chow-bg-card);
+}
+
+.chow-button-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  border: 1px solid transparent;
+  border-radius: 0.8rem;
+  background: var(--chow-mint);
+  padding: 0.75rem 1.25rem;
+  color: #17201d;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.chow-button-primary:hover {
+  background: var(--chow-mint-hover);
+  transform: translateY(-1px);
+}
+
+.chow-button-coral {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.5rem;
+  border: 1px solid transparent;
+  border-radius: 0.8rem;
+  background: var(--chow-coral);
+  padding: 0.65rem 1rem;
+  color: #241a18;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.chow-button-coral:hover {
+  background: var(--chow-coral-hover);
+  transform: translateY(-1px);
+}
+
+.chow-button-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  border: 1px solid var(--chow-border-strong);
+  border-radius: 0.8rem;
+  background: var(--chow-bg-soft);
+  padding: 0.75rem 1.25rem;
+  color: var(--chow-text);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.chow-button-secondary:hover {
+  border-color: var(--chow-mint);
+  background: var(--chow-bg-elevated);
+}
+
+.chow-input {
+  width: 100%;
+  min-height: 2.9rem;
+  border: 1px solid var(--chow-border-strong);
+  border-radius: 0.8rem;
+  background: var(--chow-bg-soft);
+  padding: 0.75rem 0.9rem;
+  color: var(--chow-text);
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.chow-input::placeholder {
+  color: var(--chow-text-subtle);
+}
+
+.chow-input:focus {
+  border-color: var(--chow-mint);
+  box-shadow: 0 0 0 3px rgb(168 223 197 / 12%);
+}
+
+@media (max-width: 640px) {
+  .chow-container {
+    width: min(100% - 2rem, 1160px);
+  }
+
+  .chow-section {
+    padding: 3.5rem 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* Keep Chow form fields dark when Chrome autofills saved details. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #202B2D inset !important;
+  box-shadow: 0 0 0 1000px #202B2D inset !important;
+  -webkit-text-fill-color: #F3EFE5 !important;
+  caret-color: #F3EFE5;
+  transition: background-color 9999s ease-out 0s;
 }

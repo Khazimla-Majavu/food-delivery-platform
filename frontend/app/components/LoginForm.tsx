@@ -67,7 +67,7 @@ export default function LoginForm({ redirect = "/" }: LoginFormProps) {
       <div>
         <label
           htmlFor="email"
-          className="mb-2 block text-sm font-medium text-black"
+          className="mb-2 block text-sm font-medium text-[#F3EFE5]"
         >
           Email
         </label>
@@ -78,7 +78,7 @@ export default function LoginForm({ redirect = "/" }: LoginFormProps) {
           value={email}
           onChange={(event) => setEmail(event.target.value)}
           required
-          className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3.5 text-black outline-none transition placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black"
+          className="w-full rounded-xl border border-[#465453] bg-[#202B2D] px-4 py-3.5 text-[#F3EFE5] outline-none transition placeholder:text-[#89938E] focus:border-[#A8DFC5] focus:ring-1 focus:ring-[#A8DFC5]"
           placeholder="you@example.com"
         />
       </div>
@@ -86,7 +86,7 @@ export default function LoginForm({ redirect = "/" }: LoginFormProps) {
       <div>
         <label
           htmlFor="password"
-          className="mb-2 block text-sm font-medium text-black"
+          className="mb-2 block text-sm font-medium text-[#F3EFE5]"
         >
           Password
         </label>
@@ -97,14 +97,14 @@ export default function LoginForm({ redirect = "/" }: LoginFormProps) {
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           required
-          className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3.5 text-black outline-none transition placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black"
+          className="w-full rounded-xl border border-[#465453] bg-[#202B2D] px-4 py-3.5 text-[#F3EFE5] outline-none transition placeholder:text-[#89938E] focus:border-[#A8DFC5] focus:ring-1 focus:ring-[#A8DFC5]"
           placeholder="Your password"
         />
       </div>
 
       {error && (
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3">
-          <p className="text-sm text-neutral-700">{error}</p>
+        <div className="rounded-xl border border-[#465453] bg-[#202B2D] px-4 py-3">
+          <p className="text-sm text-[#FF8068]">{error}</p>
           {error.toLowerCase().includes("verify your email") && (
             <button
               type="button"
@@ -120,19 +120,19 @@ export default function LoginForm({ redirect = "/" }: LoginFormProps) {
                   setResending(false);
                 }
               }}
-              className="mt-3 text-sm font-semibold text-black underline disabled:opacity-50"
+              className="mt-3 text-sm font-semibold text-[#A8DFC5] underline underline-offset-4 disabled:opacity-50"
             >
               {resending ? "Sending..." : "Resend verification email"}
             </button>
           )}
-          {resendMessage && <p className="mt-2 text-sm text-neutral-700">{resendMessage}</p>}
+          {resendMessage && <p className="mt-2 text-sm text-[#B8B7AE]">{resendMessage}</p>}
         </div>
       )}
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-full bg-black px-5 py-4 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
+        className="w-full rounded-full bg-[#A8DFC5] px-5 py-4 text-sm font-semibold text-[#14191B] transition hover:bg-[#BDE9D3] disabled:cursor-not-allowed disabled:opacity-50"
       >
         {loading ? "Logging in..." : "Log in"}
       </button>

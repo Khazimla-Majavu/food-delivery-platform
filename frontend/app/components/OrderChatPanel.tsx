@@ -92,20 +92,20 @@ export default function OrderChatPanel({
   }
 
   return (
-    <section className="mt-8 rounded-3xl border border-neutral-200 bg-white p-5 sm:p-6">
+    <section className="mt-8 rounded-3xl border border-[#303D3E] bg-[#1C2728] p-5 text-[#F3EFE5] sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold">Delivery chat</h3>
-          <p className="mt-1 text-sm text-neutral-500">
+          <p className="mt-1 text-sm text-[#B8B7AE]">
             Messages are visible to the customer and assigned driver.
           </p>
         </div>
-        <span className="rounded-full border border-neutral-200 px-3 py-1 text-xs text-neutral-500">
+        <span className="rounded-full border border-[#465453] px-3 py-1 text-xs text-[#B8B7AE]">
           Order #{orderId}
         </span>
       </div>
 
-      <div className="mt-5 max-h-80 space-y-3 overflow-y-auto rounded-2xl bg-neutral-50 p-4">
+      <div className="mt-5 max-h-80 space-y-3 overflow-y-auto rounded-2xl border border-[#303D3E] bg-[#14191B] p-4">
         {loading && (
           <p className="text-sm text-neutral-500">Loading messages…</p>
         )}
@@ -115,19 +115,19 @@ export default function OrderChatPanel({
           </p>
         )}
         {messages.map((item) => (
-          <article key={item.id} className="rounded-xl border border-neutral-200 bg-white p-3">
+          <article key={item.id} className="rounded-xl border border-[#303D3E] bg-[#263234] p-3">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <p className="text-sm font-semibold text-black">
+              <p className="text-sm font-semibold text-[#F3EFE5]">
                 {item.senderName}{" "}
-                <span className="font-normal text-neutral-500">
+                <span className="font-normal text-[#89938E]">
                   · {item.senderRole.toLowerCase()}
                 </span>
               </p>
-              <time className="text-xs text-neutral-400">
+              <time className="text-xs text-[#89938E]">
                 {new Date(item.createdAt).toLocaleString()}
               </time>
             </div>
-            <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-neutral-700">
+            <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-[#F3EFE5]">
               {item.message}
             </p>
           </article>
@@ -135,7 +135,7 @@ export default function OrderChatPanel({
       </div>
 
       {error && (
-        <p role="alert" className="mt-3 text-sm text-red-700">{error}</p>
+        <p role="alert" className="mt-3 text-sm text-[#FF8068]">{error}</p>
       )}
 
       {canSend ? (
@@ -150,16 +150,16 @@ export default function OrderChatPanel({
             maxLength={2000}
             rows={3}
             placeholder="Write a message…"
-            className="w-full resize-y rounded-2xl border border-neutral-300 px-4 py-3 text-sm outline-none focus:border-black"
+            className="w-full resize-y rounded-2xl border border-[#465453] bg-[#202B2D] px-4 py-3 text-sm text-[#F3EFE5] placeholder:text-[#89938E] outline-none transition focus:border-[#A8DFC5] focus:ring-1 focus:ring-[#A8DFC5]"
           />
           <div className="flex items-center justify-between gap-3">
-            <span className="text-xs text-neutral-400">
+            <span className="text-xs text-[#89938E]">
               {message.length}/2000
             </span>
             <button
               type="submit"
               disabled={sending || !message.trim()}
-              className="rounded-full bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-40"
+              className="rounded-full bg-[#A8DFC5] px-5 py-3 text-sm font-semibold text-[#14191B] transition hover:bg-[#BDE9D3] disabled:cursor-not-allowed disabled:opacity-40"
             >
               {sending ? "Sending…" : "Send message"}
             </button>
