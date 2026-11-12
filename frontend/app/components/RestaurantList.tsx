@@ -92,15 +92,22 @@ export default function RestaurantList() {
             <div className="absolute inset-5 rounded-full border border-white/10" />
             <div className="absolute inset-9 rounded-full border border-white/10" />
             <span className="relative text-7xl drop-shadow-xl transition duration-500 group-hover:scale-110">
-              {index % 3 === 0 ? "🍔" : index % 3 === 1 ? "🍕" : "🍗"}
+              {index % 3 === 0 ? "🍗" : index % 3 === 1 ? "🍔" : "🍕"}
             </span>
             <span className="absolute bottom-4 left-4 rounded-full border border-white/15 bg-black/25 px-3 py-1.5 text-[10px] uppercase tracking-[0.16em] text-white/80 backdrop-blur">
               Local restaurant
             </span>
             <span className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur transition group-hover:bg-[var(--chow-mint)] group-hover:text-[#17201d]">
-              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"
-                className="h-4 w-4" stroke="currentColor" strokeWidth="1.8"
-                strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                className="h-4 w-4"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M7 17 17 7M7 7h10v10" />
               </svg>
             </span>
@@ -121,9 +128,16 @@ export default function RestaurantList() {
               </p>
               <span className="shrink-0 text-xs font-semibold text-[var(--chow-mint)] transition group-hover:translate-x-1">
                 Explore
-                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"
-                  className="ml-1 inline-block h-3.5 w-3.5" stroke="currentColor"
-                  strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="ml-1 inline-block h-3.5 w-3.5"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M5 12h14m-6-6 6 6-6 6" />
                 </svg>
               </span>
