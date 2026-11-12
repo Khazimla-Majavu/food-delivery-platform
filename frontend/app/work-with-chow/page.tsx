@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Link from "next/link";
 import { submitWorkWithChowEnquiry } from "@/lib/api";
 
 export default function WorkWithChowPage() {
@@ -47,28 +48,28 @@ export default function WorkWithChowPage() {
 
   if (submitted) {
     return (
-      <main className="min-h-[calc(100vh-5rem)] bg-white text-black">
+      <main className="min-h-[calc(100vh-5rem)] bg-[var(--chow-bg)] text-[#F3EFE5]">
         <section className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-3xl items-center px-6 py-16 lg:px-8">
-          <div className="w-full rounded-3xl border border-neutral-200 bg-neutral-50 p-8 text-center sm:p-12">
-            <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-black text-xl text-white">
+          <div className="w-full rounded-3xl border border-[#303D3E] bg-[#1C2728] p-8 text-center shadow-xl sm:p-12">
+            <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-[#A8DFC5] text-xl text-[#14191B]">
               ✓
             </div>
 
-            <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
+            <h1 className="font-serif text-4xl font-semibold tracking-tight sm:text-5xl">
               Thanks for reaching out.
             </h1>
 
-            <p className="mx-auto mt-5 max-w-xl text-base leading-7 text-neutral-600">
+            <p className="mx-auto mt-5 max-w-xl text-base leading-7 text-[#B8B7AE]">
               We&apos;ve received your interest in working with Chow. We&apos;ll
               review your details and get in touch with you soon.
             </p>
 
-            <a
+            <Link
               href="/"
-              className="mt-8 inline-flex rounded-full bg-black px-6 py-3 text-sm font-semibold text-white transition hover:bg-neutral-800"
+              className="mt-8 inline-flex rounded-full bg-[#A8DFC5] px-6 py-3 text-sm font-semibold text-[#14191B] transition hover:bg-[#BCEBD5]"
             >
               Back to Chow
-            </a>
+            </Link>
           </div>
         </section>
       </main>
@@ -76,31 +77,31 @@ export default function WorkWithChowPage() {
   }
 
   return (
-    <main className="min-h-[calc(100vh-5rem)] bg-white text-black">
+    <main className="min-h-[calc(100vh-5rem)] bg-[var(--chow-bg)] text-[#F3EFE5]">
       <section className="mx-auto max-w-6xl px-6 py-16 lg:px-8 lg:py-24">
         <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
           <div className="lg:pt-8">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-neutral-500">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#A8DFC5]">
               Work with Chow
             </p>
 
-            <h1 className="mt-5 text-5xl font-semibold tracking-[-0.04em] sm:text-6xl">
+            <h1 className="mt-5 font-serif text-5xl font-semibold tracking-[-0.04em] sm:text-6xl">
               Let&apos;s work together.
             </h1>
 
-            <p className="mt-6 max-w-lg text-lg leading-8 text-neutral-600">
+            <p className="mt-6 max-w-lg text-lg leading-8 text-[#B8B7AE]">
               Whether you&apos;re a restaurant looking to reach more customers
               or a driver looking for delivery opportunities, leave your
               details and we&apos;ll get in touch.
             </p>
 
-            <div className="mt-10 space-y-4 text-sm text-neutral-500">
+            <div className="mt-10 space-y-4 text-sm text-[#B8B7AE]">
               <p>Restaurants — bring your food to more customers.</p>
               <p>Drivers — help us deliver great food.</p>
             </div>
           </div>
 
-          <div className="rounded-3xl border border-neutral-200 bg-neutral-50 p-6 sm:p-8">
+          <div className="rounded-3xl border border-[#303D3E] bg-[#1C2728] p-6 shadow-xl sm:p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div
                 aria-hidden="true"
@@ -119,7 +120,7 @@ export default function WorkWithChowPage() {
               <div>
                 <label
                   htmlFor="name"
-                  className="mb-2 block text-sm font-medium text-black"
+                  className="mb-2 block text-sm font-medium text-[#F3EFE5]"
                 >
                   Full name
                 </label>
@@ -130,14 +131,14 @@ export default function WorkWithChowPage() {
                   type="text"
                   required
                   placeholder="Your full name"
-                  className="w-full rounded-2xl border border-neutral-300 bg-white px-4 py-3.5 text-sm outline-none transition placeholder:text-neutral-400 focus:border-black"
+                  className="w-full rounded-2xl border border-[#465453] bg-[#202B2D] px-4 py-3.5 text-sm text-[#F3EFE5] outline-none transition placeholder:text-[#89938E] focus:border-[#A8DFC5] focus:ring-1 focus:ring-[#A8DFC5]"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="phone"
-                  className="mb-2 block text-sm font-medium text-black"
+                  className="mb-2 block text-sm font-medium text-[#F3EFE5]"
                 >
                   Phone number
                 </label>
@@ -148,14 +149,14 @@ export default function WorkWithChowPage() {
                   type="tel"
                   required
                   placeholder="Your phone number"
-                  className="w-full rounded-2xl border border-neutral-300 bg-white px-4 py-3.5 text-sm outline-none transition placeholder:text-neutral-400 focus:border-black"
+                  className="w-full rounded-2xl border border-[#465453] bg-[#202B2D] px-4 py-3.5 text-sm text-[#F3EFE5] outline-none transition placeholder:text-[#89938E] focus:border-[#A8DFC5] focus:ring-1 focus:ring-[#A8DFC5]"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="email"
-                  className="mb-2 block text-sm font-medium text-black"
+                  className="mb-2 block text-sm font-medium text-[#F3EFE5]"
                 >
                   Email address
                 </label>
@@ -166,12 +167,12 @@ export default function WorkWithChowPage() {
                   type="email"
                   required
                   placeholder="you@example.com"
-                  className="w-full rounded-2xl border border-neutral-300 bg-white px-4 py-3.5 text-sm outline-none transition placeholder:text-neutral-400 focus:border-black"
+                  className="w-full rounded-2xl border border-[#465453] bg-[#202B2D] px-4 py-3.5 text-sm text-[#F3EFE5] outline-none transition placeholder:text-[#89938E] focus:border-[#A8DFC5] focus:ring-1 focus:ring-[#A8DFC5]"
                 />
               </div>
 
               <fieldset>
-                <legend className="mb-3 block text-sm font-medium text-black">
+                <legend className="mb-3 block text-sm font-medium text-[#F3EFE5]">
                   I&apos;d like to work with Chow as a
                 </legend>
 
@@ -185,7 +186,7 @@ export default function WorkWithChowPage() {
                       className="peer sr-only"
                     />
 
-                    <span className="flex rounded-2xl border border-neutral-300 bg-white px-4 py-4 text-sm font-medium transition peer-checked:border-black peer-checked:bg-black peer-checked:text-white">
+                    <span className="flex rounded-2xl border border-[#465453] bg-[#202B2D] px-4 py-4 text-sm font-medium text-[#F3EFE5] transition hover:border-[#A8DFC5] peer-checked:border-[#A8DFC5] peer-checked:bg-[#263A35] peer-checked:text-[#A8DFC5]">
                       Restaurant
                     </span>
                   </label>
@@ -199,7 +200,7 @@ export default function WorkWithChowPage() {
                       className="peer sr-only"
                     />
 
-                    <span className="flex rounded-2xl border border-neutral-300 bg-white px-4 py-4 text-sm font-medium transition peer-checked:border-black peer-checked:bg-black peer-checked:text-white">
+                    <span className="flex rounded-2xl border border-[#465453] bg-[#202B2D] px-4 py-4 text-sm font-medium text-[#F3EFE5] transition hover:border-[#A8DFC5] peer-checked:border-[#A8DFC5] peer-checked:bg-[#263A35] peer-checked:text-[#A8DFC5]">
                       Driver
                     </span>
                   </label>
@@ -209,10 +210,10 @@ export default function WorkWithChowPage() {
               <div>
                 <label
                   htmlFor="message"
-                  className="mb-2 block text-sm font-medium text-black"
+                  className="mb-2 block text-sm font-medium text-[#F3EFE5]"
                 >
                   Message{" "}
-                  <span className="text-neutral-400">(optional)</span>
+                  <span className="text-[#89938E]">(optional)</span>
                 </label>
 
                 <textarea
@@ -220,12 +221,12 @@ export default function WorkWithChowPage() {
                   name="message"
                   rows={5}
                   placeholder="Tell us a little about yourself or your business..."
-                  className="w-full resize-none rounded-2xl border border-neutral-300 bg-white px-4 py-3.5 text-sm outline-none transition placeholder:text-neutral-400 focus:border-black"
+                  className="w-full resize-none rounded-2xl border border-[#465453] bg-[#202B2D] px-4 py-3.5 text-sm text-[#F3EFE5] outline-none transition placeholder:text-[#89938E] focus:border-[#A8DFC5] focus:ring-1 focus:ring-[#A8DFC5]"
                 />
               </div>
 
               {errorMessage && (
-                <p role="alert" className="text-sm text-red-700">
+                <p role="alert" className="text-sm text-[#FF8068]">
                   {errorMessage}
                 </p>
               )}
@@ -233,12 +234,12 @@ export default function WorkWithChowPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full rounded-full bg-black px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-60"
+                className="w-full rounded-full bg-[#A8DFC5] px-6 py-3.5 text-sm font-semibold text-[#14191B] transition hover:bg-[#BCEBD5] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isSubmitting ? "Sending..." : "Send enquiry"}
               </button>
 
-              <p className="text-center text-xs leading-5 text-neutral-500">
+              <p className="text-center text-xs leading-5 text-[#89938E]">
                 By submitting this form, you&apos;re asking Chow to contact you
                 about working with us.
               </p>

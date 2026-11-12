@@ -52,7 +52,7 @@ export default function RegisterForm() {
       <div>
         <label
           htmlFor="name"
-          className="mb-2 block text-sm font-medium text-black"
+          className="mb-2 block text-sm font-medium text-[#F3EFE5]"
         >
           Full name
         </label>
@@ -63,7 +63,7 @@ export default function RegisterForm() {
           value={name}
           onChange={(event) => setName(event.target.value)}
           required
-          className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3.5 text-black outline-none transition placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black"
+          className="w-full rounded-xl border border-[#465453] bg-[#202B2D] px-4 py-3.5 text-[#F3EFE5] outline-none transition placeholder:text-[#89938E] focus:border-[#A8DFC5] focus:ring-1 focus:ring-[#A8DFC5]"
           placeholder="Your name"
         />
       </div>
@@ -71,7 +71,7 @@ export default function RegisterForm() {
       <div>
         <label
           htmlFor="email"
-          className="mb-2 block text-sm font-medium text-black"
+          className="mb-2 block text-sm font-medium text-[#F3EFE5]"
         >
           Email
         </label>
@@ -82,7 +82,7 @@ export default function RegisterForm() {
           value={email}
           onChange={(event) => setEmail(event.target.value)}
           required
-          className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3.5 text-black outline-none transition placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black"
+          className="w-full rounded-xl border border-[#465453] bg-[#202B2D] px-4 py-3.5 text-[#F3EFE5] outline-none transition placeholder:text-[#89938E] focus:border-[#A8DFC5] focus:ring-1 focus:ring-[#A8DFC5]"
           placeholder="you@example.com"
         />
       </div>
@@ -90,7 +90,7 @@ export default function RegisterForm() {
       <div>
         <label
           htmlFor="phone"
-          className="mb-2 block text-sm font-medium text-black"
+          className="mb-2 block text-sm font-medium text-[#F3EFE5]"
         >
           Phone
         </label>
@@ -101,7 +101,7 @@ export default function RegisterForm() {
           value={phone}
           onChange={(event) => setPhone(event.target.value)}
           required
-          className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3.5 text-black outline-none transition placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black"
+          className="w-full rounded-xl border border-[#465453] bg-[#202B2D] px-4 py-3.5 text-[#F3EFE5] outline-none transition placeholder:text-[#89938E] focus:border-[#A8DFC5] focus:ring-1 focus:ring-[#A8DFC5]"
           placeholder="0821234567"
         />
       </div>
@@ -109,7 +109,7 @@ export default function RegisterForm() {
       <div>
         <label
           htmlFor="password"
-          className="mb-2 block text-sm font-medium text-black"
+          className="mb-2 block text-sm font-medium text-[#F3EFE5]"
         >
           Password
         </label>
@@ -121,7 +121,7 @@ export default function RegisterForm() {
           onChange={(event) => setPassword(event.target.value)}
           required
           minLength={8}
-          className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3.5 text-black outline-none transition placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black"
+          className="w-full rounded-xl border border-[#465453] bg-[#202B2D] px-4 py-3.5 text-[#F3EFE5] outline-none transition placeholder:text-[#89938E] focus:border-[#A8DFC5] focus:ring-1 focus:ring-[#A8DFC5]"
           placeholder="At least 8 characters"
         />
       </div>
@@ -129,7 +129,7 @@ export default function RegisterForm() {
       <div>
         <label
           htmlFor="confirmPassword"
-          className="mb-2 block text-sm font-medium text-black"
+          className="mb-2 block text-sm font-medium text-[#F3EFE5]"
         >
           Confirm password
         </label>
@@ -141,27 +141,27 @@ export default function RegisterForm() {
           onChange={(event) => setConfirmPassword(event.target.value)}
           required
           minLength={8}
-          className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3.5 text-black outline-none transition placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black"
+          className="w-full rounded-xl border border-[#465453] bg-[#202B2D] px-4 py-3.5 text-[#F3EFE5] outline-none transition placeholder:text-[#89938E] focus:border-[#A8DFC5] focus:ring-1 focus:ring-[#A8DFC5]"
           placeholder="Repeat your password"
         />
       </div>
 
       {error && (
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3">
-          <p className="text-sm text-neutral-700">{error}</p>
+        <div className="rounded-xl border border-[#465453] bg-[#202B2D] px-4 py-3">
+          <p className="text-sm text-[#FF8068]">{error}</p>
         </div>
       )}
 
       {success && (
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3">
-          <p className="text-sm text-neutral-700">{success}</p>
+        <div className="rounded-xl border border-[#465453] bg-[#202B2D] px-4 py-3">
+          <p className="text-sm text-[#A8DFC5]">{success}</p>
         </div>
       )}
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-full bg-black px-5 py-4 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
+        className="w-full rounded-full bg-[#A8DFC5] px-5 py-4 text-sm font-semibold text-[#14191B] transition hover:bg-[#BCEBD5] disabled:cursor-not-allowed disabled:opacity-50"
       >
         {loading ? "Creating account..." : "Create account"}
       </button>

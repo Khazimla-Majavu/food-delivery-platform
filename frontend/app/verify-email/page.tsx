@@ -38,22 +38,22 @@ function VerifyEmailContent() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-white px-6 text-black">
+    <main className="flex min-h-screen items-center justify-center bg-[#14191B] px-6 text-[#F3EFE5]">
       <section className="w-full max-w-md text-center">
-        <h1 className="text-3xl font-semibold tracking-tight">Chow</h1>
+        <h1 className="font-serif text-4xl font-semibold tracking-tight">Chow</h1>
         <h2 className="mt-8 text-xl font-semibold">
           {status === "success"
             ? "Email verified successfully"
             : "Verify your email"}
         </h2>
-        <p className="mt-4 text-sm leading-6 text-neutral-600">{message}</p>
+        <p className="mt-4 text-sm leading-6 text-[#B8B7AE]">{message}</p>
 
         {status !== "success" && (
           <button
             type="button"
             onClick={handleVerify}
             disabled={!token || status === "loading"}
-            className="mt-8 inline-flex rounded-full bg-black px-6 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-8 inline-flex rounded-full bg-[#A8DFC5] px-6 py-3 text-sm font-semibold text-[#14191B] transition hover:bg-[#BCEBD5] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {status === "loading" ? "Verifying..." : "Confirm email"}
           </button>
@@ -62,7 +62,7 @@ function VerifyEmailContent() {
         <div>
           <Link
             href="/login"
-            className="mt-5 inline-flex rounded-full border border-black px-6 py-3 text-sm font-semibold text-black"
+            className="mt-5 inline-flex rounded-full border border-[#465453] px-6 py-3 text-sm font-semibold text-[#F3EFE5] transition hover:border-[#A8DFC5]"
           >
             Go to login
           </Link>
@@ -74,7 +74,7 @@ function VerifyEmailContent() {
 
 export default function VerifyEmailPage() {
   return (
-    <Suspense fallback={<main className="p-8 text-center">Loading...</main>}>
+    <Suspense fallback={<main className="min-h-screen bg-[#14191B] p-8 text-center text-[#F3EFE5]">Loading...</main>}>
       <VerifyEmailContent />
     </Suspense>
   );

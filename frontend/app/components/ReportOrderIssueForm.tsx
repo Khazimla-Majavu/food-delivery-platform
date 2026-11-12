@@ -93,7 +93,7 @@ export default function ReportOrderIssueForm({
       </div>
 
       {success && (
-        <p role="status" className="mt-4 text-sm text-neutral-700">{success}</p>
+        <p role="status" className="mt-4 text-sm text-[#A8DFC5]">{success}</p>
       )}
       {error && (
         <p role="alert" className="mt-4 text-sm text-red-700">{error}</p>
