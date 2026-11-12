@@ -98,7 +98,11 @@ export default function RestaurantList() {
               Local restaurant
             </span>
             <span className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur transition group-hover:bg-[var(--chow-mint)] group-hover:text-[#17201d]">
-              ↗
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"
+                className="h-4 w-4" stroke="currentColor" strokeWidth="1.8"
+                strokeLinecap="round" strokeLinejoin="round">
+                <path d="M7 17 17 7M7 7h10v10" />
+              </svg>
             </span>
           </div>
 
@@ -116,7 +120,12 @@ export default function RestaurantList() {
                 {restaurant.address}
               </p>
               <span className="shrink-0 text-xs font-semibold text-[var(--chow-mint)] transition group-hover:translate-x-1">
-                Explore →
+                Explore
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"
+                  className="ml-1 inline-block h-3.5 w-3.5" stroke="currentColor"
+                  strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14m-6-6 6 6-6 6" />
+                </svg>
               </span>
             </div>
           </div>

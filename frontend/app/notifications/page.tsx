@@ -58,10 +58,10 @@ export default function NotificationsPage() {
   if (loading) {
     return (
       <main className="mx-auto w-full max-w-4xl px-6 py-10">
-        <h1 className="text-3xl font-bold text-gray-900">
+        <h1 className="text-3xl font-bold text-[#F3EFE5]">
           Notifications
         </h1>
-        <p className="mt-4 text-gray-600">Loading notifications...</p>
+        <p className="mt-4 text-[#B8B7AE]">Loading notifications...</p>
       </main>
     );
   }
@@ -71,30 +71,30 @@ export default function NotificationsPage() {
       <main className="mx-auto w-full max-w-4xl px-6 py-10">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold text-[#F3EFE5]">
             Notifications
           </h1>
-          <p className="mt-2 text-gray-600">
+          <p className="mt-2 text-[#B8B7AE]">
             Updates about your orders.
           </p>
         </div>
 
         <Link
           href="/orders"
-          className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+          className="rounded-lg border border-[#465453] px-4 py-2 text-sm font-medium text-[#B8B7AE] hover:bg-[#263234]"
         >
           My Orders
         </Link>
       </div>
 
       {error && (
-        <div className="mt-6 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
+        <div className="mt-6 rounded-lg border border-[#754B43] bg-[#302322] p-4 text-[#FF9A86]">
           {error}
         </div>
       )}
 
       {!error && notifications.length === 0 && (
-        <div className="mt-8 rounded-lg border border-gray-200 bg-white p-6 text-gray-600">
+        <div className="mt-8 rounded-lg border border-[#303D3E] bg-[#202B2D] p-6 text-[#B8B7AE]">
           You have no notifications.
         </div>
       )}
@@ -106,23 +106,23 @@ export default function NotificationsPage() {
               key={notification.id}
               className={`rounded-lg border p-4 ${
                 notification.read
-                  ? "border-gray-200 bg-white"
-                  : "border-orange-200 bg-orange-50"
+                  ? "border-[#303D3E] bg-[#202B2D]"
+                  : "border-[#465453] bg-[#263234]"
               }`}
             >
               <div className="flex items-start justify-between gap-4">
-                <p className="font-medium text-gray-900">
+                <p className="font-medium text-[#F3EFE5]">
                   {notification.message}
                 </p>
 
                 {!notification.read && (
-                  <span className="rounded-full bg-orange-600 px-2 py-1 text-xs font-bold text-white">
+                  <span className="rounded-full bg-[#A8DFC5] px-2 py-1 text-xs font-bold text-[#17201D]">
                     New
                   </span>
                 )}
               </div>
 
-              <p className="mt-2 text-sm text-gray-500">
+              <p className="mt-2 text-sm text-[#89938E]">
                 {new Date(notification.createdAt).toLocaleString()}
               </p>
             </div>

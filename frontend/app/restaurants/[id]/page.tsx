@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { getRestaurantMenu, MenuItem } from "../../../lib/api";
+import { getRestaurantMenu, getRestaurants, MenuItem } from "../../../lib/api";
 import { useCart } from "../../context/CartContext";
 
 export default function RestaurantPage() {
@@ -13,6 +13,7 @@ export default function RestaurantPage() {
   const { addToCart, items, total } = useCart();
 
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [restaurantName, setRestaurantName] = useState("Restaurant");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -31,6 +32,19 @@ export default function RestaurantPage() {
       try {
         const data = await getRestaurantMenu(restaurantId, token || "");
         setMenuItems(data);
+
+        try {
+          const restaurants = await getRestaurants(token || "");
+          const restaurant = restaurants.find(
+            (item) => item.id === restaurantId
+          );
+
+          if (restaurant) {
+            setRestaurantName(restaurant.name);
+          }
+        } catch {
+          // Keep the fallback restaurant name if details cannot be loaded.
+        }
       } catch {
         setError("Unable to load the restaurant menu. Please try again.");
       } finally {
@@ -57,25 +71,11 @@ export default function RestaurantPage() {
           </Link>
 
           <div className="max-w-3xl">
-            <p className="chow-eyebrow">DISCOVER SOMETHING DELICIOUS</p>
-
-            <h1 className="mt-4 font-serif text-5xl font-medium tracking-tight text-[var(--chow-text)] sm:text-6xl lg:text-7xl">
-              Good food.
-              <br />
-              <span className="text-[var(--chow-mint)]">
-                Good mood.
-              </span>
+            <h1 className="font-serif text-5xl font-medium tracking-tight text-[var(--chow-text)] sm:text-6xl lg:text-7xl">
+              {restaurantName}
             </h1>
 
-            <p className="mt-6 max-w-xl text-base leading-8 text-[var(--chow-text-muted)] sm:text-lg">
-              Explore the menu, find your favourites, and get your next meal
-              started with Chow.
-            </p>
-
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              <span className="rounded-full border border-[var(--chow-border)] bg-[var(--chow-bg-card)] px-4 py-2 text-xs font-medium tracking-wide text-[var(--chow-text-muted)]">
-                RESTAURANT MENU
-              </span>
               <span className="rounded-full border border-[var(--chow-border)] bg-[var(--chow-bg-card)] px-4 py-2 text-xs font-medium tracking-wide text-[var(--chow-text-muted)]">
                 {menuItems.length} {menuItems.length === 1 ? "ITEM" : "ITEMS"}
               </span>

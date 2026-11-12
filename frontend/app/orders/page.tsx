@@ -2,6 +2,7 @@
 
 import { Fragment, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import RoleGuard from "../components/RoleGuard";
 import OrderChatPanel from "../components/OrderChatPanel";
 import ReportOrderIssueForm from "../components/ReportOrderIssueForm";
@@ -11,8 +12,8 @@ const DriverTrackingMap = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="mt-8 rounded-2xl border border-neutral-200 bg-neutral-50 p-6">
-        <p className="text-sm text-neutral-500">Loading live tracking map...</p>
+      <div className="mt-8 rounded-2xl border border-[#303D3E] bg-[#202B2D] p-6">
+        <p className="text-sm text-[#B8B7AE]">Loading live tracking map...</p>
       </div>
     ),
   },
@@ -59,10 +60,10 @@ function getStatusIndex(status: string) {
 function OrderStatusTracker({ status }: { status: string }) {
   if (status === "CANCELLED") {
     return (
-      <div className="mt-8 rounded-2xl border border-neutral-200 bg-neutral-50 p-5">
-        <p className="font-semibold text-black">Order cancelled</p>
+      <div className="mt-8 rounded-2xl border border-[#303D3E] bg-[#202B2D] p-5">
+        <p className="font-semibold text-[#F3EFE5]">Order cancelled</p>
 
-        <p className="mt-1 text-sm text-neutral-500">
+        <p className="mt-1 text-sm text-[#B8B7AE]">
           This order has been cancelled.
         </p>
       </div>
@@ -74,12 +75,12 @@ function OrderStatusTracker({ status }: { status: string }) {
   return (
     <div className="mt-8">
       <div className="mb-5 flex items-center justify-between">
-        <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-neutral-500">
+        <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-[#B8B7AE]">
           Order progress
         </h3>
 
         {status === "DELIVERED" && (
-          <span className="text-sm font-semibold text-black">
+          <span className="text-sm font-semibold text-[#F3EFE5]">
             Complete
           </span>
         )}
@@ -96,8 +97,8 @@ function OrderStatusTracker({ status }: { status: string }) {
                 <div
                   className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold ${
                     completed
-                      ? "bg-black text-white"
-                      : "border border-neutral-300 bg-white text-neutral-400"
+                      ? "bg-[#A8DFC5] text-[#14191B]"
+                      : "border border-[#465453] bg-[#1C2728] text-[#89938E]"
                   }`}
                 >
                   {completed ? "✓" : index + 1}
@@ -107,8 +108,8 @@ function OrderStatusTracker({ status }: { status: string }) {
                   <div
                     className={`mt-1 h-6 w-px ${
                       index < currentIndex
-                        ? "bg-black"
-                        : "bg-neutral-200"
+                        ? "bg-[#A8DFC5]"
+                        : "bg-[#303D3E]"
                     }`}
                   />
                 )}
@@ -118,17 +119,17 @@ function OrderStatusTracker({ status }: { status: string }) {
                 <p
                   className={`font-semibold ${
                     current
-                      ? "text-black"
+                      ? "text-[#F3EFE5]"
                       : completed
-                        ? "text-neutral-700"
-                        : "text-neutral-400"
+                        ? "text-[#D4D2C9]"
+                        : "text-[#89938E]"
                   }`}
                 >
                   {step.label}
                 </p>
 
                 {current && status !== "DELIVERED" && (
-                  <p className="mt-1 text-sm text-neutral-500">
+                  <p className="mt-1 text-sm text-[#B8B7AE]">
                     Current status
                   </p>
                 )}
@@ -252,33 +253,33 @@ export default function OrdersPage() {
 
   return (
     <RoleGuard allowedRoles={["CUSTOMER"]}>
-      <main className="min-h-screen bg-white text-black">
-      <section className="border-b border-neutral-200">
+      <main className="min-h-screen bg-[#14191B] text-[#F3EFE5]">
+      <section className="border-b border-[#303D3E]">
         <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
-          <a
+          <Link
             href="/"
-            className="mb-8 inline-flex items-center text-sm font-medium text-neutral-500 transition hover:text-black"
+            className="mb-8 inline-flex items-center text-sm font-medium text-[#B8B7AE] transition hover:text-[#A8DFC5]"
           >
             ← Continue shopping
-          </a>
+          </Link>
 
           <div className="max-w-3xl">
-            <p className="text-sm font-medium uppercase tracking-[0.2em] text-neutral-500">
+            <p className="text-sm font-medium uppercase tracking-[0.2em] text-[#B8B7AE]">
               Your account
             </p>
 
-            <h1 className="mt-3 text-5xl font-semibold tracking-[-0.04em] sm:text-6xl">
+            <h1 className="mt-3 font-serif text-5xl font-semibold tracking-[-0.04em] sm:text-6xl">
               My Orders
             </h1>
 
-            <p className="mt-5 max-w-2xl text-lg leading-8 text-neutral-500">
+            <p className="mt-5 max-w-2xl text-lg leading-8 text-[#B8B7AE]">
               Track your current orders and view your previous orders.
             </p>
 
             <div className="mt-6">
               <a
                 href="/issue-reports"
-                className="inline-flex rounded-full border border-neutral-300 px-5 py-3 text-sm font-semibold transition hover:border-black"
+                className="inline-flex rounded-full border border-[#465453] px-5 py-3 text-sm font-semibold transition hover:border-[#A8DFC5]"
               >
                 My issue reports
               </a>
@@ -290,21 +291,21 @@ export default function OrdersPage() {
       <section className="mx-auto max-w-4xl px-6 py-16 lg:px-8 lg:py-20">
         {loading && (
           <div className="py-12">
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-[#B8B7AE]">
               Loading orders...
             </p>
           </div>
         )}
 
         {error && (
-          <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-6">
-            <p className="text-sm text-neutral-700">{error}</p>
+          <div className="rounded-2xl border border-[#303D3E] bg-[#202B2D] p-6">
+            <p className="text-sm text-[#D4D2C9]">{error}</p>
           </div>
         )}
 
         {!loading && !error && orders.length === 0 && (
-          <div className="rounded-3xl border border-neutral-200 bg-neutral-50 p-10 text-center sm:p-14">
-            <p className="text-sm font-medium uppercase tracking-[0.15em] text-neutral-500">
+          <div className="rounded-3xl border border-[#303D3E] bg-[#202B2D] p-10 text-center sm:p-14">
+            <p className="text-sm font-medium uppercase tracking-[0.15em] text-[#B8B7AE]">
               Nothing here yet
             </p>
 
@@ -312,16 +313,16 @@ export default function OrdersPage() {
               No orders yet
             </h2>
 
-            <p className="mx-auto mt-3 max-w-md text-neutral-500">
+            <p className="mx-auto mt-3 max-w-md text-[#B8B7AE]">
               Your orders will appear here after you place one.
             </p>
 
-            <a
+            <Link
               href="/"
-              className="mt-7 inline-flex rounded-full bg-black px-7 py-4 text-sm font-semibold text-white transition hover:bg-neutral-800"
+              className="mt-7 inline-flex rounded-full bg-[#A8DFC5] px-7 py-4 text-sm font-semibold text-[#14191B] transition hover:bg-[#BDEBD4]"
             >
               Browse restaurants
-            </a>
+            </Link>
           </div>
         )}
 
@@ -338,7 +339,7 @@ export default function OrdersPage() {
                         ? "Order History"
                         : "Ongoing Orders"}
                     </h2>
-                    <p className="mt-2 text-sm text-neutral-500">
+                    <p className="mt-2 text-sm text-[#B8B7AE]">
                       {isOrderHistory(order)
                         ? "Delivered and cancelled orders."
                         : "Orders that are still being processed or delivered."}
@@ -347,12 +348,12 @@ export default function OrdersPage() {
                 )}
               <article
                 key={order.id}
-                className="overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm"
+                className="overflow-hidden rounded-3xl border border-[#303D3E] bg-[#1C2728] shadow-sm"
               >
-                <div className="border-b border-neutral-200 p-6 sm:p-8">
+                <div className="border-b border-[#303D3E] p-6 sm:p-8">
                   <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                      <p className="text-sm font-medium uppercase tracking-[0.15em] text-neutral-500">
+                      <p className="text-sm font-medium uppercase tracking-[0.15em] text-[#B8B7AE]">
                         Order #{order.id}
                       </p>
 
@@ -360,12 +361,12 @@ export default function OrdersPage() {
                         {order.restaurantName}
                       </h2>
 
-                      <p className="mt-2 text-sm text-neutral-500">
+                      <p className="mt-2 text-sm text-[#B8B7AE]">
                         {order.restaurantAddress}
                       </p>
 
                       {deliveryDistances[order.id] !== undefined && (
-                        <p className="mt-2 text-sm font-medium text-neutral-700">
+                        <p className="mt-2 text-sm font-medium text-[#D4D2C9]">
                           {deliveryDistances[order.id].toFixed(2)} km delivery
                         </p>
                       )}
@@ -374,10 +375,10 @@ export default function OrdersPage() {
                     <span
                       className={`inline-flex w-fit rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] ${
                         order.status === "CANCELLED"
-                          ? "bg-neutral-100 text-neutral-600"
+                          ? "bg-[#263234] text-[#B8B7AE]"
                           : order.status === "DELIVERED"
-                            ? "bg-black text-white"
-                            : "border border-neutral-300 bg-white text-black"
+                            ? "bg-[#A8DFC5] text-[#14191B]"
+                            : "border border-[#465453] bg-[#14191B] text-[#F3EFE5]"
                       }`}
                     >
                       {order.status.replaceAll("_", " ")}
@@ -390,14 +391,14 @@ export default function OrdersPage() {
 
                   {order.status === "OUT_FOR_DELIVERY" && (
                     <>
-                      <div className="mt-8 rounded-3xl border border-neutral-200 bg-neutral-50 p-6 sm:p-8">
-                        <p className="text-sm font-semibold uppercase tracking-[0.15em] text-neutral-500">
+                      <div className="mt-8 rounded-3xl border border-[#303D3E] bg-[#202B2D] p-6 sm:p-8">
+                        <p className="text-sm font-semibold uppercase tracking-[0.15em] text-[#B8B7AE]">
                           Delivery confirmation PIN
                         </p>
-                        <p className="mt-3 text-3xl font-semibold tracking-[0.3em] text-black">
+                        <p className="mt-3 text-3xl font-semibold tracking-[0.3em] text-[#F3EFE5]">
                           {deliveryPins[order.id] ?? "------"}
                         </p>
-                        <p className="mt-3 text-sm text-neutral-600">
+                        <p className="mt-3 text-sm text-[#B8B7AE]">
                           Give this six-digit PIN to your driver when your order arrives. The driver needs it to complete the delivery.
                         </p>
                       </div>
@@ -418,13 +419,13 @@ export default function OrdersPage() {
                     </div>
                   )}
 
-                  <div className="mt-10 border-t border-neutral-200 pt-8">
+                  <div className="mt-10 border-t border-[#303D3E] pt-8">
                     <div className="mb-5 flex items-center justify-between">
-                      <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-neutral-500">
+                      <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-[#B8B7AE]">
                         Items
                       </h3>
 
-                      <span className="text-sm text-neutral-500">
+                      <span className="text-sm text-[#B8B7AE]">
                         {order.items.length}{" "}
                         {order.items.length === 1 ? "item" : "items"}
                       </span>
@@ -437,17 +438,17 @@ export default function OrdersPage() {
                           className="flex items-center justify-between gap-6"
                         >
                           <div>
-                            <p className="font-semibold text-black">
+                            <p className="font-semibold text-[#F3EFE5]">
                               {item.menuItemName}
                             </p>
 
-                            <p className="mt-1 text-sm text-neutral-500">
+                            <p className="mt-1 text-sm text-[#B8B7AE]">
                               {item.quantity} × R
                               {Number(item.price).toFixed(2)}
                             </p>
                           </div>
 
-                          <p className="shrink-0 font-semibold text-black">
+                          <p className="shrink-0 font-semibold text-[#F3EFE5]">
                             R{Number(item.subtotal).toFixed(2)}
                           </p>
                         </div>
@@ -455,9 +456,9 @@ export default function OrdersPage() {
                     </div>
                   </div>
 
-                  <div className="mt-8 flex items-end justify-between border-t border-neutral-200 pt-6">
+                  <div className="mt-8 flex items-end justify-between border-t border-[#303D3E] pt-6">
                     <div>
-                      <p className="text-sm text-neutral-500">
+                      <p className="text-sm text-[#B8B7AE]">
                         Total
                       </p>
 
@@ -466,7 +467,7 @@ export default function OrdersPage() {
                       </p>
                     </div>
 
-                    <p className="text-right text-xs text-neutral-400">
+                    <p className="text-right text-xs text-[#89938E]">
                       Placed
                       <br />
                       {new Date(order.createdAt).toLocaleString()}

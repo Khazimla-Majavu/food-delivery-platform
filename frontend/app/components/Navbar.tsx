@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   getNotifications,
   NotificationResponse,
@@ -10,6 +11,20 @@ import {
 import { getToken, getUser, logout } from "../../lib/auth";
 
 export default function Navbar() {
+  const pathname = usePathname();
+
+  function isActive(href: string) {
+    return href === "/"
+      ? pathname === "/"
+      : pathname === href || pathname.startsWith(`${href}/`);
+  }
+
+  function navLinkClass(href: string) {
+    return isActive(href)
+      ? "rounded-full bg-[#a8dfc5] px-4 py-2 text-sm font-semibold text-[#17201d] transition"
+      : "rounded-full px-4 py-2 text-sm text-[#c2c5bd] transition hover:bg-[#263234] hover:text-[#a8dfc5]";
+  }
+
   const [user, setUser] = useState<UserResponse | null>(null);
   const [notifications, setNotifications] = useState<NotificationResponse[]>(
     [],
@@ -93,25 +108,25 @@ export default function Navbar() {
                 <>
                   <Link
                     href="/"
-                    className="text-sm text-[#c2c5bd] transition hover:text-[#a8dfc5]"
+                    className={navLinkClass("/")}
                   >
                     Find food
                   </Link>
                   <Link
                     href="/#restaurants"
-                    className="text-sm text-[#c2c5bd] transition hover:text-[#a8dfc5]"
+                    className={navLinkClass("/#restaurants")}
                   >
                     Restaurants
                   </Link>
                   <Link
                     href="/orders"
-                    className="text-sm text-[#c2c5bd] transition hover:text-[#a8dfc5]"
+                    className={navLinkClass("/orders")}
                   >
                     Orders
                   </Link>
                   <Link
                     href="/notifications"
-                    className="relative text-sm text-[#c2c5bd] transition hover:text-[#a8dfc5]"
+                    className={`relative ${navLinkClass("/notifications")}`}
                   >
                     Notifications
                     {unreadCount > 0 && (
@@ -122,9 +137,9 @@ export default function Navbar() {
                   </Link>
                   <Link
                     href="/cart"
-                    className="rounded-full bg-[#a8dfc5] px-5 py-2.5 text-sm font-semibold text-[#17201d] transition hover:bg-[#bcebd5]"
+                    className={navLinkClass("/cart")}
                   >
-                    Your order
+                    Your Cart
                   </Link>
                 </>
               )}
@@ -132,7 +147,7 @@ export default function Navbar() {
               {dashboardLink && (
                 <Link
                   href={dashboardLink.href}
-                  className="rounded-full bg-[#a8dfc5] px-5 py-2.5 text-sm font-semibold text-[#17201d] transition hover:bg-[#bcebd5]"
+                  className={navLinkClass(dashboardLink.href)}
                 >
                   {dashboardLink.label}
                 </Link>
@@ -154,19 +169,19 @@ export default function Navbar() {
             <>
               <Link
                 href="/work-with-chow"
-                className="text-sm text-[#c2c5bd] transition hover:text-[#a8dfc5]"
+                className={navLinkClass("/work-with-chow")}
               >
                 Work with Chow
               </Link>
               <Link
                 href="/login"
-                className="text-sm text-[#c2c5bd] transition hover:text-[#a8dfc5]"
+                className={navLinkClass("/login")}
               >
                 Log in
               </Link>
               <Link
                 href="/register"
-                className="rounded-full bg-[#a8dfc5] px-5 py-2.5 text-sm font-semibold text-[#17201d] transition hover:bg-[#bcebd5]"
+                className={navLinkClass("/register")}
               >
                 Get started
               </Link>
@@ -203,28 +218,28 @@ export default function Navbar() {
                     <Link
                       href="/"
                       onClick={closeMenu}
-                      className="rounded-lg px-3 py-3 text-sm hover:bg-[#263234]"
+                      className={`rounded-lg px-3 py-3 text-sm ${isActive("/") ? "bg-[#a8dfc5] font-semibold text-[#17201d]" : "hover:bg-[#263234]"}`}
                     >
                       Find food
                     </Link>
                     <Link
                       href="/#restaurants"
                       onClick={closeMenu}
-                      className="rounded-lg px-3 py-3 text-sm hover:bg-[#263234]"
+                      className={`rounded-lg px-3 py-3 text-sm ${isActive("/#restaurants") ? "bg-[#a8dfc5] font-semibold text-[#17201d]" : "hover:bg-[#263234]"}`}
                     >
                       Restaurants
                     </Link>
                     <Link
                       href="/orders"
                       onClick={closeMenu}
-                      className="rounded-lg px-3 py-3 text-sm hover:bg-[#263234]"
+                      className={`rounded-lg px-3 py-3 text-sm ${isActive("/orders") ? "bg-[#a8dfc5] font-semibold text-[#17201d]" : "hover:bg-[#263234]"}`}
                     >
                       Orders
                     </Link>
                     <Link
                       href="/notifications"
                       onClick={closeMenu}
-                      className="flex items-center justify-between rounded-lg px-3 py-3 text-sm hover:bg-[#263234]"
+                      className={`flex items-center justify-between rounded-lg px-3 py-3 text-sm ${isActive("/notifications") ? "bg-[#a8dfc5] font-semibold text-[#17201d]" : "hover:bg-[#263234]"}`}
                     >
                       Notifications
                       {unreadCount > 0 && (
@@ -236,9 +251,9 @@ export default function Navbar() {
                     <Link
                       href="/cart"
                       onClick={closeMenu}
-                      className="mt-2 rounded-full bg-[#a8dfc5] px-5 py-3 text-center text-sm font-semibold text-[#17201d]"
+                      className={`mt-2 rounded-full px-5 py-3 text-center text-sm font-semibold ${isActive("/cart") ? "bg-[#a8dfc5] text-[#17201d]" : "border border-[#465453] text-[#f3efe5] hover:bg-[#263234]"}`}
                     >
-                      Your order
+                      Your Cart
                     </Link>
                   </>
                 )}
@@ -247,7 +262,7 @@ export default function Navbar() {
                   <Link
                     href={dashboardLink.href}
                     onClick={closeMenu}
-                    className="mt-2 rounded-full bg-[#a8dfc5] px-5 py-3 text-center text-sm font-semibold text-[#17201d]"
+                    className={`mt-2 rounded-full px-5 py-3 text-center text-sm font-semibold ${isActive(dashboardLink.href) ? "bg-[#a8dfc5] text-[#17201d]" : "border border-[#465453] text-[#f3efe5] hover:bg-[#263234]"}`}
                   >
                     {dashboardLink.label}
                   </Link>
@@ -266,21 +281,21 @@ export default function Navbar() {
                 <Link
                   href="/work-with-chow"
                   onClick={closeMenu}
-                  className="rounded-lg px-3 py-3 text-sm hover:bg-[#263234]"
+                  className={`rounded-lg px-3 py-3 text-sm ${isActive("/work-with-chow") ? "bg-[#a8dfc5] font-semibold text-[#17201d]" : "hover:bg-[#263234]"}`}
                 >
                   Work with Chow
                 </Link>
                 <Link
                   href="/login"
                   onClick={closeMenu}
-                  className="rounded-lg px-3 py-3 text-sm hover:bg-[#263234]"
+                  className={`rounded-lg px-3 py-3 text-sm ${isActive("/login") ? "bg-[#a8dfc5] font-semibold text-[#17201d]" : "hover:bg-[#263234]"}`}
                 >
                   Log in
                 </Link>
                 <Link
                   href="/register"
                   onClick={closeMenu}
-                  className="mt-2 rounded-full bg-[#a8dfc5] px-5 py-3 text-center text-sm font-semibold text-[#17201d]"
+                  className={`mt-2 rounded-full px-5 py-3 text-center text-sm font-semibold ${isActive("/register") ? "bg-[#a8dfc5] text-[#17201d]" : "border border-[#465453] text-[#f3efe5] hover:bg-[#263234]"}`}
                 >
                   Get started
                 </Link>
